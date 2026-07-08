@@ -760,38 +760,47 @@ async function saveQueueToStorage() { try { for (const item of state.syncQueue) 
 async function loadQueueFromStorage() { try { const queue = await IDB.getAll('syncQueue'); state.syncQueue = queue || []; } catch (e) { console.warn('Gagal load queue:', e); state.syncQueue = []; } }
 
 function getFilteredData() {
-const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
-const cached = MemoCache.get(cacheKey);
-if (cached) return cached;
-let data = [...state.savedData];
-if (state.searchTerm) {
-const term = state.searchTerm.toLowerCase();
-data = data.filter(item =>
-(item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-(item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-(item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-(item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-(item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-(item["Koordinat"] || '').toLowerCase().includes(term) ||
-(item["Keterangan Kondisi"] || '').toLowerCase().includes(term) ||
-(item["Kondisi Daun Pintu"] || '').toLowerCase().includes(term) ||
-(item["Kondisi Drat Stang"] || '').toLowerCase().includes(term) ||
-(item["Kondisi Rangka"] || '').toLowerCase().includes(term)
-);
-}
-if (state.filters.jenis) data = data.filter(item => item["Jenis Pintu"] === state.filters.jenis);
-if (state.filters.kondisi) {
-data = data.filter(item => {
-const kondisi = [item["Kondisi Daun Pintu"], item["Kondisi Drat Stang"], item["Kondisi Rangka"]].join(' ').toLowerCase();
-return kondisi.includes(state.filters.kondisi);
-});
-}
-if (state.filters.tanggal) {
-const filterDate = new Date(state.filters.tanggal).toDateString();
-data = data.filter(item => new Date(item["Timestamp"]).toDateString() === filterDate);
-}
-MemoCache.set(cacheKey, data);
-return data;
+  const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
+  const cached = MemoCache.get(cacheKey);
+  if (cached) return cached;
+  
+  let data = [...state.savedData];
+  
+  if (state.searchTerm) {
+    const term = state.searchTerm.toLowerCase();
+    data = data.filter(item => {
+      // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
+      return String(item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
+             String(item["Nama Saluran"] || '').toLowerCase().includes(term) ||
+             String(item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
+             String(item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
+             String(item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
+             String(item["Koordinat"] || '').toLowerCase().includes(term) ||
+             String(item["Keterangan Kondisi"] || '').toLowerCase().includes(term) ||
+             String(item["Kondisi Daun Pintu"] || '').toLowerCase().includes(term) ||
+             String(item["Kondisi Drat Stang"] || '').toLowerCase().includes(term) ||
+             String(item["Kondisi Rangka"] || '').toLowerCase().includes(term);
+    });
+  }
+  
+  if (state.filters.jenis) data = data.filter(item => item["Jenis Pintu"] === state.filters.jenis);
+  if (state.filters.kondisi) {
+    data = data.filter(item => {
+      const kondisi = [
+        String(item["Kondisi Daun Pintu"] || ''),
+        String(item["Kondisi Drat Stang"] || ''),
+        String(item["Kondisi Rangka"] || '')
+      ].join(' ').toLowerCase();
+      return kondisi.includes(state.filters.kondisi);
+    });
+  }
+  if (state.filters.tanggal) {
+    const filterDate = new Date(state.filters.tanggal).toDateString();
+    data = data.filter(item => new Date(item["Timestamp"]).toDateString() === filterDate);
+  }
+  
+  MemoCache.set(cacheKey, data);
+  return data;
 }
 
 function getPaginatedData(data) { const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE; return data.slice(start, start + CONFIG.ITEMS_PER_PAGE); }
@@ -1352,17 +1361,28 @@ function refreshMap() { if (homeMapInstance) setTimeout(() => homeMapInstance.in
 window.addEventListener('resize', () => refreshMap());
 
 function searchLocations(query) {
-const coordinates = getCoordinatesForMap();
-const searchTerm = query.toLowerCase();
-const listContainer = document.getElementById('location-list');
-if (!listContainer) return;
-const filtered = coordinates.filter(coord => {
-const data = coord.data || {};
-return (data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) || (data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) || (data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) || (data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
-});
-if (filtered.length === 0) { listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`; return; }
-listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${coordinates.indexOf(coord)})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div></div></div>`).join('');
-if (window.lucide) lucide.createIcons({ nodes: [listContainer] });
+  const coordinates = getCoordinatesForMap();
+  const searchTerm = query.toLowerCase();
+  const listContainer = document.getElementById('location-list');
+  if (!listContainer) return;
+  
+  const filtered = coordinates.filter(coord => {
+    const data = coord.data || {};
+    // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
+    return String(data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) ||
+           String(data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) ||
+           String(data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) ||
+           String(data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
+  });
+  
+  if (filtered.length === 0) {
+    listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`;
+    return;
+  }
+  
+  listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${coordinates.indexOf(coord)})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div></div></div>`).join('');
+  
+  if (window.lucide) lucide.createIcons({ nodes: [listContainer] });
 }
 
 function focusLocation(lat, lng, index) {
@@ -1426,15 +1446,16 @@ const pintuRadial = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Radi
 const allPhotos = [];
 state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
 const filteredPhotos = allPhotos.filter(photo => {
-if (!state.homeSearchTerm) return true;
-const term = state.homeSearchTerm.toLowerCase();
-return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
-(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
+  if (!state.homeSearchTerm) return true;
+  const term = state.homeSearchTerm.toLowerCase();
+  // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
+  return String(photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
 });
 const coordinates = getCoordinatesForMap();
 return `
@@ -1515,15 +1536,16 @@ if (!gallerySection) return;
 const allPhotos = [];
 state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
 const filteredPhotos = allPhotos.filter(photo => {
-if (!state.homeSearchTerm) return true;
-const term = state.homeSearchTerm.toLowerCase();
-return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
-(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
+  if (!state.homeSearchTerm) return true;
+  const term = state.homeSearchTerm.toLowerCase();
+  // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
+  return String(photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
+         String(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
 });
 const galleryGrid = gallerySection.querySelector('.grid.grid-cols-2') || gallerySection.querySelector('.bg-white');
 if (!galleryGrid) return;

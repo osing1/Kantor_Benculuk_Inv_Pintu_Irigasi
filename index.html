@@ -58,7 +58,6 @@ body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .offline-banner.show { display: block; }
 .watermark-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(59, 130, 246, 0.1); color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2); }
 .dark .watermark-badge { background: rgba(96, 165, 250, 0.15); color: #93c5fd; border-color: rgba(96, 165, 250, 0.3); }
-/* Map Styles */
 .map-wrapper { position: relative; width: 100%; height: 400px; background: #e5e7eb; border-radius: 0 0 1rem 1rem; overflow: hidden; }
 #home-map, .leaflet-container { height: 100% !important; width: 100% !important; z-index: 1 !important; font-family: system-ui, -apple-system, sans-serif !important; background: #e5e7eb; }
 .leaflet-pane { z-index: 1 !important; }
@@ -92,192 +91,123 @@ body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .custom-marker-pin:hover { transform: rotate(-45deg) scale(1.15); }
 .custom-marker-pin span { transform: rotate(45deg); color: white; font-weight: bold; font-size: 11px; }
 
-/* ===== PERBAIKAN BANNER FOTO SEMI-TRANSPARAN ===== */
-/* ===== PERBAIKAN BANNER FOTO - GLASSMORPHISM ===== */
-.photo-badge {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* ===== BADGE GLASSMORPHISM ===== */
+.photo-badge-glass {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  color: #1e293b !important;
   transition: all 0.3s ease;
 }
-
-.photo-badge:hover {
-  background: rgba(255, 255, 255, 0.95) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.photo-badge-glass:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+}
+.dark .photo-badge-glass {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #f1f5f9 !important;
+}
+.dark .photo-badge-glass:hover {
+  background: rgba(30, 41, 59, 0.8) !important;
 }
 
-/* Untuk mobile - lebih transparan */
-@media (max-width: 640px) {
-  .photo-badge {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(10px) saturate(180%);
-    font-size: 9px !important;
-    padding: 4px 8px !important;
-  }
-}
-
-/* ===== PERBAIKAN GALLERY OVERLAY ===== */
-.gallery-overlay {
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.6) 40%,
-    rgba(0, 0, 0, 0.3) 70%,
-    rgba(0, 0, 0, 0.1) 100%
-  ) !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-/* Teks di overlay tetap terbaca */
-.gallery-overlay p {
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* ===== CARD FOTO DENGAN GLASS EFFECT ===== */
-.gallery-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Dark mode adjustments */
-.dark .gallery-card {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* ===== BADGE DENGAN GRADIENT GLASS ===== */
-.photo-badge-gradient {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.7) 100%
-  ) !important;
-  backdrop-filter: blur(16px) saturate(200%);
-  -webkit-backdrop-filter: blur(16px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-/* ===== ALTERNATIF: BADGE DENGAN WARNA SEDERNA ===== */
-.photo-badge-simple {
+/* ===== GLASS CARD ===== */
+.glass-card {
   background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* ===== BADGE DENGAN ICON ===== */
-.photo-badge-with-icon {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+/* ===== FILTER SECTION ===== */
+.filter-glass {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.dark .filter-glass {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* ===== PERBAIKAN TOMBOL SUBMIT - PREVENT DOUBLE CLICK ===== */
-.btn-submitting {
-  pointer-events: none !important;
-  opacity: 0.7 !important;
-  cursor: not-allowed !important;
-}
-
-/* ===== PERBAIKAN DETAIL DATA MOBILE ===== */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 640px) {
-  .container { padding-left: 12px; padding-right: 12px; }
-  .header-sharp { border-radius: 0; }
-  .card-mobile { border-radius: 12px; }
-  .leaflet-popup-content { min-width: 230px !important; }
-  .map-wrapper { height: 350px; }
-  
-  #photo-modal .bg-white,
-  #photo-modal .dark\:bg-slate-800 {
-    max-height: 95vh;
+  .photo-badge-glass {
+    font-size: 9px !important;
+    padding: 2px 8px !important;
+    gap: 2px !important;
   }
-  
-  #modal-content {
-    padding: 12px !important;
+  .photo-badge-glass i {
+    width: 12px !important;
+    height: 12px !important;
   }
-  
-  #modal-content .grid.grid-cols-1.md\:grid-cols-2 {
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
+  .glass-card {
+    backdrop-filter: blur(4px) !important;
   }
-  
-  #modal-content .grid.grid-cols-2 {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
+  .filter-glass {
+    backdrop-filter: blur(4px) !important;
   }
-  
-  #modal-content .lazy-image,
-  #modal-content img[data-src] {
-    height: 180px !important;
-  }
-  
-  #modal-content .rounded-2xl {
-    border-radius: 12px !important;
-  }
-  
-  #modal-content .bg-slate-50,
-  #modal-content .dark\:bg-slate-700\/50 {
-    padding: 12px !important;
-  }
-  
-  #modal-content .rounded-xl.p-4 {
-    padding: 10px !important;
-  }
-  
-  #modal-content h4 {
-    font-size: 13px !important;
-    margin-bottom: 8px !important;
-  }
-  
-  #modal-content .text-xs {
-    font-size: 10px !important;
-  }
-  
-  #modal-content .text-sm {
-    font-size: 12px !important;
-  }
-  
-  #modal-content iframe {
-    height: 180px !important;
-  }
-  
-  #modal-content .flex.flex-wrap.gap-3 {
-    gap: 6px !important;
-  }
-  
-  #modal-content .flex.flex-wrap.gap-3 button,
-  #modal-content .flex.flex-wrap.gap-3 a {
-    padding: 10px !important;
-    font-size: 12px !important;
-    flex: 1 1 calc(50% - 6px) !important;
-    min-width: 0 !important;
-  }
-  
-  #photo-modal .sticky.top-0 {
-    padding: 10px 12px !important;
-  }
-  
-  #photo-modal .sticky.top-0 h3 {
-    font-size: 15px !important;
-  }
-  
-  #photo-modal .sticky.top-0 button {
-    padding: 6px !important;
-  }
+  .map-wrapper { height: 300px !important; }
+}
+
+/* ===== MAP LEGEND IMPROVED ===== */
+.map-legend-improved {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+  min-width: 140px !important;
+}
+.dark .map-legend-improved {
+  background: rgba(30, 41, 59, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+.map-legend-improved .legend-title {
+  font-weight: 700;
+  font-size: 11px;
+  color: #1e293b;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dark .map-legend-improved .legend-title {
+  color: #e2e8f0;
+}
+.map-legend-improved .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+.map-legend-improved .legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+.map-legend-improved .legend-label {
+  font-size: 11px;
+  color: #334155;
+}
+.dark .map-legend-improved .legend-label {
+  color: #cbd5e1;
 }
 
 body, .bg-white, .bg-slate-50, .bg-slate-100, .text-slate-800 { transition: background-color 0.3s ease, color 0.3s ease; }
@@ -387,34 +317,13 @@ Keyboard Shortcuts
 </button>
 </div>
 <div class="space-y-3">
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="file-plus" class="w-4 h-4"></i>Input data baru</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">N</span></div>
-</div>
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="save" class="w-4 h-4"></i>Simpan data</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">S</span></div>
-</div>
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i>Fokus pencarian</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">F</span></div>
-</div>
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="moon" class="w-4 h-4"></i>Toggle dark mode</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">D</span></div>
-</div>
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i>Performance monitor</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">P</span></div>
-</div>
-<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4"></i>Lihat shortcuts</span>
-<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">/</span></div>
-</div>
-<div class="flex justify-between items-center py-2">
-<span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="x-circle" class="w-4 h-4"></i>Tutup modal</span>
-<span class="kbd">Esc</span>
-</div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="file-plus" class="w-4 h-4"></i>Input data baru</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">N</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="save" class="w-4 h-4"></i>Simpan data</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">S</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i>Fokus pencarian</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">F</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="moon" class="w-4 h-4"></i>Toggle dark mode</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">D</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4"></i>Performance monitor</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">P</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4"></i>Lihat shortcuts</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">/</span></div></div>
+<div class="flex justify-between items-center py-2"><span class="text-slate-700 dark:text-slate-200 flex items-center gap-2"><i data-lucide="x-circle" class="w-4 h-4"></i>Tutup modal</span><span class="kbd">Esc</span></div>
 </div>
 </div>
 </div>
@@ -468,6 +377,9 @@ Keyboard Shortcuts
 </main>
 </div>
 <script>
+// ============================================
+// PERF MONITOR
+// ============================================
 const PerfMonitor = {
 startTime: performance.now(), cache: new Map(),
 mark(label) { this.cache.set(label, performance.now() - this.startTime); },
@@ -485,6 +397,9 @@ if (cacheEl) cacheEl.textContent = `${this.cache.size} items`;
 };
 PerfMonitor.mark('script-start');
 
+// ============================================
+// INDEXED DB WRAPPER
+// ============================================
 const IDB = {
 dbName: 'IrigasiDB', dbVersion: 1, db: null,
 async init() {
@@ -500,13 +415,51 @@ if (!db.objectStoreNames.contains('draft')) db.createObjectStore('draft', { keyP
 };
 });
 },
-async set(storeName, data) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const req = tx.objectStore(storeName).put(data); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); }); },
-async get(storeName, key) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readonly'); const req = tx.objectStore(storeName).get(key); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); },
-async getAll(storeName) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readonly'); const req = tx.objectStore(storeName).getAll(); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); },
-async delete(storeName, key) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const req = tx.objectStore(storeName).delete(key); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); }); },
-async clear(storeName) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const req = tx.objectStore(storeName).clear(); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); }); }
+async set(storeName, data) {
+return new Promise((resolve, reject) => {
+const tx = this.db.transaction(storeName, 'readwrite');
+const req = tx.objectStore(storeName).put(data);
+req.onsuccess = () => resolve();
+req.onerror = () => reject(req.error);
+});
+},
+async get(storeName, key) {
+return new Promise((resolve, reject) => {
+const tx = this.db.transaction(storeName, 'readonly');
+const req = tx.objectStore(storeName).get(key);
+req.onsuccess = () => resolve(req.result);
+req.onerror = () => reject(req.error);
+});
+},
+async getAll(storeName) {
+return new Promise((resolve, reject) => {
+const tx = this.db.transaction(storeName, 'readonly');
+const req = tx.objectStore(storeName).getAll();
+req.onsuccess = () => resolve(req.result);
+req.onerror = () => reject(req.error);
+});
+},
+async delete(storeName, key) {
+return new Promise((resolve, reject) => {
+const tx = this.db.transaction(storeName, 'readwrite');
+const req = tx.objectStore(storeName).delete(key);
+req.onsuccess = () => resolve();
+req.onerror = () => reject(req.error);
+});
+},
+async clear(storeName) {
+return new Promise((resolve, reject) => {
+const tx = this.db.transaction(storeName, 'readwrite');
+const req = tx.objectStore(storeName).clear();
+req.onsuccess = () => resolve();
+req.onerror = () => reject(req.error);
+});
+}
 };
 
+// ============================================
+// MEMO CACHE
+// ============================================
 const MemoCache = {
 cache: new Map(), maxSize: 100,
 get(key) { return this.cache.get(key); },
@@ -515,6 +468,9 @@ clear() { this.cache.clear(); },
 generateKey(...args) { return JSON.stringify(args); }
 };
 
+// ============================================
+// LAZY LOADER
+// ============================================
 const LazyLoader = {
 observer: null,
 init() {
@@ -523,15 +479,25 @@ entries.forEach(entry => {
 if (entry.isIntersecting) {
 const img = entry.target;
 const src = img.dataset.src;
-if (src) { img.src = src; img.onload = () => img.classList.add('loaded'); img.onerror = () => img.classList.add('error'); this.observer.unobserve(img); }
+if (src) {
+img.src = src;
+img.onload = () => img.classList.add('loaded');
+img.onerror = () => img.classList.add('error');
+this.observer.unobserve(img);
+}
 }
 });
 }, { rootMargin: '50px 0px', threshold: 0.01 });
 },
 observe(element) { if (this.observer && element) this.observer.observe(element); },
-observeAll(selector) { document.querySelectorAll(selector).forEach(el => this.observe(el)); }
+observeAll(selector) {
+document.querySelectorAll(selector).forEach(el => this.observe(el));
+}
 };
 
+// ============================================
+// CONFIG
+// ============================================
 const CONFIG = {
 APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwVYG0WhbzKlKgicPTVpyVvlJq0i8Yvvg5gCQz43J0SYteKkRZToN5POE2RvgMzrWM/exec",
 API_KEY: "IRIGASI2024RAHASIA",
@@ -548,6 +514,9 @@ CACHE_EXPIRY: 5 * 60 * 1000,
 DAERAH_IRIGASI_OPTIONS: ['Baru', 'Porolinggo', 'Lainnya']
 };
 
+// ============================================
+// STATE
+// ============================================
 const state = {
 activeTab: 'home',
 isOnline: navigator.onLine,
@@ -584,9 +553,25 @@ renderTimer: null
 };
 PerfMonitor.mark('state-init');
 
-// Flag untuk cegah double submit
 let isSubmitting = false;
+let homeMapInstance = null;
+let markersLayer = null;
+let currentItemData = null;
 
+// ============================================
+// HELPER: Ensure Lucide Icons
+// ============================================
+function renderIcons(container) {
+if (window.lucide) {
+try {
+lucide.createIcons({ nodes: container ? [container] : undefined });
+} catch (e) { /* ignore */ }
+}
+}
+
+// ============================================
+// DARK MODE
+// ============================================
 function initDarkMode() {
 const saved = localStorage.getItem('darkMode');
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -597,10 +582,16 @@ function applyDarkMode() { document.documentElement.classList.toggle('dark', sta
 function toggleDarkMode() { state.darkMode = !state.darkMode; localStorage.setItem('darkMode', state.darkMode); applyDarkMode(); showToast(state.darkMode ? 'Mode gelap aktif' : 'Mode terang aktif', 'info', 2000); }
 function updateDarkModeIcons() {
 const iconName = state.darkMode ? 'sun' : 'moon';
-['dark-mode-icon', 'mobile-dark-mode-icon'].forEach(id => { const icon = document.getElementById(id); if (icon) icon.setAttribute('data-lucide', iconName); });
-if (window.lucide) lucide.createIcons();
+['dark-mode-icon', 'mobile-dark-mode-icon'].forEach(id => {
+const icon = document.getElementById(id);
+if (icon) icon.setAttribute('data-lucide', iconName);
+});
+renderIcons();
 }
 
+// ============================================
+// TOAST
+// ============================================
 function showToast(message, type = 'info', duration = 4000) {
 const container = document.getElementById('toast-container');
 const toast = document.createElement('div');
@@ -611,10 +602,19 @@ toast.innerHTML = `<div class="flex items-center space-x-3"><i data-lucide="${ic
 const closeBtn = toast.querySelector('button');
 closeBtn.onclick = () => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); };
 container.appendChild(toast);
-if (window.lucide) lucide.createIcons({ nodes: [toast] });
-setTimeout(() => { if (toast.parentNode) { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); } }, duration);
+renderIcons(toast);
+setTimeout(() => {
+if (toast.parentNode) {
+toast.style.opacity = '0';
+toast.style.transform = 'translateX(100%)';
+setTimeout(() => toast.remove(), 300);
+}
+}, duration);
 }
 
+// ============================================
+// VALIDATION
+// ============================================
 function validateForm() {
 const errors = [];
 if (!state.formData.namaDaerahIrigasi) errors.push('Nama Daerah Irigasi wajib dipilih');
@@ -629,6 +629,9 @@ if (totalSize > CONFIG.MAX_FILE_SIZE * 10) errors.push('Total ukuran foto baru t
 return errors;
 }
 
+// ============================================
+// WATERMARK
+// ============================================
 function addWatermarkToImage(base64, koordinat, timestamp) {
 return new Promise((resolve, reject) => {
 const img = new Image();
@@ -671,6 +674,9 @@ img.src = base64;
 });
 }
 
+// ============================================
+// COMPRESS IMAGE
+// ============================================
 function compressImage(file, maxWidth = CONFIG.MAX_WIDTH, quality = CONFIG.COMPRESSION_QUALITY) {
 return new Promise((resolve, reject) => {
 const reader = new FileReader();
@@ -695,6 +701,9 @@ reader.readAsDataURL(file);
 });
 }
 
+// ============================================
+// HELPERS
+// ============================================
 function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 function formatDate(dateStr) { try { return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return '-'; } }
 function formatDateTime(dateStr) { try { return new Date(dateStr).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return '-'; } }
@@ -708,11 +717,23 @@ if (kondisi.includes('rusak')) return 'text-rose-600 bg-rose-50 dark:text-rose-4
 return 'text-slate-600 bg-slate-50';
 }
 
-function hasFormData() { return Object.values(state.formData).some(v => v !== '' && v !== 'Pintu Plat' && v !== 'Baru' && !(Array.isArray(v) && v.length === 0)); }
+function hasFormData() {
+return Object.values(state.formData).some(v => v !== '' && v !== 'Pintu Plat' && v !== 'Baru' && !(Array.isArray(v) && v.length === 0));
+}
+
+// ============================================
+// DRAFT
+// ============================================
 async function saveDraft() {
 if (state.activeTab === 'input' && hasFormData() && !state.isEditing) {
 try {
-const draft = { id: 'current', ...state.formData, photos: state.formData.photos.map(p => ({ name: p.name, base64: p.base64.substring(0, 100) + '...', compressedSize: p.compressedSize })), _timestamp: Date.now(), _hasPhotos: state.formData.photos.length > 0 };
+const draft = {
+id: 'current',
+...state.formData,
+photos: state.formData.photos.map(p => ({ name: p.name, base64: p.base64.substring(0, 100) + '...', compressedSize: p.compressedSize })),
+_timestamp: Date.now(),
+_hasPhotos: state.formData.photos.length > 0
+};
 await IDB.set('draft', draft);
 showDraftIndicator('Draft tersimpan otomatis');
 } catch (e) { console.warn('Gagal simpan draft:', e); }
@@ -721,10 +742,10 @@ showDraftIndicator('Draft tersimpan otomatis');
 async function loadDraft() {
 try {
 const draft = await IDB.get('draft', 'current');
-if (draft) {
+if (draft && draft._timestamp) {
 const hoursAgo = (Date.now() - draft._timestamp) / (1000 * 60 * 60);
 if (hoursAgo < CONFIG.DRAFT_EXPIRY_HOURS) {
-const hasPhotos = draft._hasPhotos;
+const hasPhotos = draft._hasPhotos || false;
 delete draft._timestamp; delete draft._hasPhotos; delete draft.id;
 if (confirm(`Ada draft dari ${hoursAgo.toFixed(1)} jam lalu${hasPhotos ? ' (tanpa foto)' : ''}. Muat draft?`)) {
 state.formData = { ...state.formData, ...draft };
@@ -741,7 +762,19 @@ async function clearDraft() { try { await IDB.delete('draft', 'current'); } catc
 function startAutoSave() { if (state.autoSaveTimer) clearInterval(state.autoSaveTimer); state.autoSaveTimer = setInterval(saveDraft, CONFIG.AUTO_SAVE_INTERVAL); }
 function showDraftIndicator(text = 'Draft tersimpan') { const indicator = document.getElementById('draft-indicator'); document.getElementById('draft-text').textContent = text; indicator.classList.add('show'); setTimeout(() => indicator.classList.remove('show'), 3000); }
 function hideDraftIndicator() { document.getElementById('draft-indicator').classList.remove('show'); }
-function setupBeforeUnload() { window.addEventListener('beforeunload', (e) => { if (state.activeTab === 'input' && hasFormData() && !state.isEditing) { e.preventDefault(); e.returnValue = 'Anda memiliki data yang belum disimpan. Yakin ingin keluar?'; return e.returnValue; } }); }
+function setupBeforeUnload() {
+window.addEventListener('beforeunload', (e) => {
+if (state.activeTab === 'input' && hasFormData() && !state.isEditing) {
+e.preventDefault();
+e.returnValue = 'Anda memiliki data yang belum disimpan. Yakin ingin keluar?';
+return e.returnValue;
+}
+});
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
 function setupKeyboardShortcuts() {
 document.addEventListener('keydown', (e) => {
 const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
@@ -754,10 +787,14 @@ if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); openShortcu
 if (e.key === 'Escape') { closePhotoModal(); closeImageZoom(); closeShortcutsModal(); if (state.mobileMenuOpen) { state.mobileMenuOpen = false; document.getElementById('mobile-menu').classList.add('hidden'); } }
 });
 }
-function openShortcutsModal() { document.getElementById('shortcuts-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; if (window.lucide) lucide.createIcons({ nodes: [document.getElementById('shortcuts-modal')] }); }
+function openShortcutsModal() { document.getElementById('shortcuts-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; renderIcons(document.getElementById('shortcuts-modal')); }
 function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.add('hidden'); document.body.style.overflow = ''; }
+
 function debouncedSearch(value, callback) { clearTimeout(state.searchTimer); state.searchTimer = setTimeout(() => callback(value), CONFIG.SEARCH_DEBOUNCE); }
 
+// ============================================
+// FETCH WITH RETRY
+// ============================================
 const pendingRequests = new Map();
 async function fetchWithRetry(url, options, retries = CONFIG.MAX_RETRIES) {
 const requestKey = url + JSON.stringify(options);
@@ -783,12 +820,18 @@ pendingRequests.set(requestKey, promise);
 try { return await promise; } finally { pendingRequests.delete(requestKey); }
 }
 
-// ✅ PERBAIKAN: fetchOnlineData dengan parameter forceRefresh
+// ============================================
+// FETCH ONLINE DATA
+// ============================================
 async function fetchOnlineData(forceRefresh = false) {
 if (CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) return;
 const cacheKey = 'onlineData';
 const cached = MemoCache.get(cacheKey);
-if (!forceRefresh && cached && Date.now() - cached.timestamp < CONFIG.CACHE_EXPIRY) { state.savedData = cached.data; return; }
+if (!forceRefresh && cached && Date.now() - cached.timestamp < CONFIG.CACHE_EXPIRY) {
+state.savedData = cached.data || [];
+renderCurrentTab();
+return;
+}
 state.isLoadingData = true;
 renderCurrentTab();
 showToast("🔄 Memuat data dari server...", 'info', 2000);
@@ -801,15 +844,29 @@ MemoCache.set(cacheKey, { data: state.savedData, timestamp: Date.now() });
 showToast(`✅ ${state.savedData.length} data berhasil dimuat`, "success");
 } catch (error) {
 console.error("Gagal mengambil data:", error);
-if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) showToast("Gagal memuat data. Pastikan Apps Script di-deploy dengan akses 'Anyone'.", "error");
-else showToast("Gagal mengambil data dari server.", "error");
-} finally { state.isLoadingData = false; renderCurrentTab(); }
+if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+showToast("Gagal memuat data. Pastikan Apps Script di-deploy dengan akses 'Anyone'.", "error");
+} else {
+showToast("Gagal mengambil data dari server.", "error");
+}
+} finally {
+state.isLoadingData = false;
+renderCurrentTab();
+}
 }
 
+// ============================================
+// SEND DATA
+// ============================================
 async function sendDataToSheet(dataPayload) {
 const jsonBody = JSON.stringify(dataPayload);
 try {
-const response = await fetchWithRetry(CONFIG.APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: jsonBody });
+const response = await fetchWithRetry(CONFIG.APPS_SCRIPT_URL, {
+method: 'POST',
+mode: 'no-cors',
+headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+body: jsonBody
+});
 MemoCache.clear();
 return { status: 'success', message: 'Data dikirim (mode no-cors)' };
 } catch (error) {
@@ -819,6 +876,9 @@ throw new Error(`Gagal mengirim: ${error.message}`);
 }
 }
 
+// ============================================
+// AUTO SYNC
+// ============================================
 async function autoSync() {
 if (state.syncQueue.length === 0 || state.isSyncing) return;
 if (CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) { showToast("URL Apps Script belum diatur!", "error"); return; }
@@ -841,69 +901,97 @@ renderCurrentTab();
 async function saveQueueToStorage() { try { for (const item of state.syncQueue) await IDB.set('syncQueue', item); await IDB.set('cache', { key: 'queueTimestamp', value: new Date().toISOString() }); } catch (e) { showToast("Penyimpanan lokal penuh!", "error"); } }
 async function loadQueueFromStorage() { try { const queue = await IDB.getAll('syncQueue'); state.syncQueue = queue || []; } catch (e) { console.warn('Gagal load queue:', e); state.syncQueue = []; } }
 
+// ============================================
+// FILTERED DATA
+// ============================================
 function getFilteredData() {
-  const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
-  const cached = MemoCache.get(cacheKey);
-  if (cached) return cached;
-  
-  let data = [...state.savedData];
-  
-  if (state.searchTerm) {
-    const term = state.searchTerm.toLowerCase();
-    data = data.filter(item => {
-      // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
-      return String(item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-             String(item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-             String(item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-             String(item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-             String(item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-             String(item["Koordinat"] || '').toLowerCase().includes(term) ||
-             String(item["Keterangan Kondisi"] || '').toLowerCase().includes(term) ||
-             String(item["Kondisi Daun Pintu"] || '').toLowerCase().includes(term) ||
-             String(item["Kondisi Drat Stang"] || '').toLowerCase().includes(term) ||
-             String(item["Kondisi Rangka"] || '').toLowerCase().includes(term);
-    });
-  }
-  
-  if (state.filters.jenis) data = data.filter(item => item["Jenis Pintu"] === state.filters.jenis);
-  if (state.filters.kondisi) {
-    data = data.filter(item => {
-      const kondisi = [
-        String(item["Kondisi Daun Pintu"] || ''),
-        String(item["Kondisi Drat Stang"] || ''),
-        String(item["Kondisi Rangka"] || '')
-      ].join(' ').toLowerCase();
-      return kondisi.includes(state.filters.kondisi);
-    });
-  }
-  if (state.filters.tanggal) {
-    const filterDate = new Date(state.filters.tanggal).toDateString();
-    data = data.filter(item => new Date(item["Timestamp"]).toDateString() === filterDate);
-  }
-  
-  MemoCache.set(cacheKey, data);
-  return data;
+const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
+const cached = MemoCache.get(cacheKey);
+if (cached) return cached;
+
+let data = [...state.savedData];
+
+if (state.searchTerm) {
+const term = state.searchTerm.toLowerCase();
+data = data.filter(item => {
+const safe = (val) => String(val || '').toLowerCase();
+return safe(item["Nama Daerah Irigasi"]).includes(term) ||
+safe(item["Nama Saluran"]).includes(term) ||
+safe(item["Nama Petugas/PPA"]).includes(term) ||
+safe(item["Nomen Klatur"]).includes(term) ||
+safe(item["Jenis Pintu"]).includes(term) ||
+safe(item["Koordinat"]).includes(term) ||
+safe(item["Keterangan Kondisi"]).includes(term) ||
+safe(item["Kondisi Daun Pintu"]).includes(term) ||
+safe(item["Kondisi Drat Stang"]).includes(term) ||
+safe(item["Kondisi Rangka"]).includes(term);
+});
 }
 
-function getPaginatedData(data) { const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE; return data.slice(start, start + CONFIG.ITEMS_PER_PAGE); }
-function changePage(page) { state.currentPage = page; renderCurrentTab(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-// ✅ PERBAIKAN: applyFilters dengan feedback
-function applyFilters() { 
-  state.currentPage = 1; 
-  MemoCache.clear(); 
-  renderCurrentTab(); 
-  const filteredCount = getFilteredData().length;
-  const totalCount = state.savedData.length;
-  if (state.searchTerm || state.filters.jenis || state.filters.kondisi || state.filters.tanggal) {
-    showToast(`✅ Filter diterapkan: ${filteredCount} dari ${totalCount} data`, 'success', 2500);
-  } else {
-    showToast('Tidak ada filter aktif', 'info', 2000);
-  }
+if (state.filters.jenis) {
+data = data.filter(item => String(item["Jenis Pintu"] || '') === state.filters.jenis);
+}
+if (state.filters.kondisi) {
+const kw = state.filters.kondisi.toLowerCase();
+data = data.filter(item => {
+const kondisi = [
+String(item["Kondisi Daun Pintu"] || ''),
+String(item["Kondisi Drat Stang"] || ''),
+String(item["Kondisi Rangka"] || '')
+].join(' ').toLowerCase();
+return kondisi.includes(kw);
+});
+}
+if (state.filters.tanggal) {
+const filterDate = new Date(state.filters.tanggal).toDateString();
+data = data.filter(item => {
+try { return new Date(item["Timestamp"]).toDateString() === filterDate; } catch { return false; }
+});
 }
 
-function resetFilters() { state.filters = { jenis: '', kondisi: '', tanggal: '' }; state.searchTerm = ''; state.currentPage = 1; MemoCache.clear(); renderCurrentTab(); showToast('Filter direset', 'info', 1500); }
+MemoCache.set(cacheKey, data);
+return data;
+}
 
+function getPaginatedData(data) {
+const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
+return data.slice(start, start + CONFIG.ITEMS_PER_PAGE);
+}
+
+function changePage(page) {
+state.currentPage = page;
+renderCurrentTab();
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================
+// FILTERS
+// ============================================
+function applyFilters() {
+state.currentPage = 1;
+MemoCache.clear();
+renderCurrentTab();
+const filteredCount = getFilteredData().length;
+const totalCount = state.savedData.length;
+if (state.searchTerm || state.filters.jenis || state.filters.kondisi || state.filters.tanggal) {
+showToast(`✅ Filter diterapkan: ${filteredCount} dari ${totalCount} data`, 'success', 2500);
+} else {
+showToast('Tidak ada filter aktif', 'info', 2000);
+}
+}
+
+function resetFilters() {
+state.filters = { jenis: '', kondisi: '', tanggal: '' };
+state.searchTerm = '';
+state.currentPage = 1;
+MemoCache.clear();
+renderCurrentTab();
+showToast('Filter direset', 'info', 1500);
+}
+
+// ============================================
+// MODALS (FIXED: no DOM cloning crashes)
+// ============================================
 function showConfirm(title, message, onConfirm, okText = 'Hapus', okColor = 'bg-red-600') {
 const modal = document.getElementById('confirm-modal');
 document.getElementById('confirm-title').textContent = title;
@@ -912,15 +1000,28 @@ const okBtn = document.getElementById('confirm-ok');
 okBtn.textContent = okText;
 okBtn.className = `flex-1 py-3 rounded-xl ${okColor} text-white font-semibold hover:opacity-90 transition-colors`;
 modal.classList.remove('hidden');
-if (window.lucide) lucide.createIcons({ nodes: [modal] });
-const handleOk = () => { modal.classList.add('hidden'); onConfirm(); cleanup(); };
-const handleCancel = () => { modal.classList.add('hidden'); cleanup(); };
-function cleanup() {
-const newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
-const cancelBtn = document.getElementById('confirm-cancel'); const newCancel = cancelBtn.cloneNode(true); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-newOk.addEventListener('click', handleOk); newCancel.addEventListener('click', handleCancel);
+renderIcons(modal);
+
+let isHandled = false;
+function handleOk() {
+if (isHandled) return;
+isHandled = true;
+modal.classList.add('hidden');
+onConfirm();
+cleanup();
 }
-okBtn.addEventListener('click', handleOk); document.getElementById('confirm-cancel').addEventListener('click', handleCancel);
+function handleCancel() {
+if (isHandled) return;
+isHandled = true;
+modal.classList.add('hidden');
+cleanup();
+}
+function cleanup() {
+okBtn.removeEventListener('click', handleOk);
+document.getElementById('confirm-cancel').removeEventListener('click', handleCancel);
+}
+okBtn.addEventListener('click', handleOk);
+document.getElementById('confirm-cancel').addEventListener('click', handleCancel);
 }
 
 function showSubmitModal(totalPhotos, totalSize, onConfirm) {
@@ -937,23 +1038,48 @@ details.innerHTML = `
 <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Ukuran Foto Baru:</span><span class="font-semibold">${totalSize}</span></div>
 `;
 modal.classList.remove('hidden');
-if (window.lucide) lucide.createIcons({ nodes: [modal] });
-const okBtn = document.getElementById('submit-ok'); const cancelBtn = document.getElementById('submit-cancel');
-const handleOk = () => { modal.classList.add('hidden'); onConfirm(); cleanup(); };
-const handleCancel = () => { modal.classList.add('hidden'); cleanup(); };
+renderIcons(modal);
+
+let isHandled = false;
+function handleOk() {
+if (isHandled) return;
+isHandled = true;
+modal.classList.add('hidden');
+onConfirm();
+cleanup();
+}
+function handleCancel() {
+if (isHandled) return;
+isHandled = true;
+modal.classList.add('hidden');
+cleanup();
+}
 function cleanup() {
-const newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
-const newCancel = cancelBtn.cloneNode(true); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-newOk.addEventListener('click', handleOk); newCancel.addEventListener('click', handleCancel);
+okBtn.removeEventListener('click', handleOk);
+cancelBtn.removeEventListener('click', handleCancel);
 }
-okBtn.addEventListener('click', handleOk); cancelBtn.addEventListener('click', handleCancel);
+const okBtn = document.getElementById('submit-ok');
+const cancelBtn = document.getElementById('submit-cancel');
+okBtn.addEventListener('click', handleOk);
+cancelBtn.addEventListener('click', handleCancel);
 }
 
-function handleInputChange(e) { const { name, value } = e.target; if (name === 'namaPetugasPPA') state.formData[name] = value.toUpperCase(); else state.formData[name] = value; }
+function handleInputChange(e) {
+const { name, value } = e.target;
+if (name === 'namaPetugasPPA') state.formData[name] = value.toUpperCase();
+else state.formData[name] = value;
+}
 
+// ============================================
+// GEOLOCATION
+// ============================================
 function getLocation() {
 return new Promise((resolve, reject) => {
-if (!navigator.geolocation) { showToast("Geolokasi tidak didukung browser ini.", "error"); reject(new Error('Geolocation not supported')); return; }
+if (!navigator.geolocation) {
+showToast("Geolokasi tidak didukung browser ini.", "error");
+reject(new Error('Geolocation not supported'));
+return;
+}
 showToast("Mengambil lokasi GPS...", "info");
 navigator.geolocation.getCurrentPosition(
 (position) => {
@@ -966,20 +1092,33 @@ resolve(coord);
 },
 (error) => {
 let message = "Gagal mengambil lokasi.";
-switch(error.code) { case error.PERMISSION_DENIED: message += " Izin ditolak."; break; case error.POSITION_UNAVAILABLE: message += " Lokasi tidak tersedia."; break; case error.TIMEOUT: message += " Timeout."; break; }
-showToast(message, "error"); reject(error);
+switch(error.code) {
+case error.PERMISSION_DENIED: message += " Izin ditolak."; break;
+case error.POSITION_UNAVAILABLE: message += " Lokasi tidak tersedia."; break;
+case error.TIMEOUT: message += " Timeout."; break;
+}
+showToast(message, "error");
+reject(error);
 },
 { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
 );
 });
 }
 
+// ============================================
+// PHOTO HANDLING
+// ============================================
 function triggerCamera() {
 if (state.formData.photos.length >= 10) { showToast("Maksimal 10 foto baru sudah tercapai", "warning"); return; }
 if (!state.formData.koordinat) {
 showToast("Mengambil lokasi GPS terlebih dahulu...", "info");
-getLocation().then(() => { document.getElementById('camera-input').click(); }).catch(() => { if (confirm("Lokasi GPS tidak tersedia. Foto akan diambil TANPA watermark koordinat. Lanjutkan?")) document.getElementById('camera-input').click(); });
-} else { document.getElementById('camera-input').click(); }
+getLocation().then(() => { document.getElementById('camera-input').click(); }).catch(() => {
+if (confirm("Lokasi GPS tidak tersedia. Foto akan diambil TANPA watermark koordinat. Lanjutkan?"))
+document.getElementById('camera-input').click();
+});
+} else {
+document.getElementById('camera-input').click();
+}
 }
 
 function triggerFile() {
@@ -994,27 +1133,37 @@ if (state.formData.photos.length + files.length > 10) { showToast("Maksimal uplo
 showToast(`Mengompres ${files.length} foto...`, 'info');
 try {
 const processedPhotos = [];
+const timestamp = new Date().toISOString();
+const koordinat = state.formData.koordinat || 'Koordinat tidak tersedia';
+
 for (const file of files) {
 if (!file.type.startsWith('image/')) throw new Error(`${file.name} bukan gambar`);
 if (file.size > CONFIG.MAX_FILE_SIZE) throw new Error(`${file.name} terlalu besar (max 5MB)`);
 let photo = await compressImage(file);
+
 if (isFromCamera) {
-showToast("Menambahkan watermark...", "info");
-const timestamp = new Date().toISOString();
-const koordinat = state.formData.koordinat || 'Koordinat tidak tersedia';
 try {
 const watermarked = await addWatermarkToImage(photo.base64, koordinat, timestamp);
-photo.base64 = watermarked; photo.compressedSize = (watermarked.length * 3) / 4; photo.hasWatermark = true;
-} catch (wmErr) { console.warn('Watermark gagal:', wmErr); showToast("Watermark gagal ditambahkan, foto tetap disimpan", "warning"); }
+photo.base64 = watermarked;
+photo.compressedSize = (watermarked.length * 3) / 4;
+photo.hasWatermark = true;
+} catch (wmErr) {
+console.warn('Watermark gagal:', wmErr);
+showToast("Watermark gagal ditambahkan untuk satu foto", "warning");
+}
 }
 processedPhotos.push(photo);
 }
+
 state.formData.photos = [...state.formData.photos, ...processedPhotos];
 renderPhotoPreview();
 const totalSaved = formatBytes(processedPhotos.reduce((acc, p) => acc + p.compressedSize, 0));
 const watermarkInfo = isFromCamera ? ' (dengan watermark)' : '';
 showToast(`${files.length} foto berhasil ditambahkan! (${totalSaved})${watermarkInfo}`, 'success');
-} catch (error) { console.error(error); showToast(error.message || 'Gagal memproses foto.', 'error'); }
+} catch (error) {
+console.error(error);
+showToast(error.message || 'Gagal memproses foto.', 'error');
+}
 e.target.value = '';
 }
 
@@ -1051,7 +1200,7 @@ fragment.appendChild(div);
 });
 container.innerHTML = '';
 container.appendChild(fragment);
-if (window.lucide) lucide.createIcons({ nodes: [container] });
+renderIcons(container);
 }
 
 function resetForm() {
@@ -1070,7 +1219,9 @@ renderPhotoPreview();
 clearDraft();
 }
 
-// ✅ PERBAIKAN: handleSubmit dengan flag isSubmitting
+// ============================================
+// SUBMIT
+// ============================================
 async function handleSubmit(e) {
 e.preventDefault();
 if (isSubmitting) {
@@ -1079,10 +1230,12 @@ return;
 }
 const errors = validateForm();
 if (errors.length > 0) { showToast(errors.join(', '), "error"); return; }
+
 const totalPhotos = state.formData.photos.length;
 const totalSize = formatBytes(state.formData.photos.reduce((acc, p) => acc + p.compressedSize, 0));
 let finalJenisPintu = state.formData.jenisPintu;
 if (finalJenisPintu === 'Lainnya') finalJenisPintu = state.formData.jenisPintuLainnya;
+
 showSubmitModal(totalPhotos, totalSize, async () => {
 isSubmitting = true;
 const basePayload = {
@@ -1100,6 +1253,7 @@ kondisiRangka: state.formData.kondisiRangka,
 keterangan: state.formData.keterangan,
 timestamp: new Date().toISOString()
 };
+
 if (state.isEditing) {
 basePayload.action = 'update';
 basePayload.id = state.editingId;
@@ -1110,6 +1264,7 @@ basePayload.action = 'create';
 basePayload.id = Date.now().toString();
 basePayload.photos = state.formData.photos;
 }
+
 if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
 state.isSyncing = true; renderCurrentTab();
 showToast("Mengirim data ke server...", 'info');
@@ -1122,10 +1277,16 @@ setTimeout(() => fetchOnlineData(true), 1500);
 showToast(`Gagal mengirim: ${error.message}. Data disimpan ke antrean.`, "warning", 6000);
 if (!state.isEditing) { state.syncQueue.push(basePayload); await saveQueueToStorage(); }
 resetForm();
-} finally { state.isSyncing = false; isSubmitting = false; renderCurrentTab(); }
+} finally {
+state.isSyncing = false;
+isSubmitting = false;
+renderCurrentTab();
+}
 } else {
 if (!state.isEditing) { state.syncQueue.push(basePayload); await saveQueueToStorage(); showToast("Mode Offline. Data disimpan ke antrean.", "info"); }
-resetForm(); isSubmitting = false; renderCurrentTab();
+resetForm();
+isSubmitting = false;
+renderCurrentTab();
 }
 });
 }
@@ -1188,16 +1349,10 @@ showToast('Gagal menghapus data.', 'error');
 }
 
 function cancelEdit() {
-  showConfirm(
-    'Batal Edit', 
-    'Perubahan yang belum disimpan akan hilang. Yakin ingin batal?', 
-    () => {
-      resetForm();
-      switchTab('data');
-    },
-    'Ya, Batal',  // ✅ Ganti teks tombol dari 'Hapus' menjadi 'Ya, Batal'
-    'bg-red-600'
-  );
+showConfirm('Batal Edit', 'Perubahan yang belum disimpan akan hilang. Yakin ingin batal?', () => {
+resetForm();
+switchTab('data');
+}, 'Ya, Batal', 'bg-red-600');
 }
 
 function removeExistingPhoto(index) {
@@ -1212,14 +1367,14 @@ container.innerHTML = state.formData.existingPhotoUrls.map((url, idx) => `
 </button>
 </div>
 `).join('');
-if (window.lucide) lucide.createIcons({ nodes: [container] });
+renderIcons(container);
 }
 showToast('Foto akan dihapus saat Update', 'info');
 }
 
-let currentItemData = null;
-
-// ✅ PERBAIKAN: openPhotoModal dengan layout mobile-friendly
+// ============================================
+// PHOTO MODAL
+// ============================================
 function openPhotoModal(item) {
 currentItemData = item;
 const modal = document.getElementById('photo-modal');
@@ -1282,12 +1437,20 @@ ${mapEmbedUrl ? `<div class="bg-white dark:bg-slate-800 rounded-lg md:rounded-xl
 </div>
 `;
 modal.classList.remove('hidden');
-if (window.lucide) lucide.createIcons({ nodes: [content] });
+renderIcons(content);
 document.body.style.overflow = 'hidden';
 LazyLoader.observeAll('.lazy-image');
 }
-function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); document.body.style.overflow = ''; currentItemData = null; }
 
+function closePhotoModal() {
+document.getElementById('photo-modal').classList.add('hidden');
+document.body.style.overflow = '';
+currentItemData = null;
+}
+
+// ============================================
+// EXPORT / PRINT
+// ============================================
 function exportCurrentItemPDF() {
 if (!currentItemData) return;
 if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; }
@@ -1302,15 +1465,32 @@ doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.text("LAPORAN INVENTAR
 doc.setFontSize(10); doc.text("Kantor Benculuk - Dinas PUPR", pageWidth/2, 23, { align: 'center' });
 yPos = 40; doc.setTextColor(30, 64, 175); doc.setFontSize(12); doc.text("INFORMASI UMUM", 14, yPos); yPos += 8;
 doc.setTextColor(0, 0, 0); doc.setFontSize(9);
-const info = [`Daerah Irigasi: ${row["Nama Daerah Irigasi"] || '-'}`, `Nama Petugas/PPA: ${row["Nama Petugas/PPA"] || '-'}`, `Nama Saluran: ${row["Nama Saluran"] || '-'}`, `Nomen Klatur: ${row["Nomen Klatur"] || '-'}`, `Jenis Pintu: ${row["Jenis Pintu"] || '-'}`, `Tanggal: ${formatDateTime(row["Timestamp"])}`, `Koordinat: ${row["Koordinat"] || '-'}`];
+const info = [
+`Daerah Irigasi: ${row["Nama Daerah Irigasi"] || '-'}`,
+`Nama Petugas/PPA: ${row["Nama Petugas/PPA"] || '-'}`,
+`Nama Saluran: ${row["Nama Saluran"] || '-'}`,
+`Nomen Klatur: ${row["Nomen Klatur"] || '-'}`,
+`Jenis Pintu: ${row["Jenis Pintu"] || '-'}`,
+`Tanggal: ${formatDateTime(row["Timestamp"])}`,
+`Koordinat: ${row["Koordinat"] || '-'}`
+];
 info.forEach(line => { doc.text(line, 14, yPos); yPos += 5; });
 yPos += 5; doc.setFontSize(12); doc.setTextColor(30, 64, 175); doc.text("SPESIFIKASI TEKNIS", 14, yPos); yPos += 8;
 doc.setTextColor(0, 0, 0); doc.setFontSize(9);
-const specs = [`H1: ${row["H1"] && row["H1"] !== '-' ? row["H1"] + ' cm' : '-'}`, `H: ${row["H"] && row["H"] !== '-' ? row["H"] + ' cm' : '-'}`, `B: ${row["B"] && row["B"] !== '-' ? row["B"] + ' cm' : '-'}`, `t: ${row["t"] && row["t"] !== '-' ? row["t"] + ' cm' : '-'}`];
+const specs = [
+`H1: ${row["H1"] && row["H1"] !== '-' ? row["H1"] + ' cm' : '-'}`,
+`H: ${row["H"] && row["H"] !== '-' ? row["H"] + ' cm' : '-'}`,
+`B: ${row["B"] && row["B"] !== '-' ? row["B"] + ' cm' : '-'}`,
+`t: ${row["t"] && row["t"] !== '-' ? row["t"] + ' cm' : '-'}`
+];
 specs.forEach(spec => { doc.text(spec, 14, yPos); yPos += 5; });
 yPos += 5; doc.setFontSize(12); doc.setTextColor(30, 64, 175); doc.text("KONDISI KOMPONEN", 14, yPos); yPos += 8;
 doc.setTextColor(0, 0, 0); doc.setFontSize(9);
-const conditions = [`Daun Pintu: ${row["Kondisi Daun Pintu"] || '-'}`, `Drat Stang: ${row["Kondisi Drat Stang"] || '-'}`, `Rangka: ${row["Kondisi Rangka"] || '-'}`];
+const conditions = [
+`Daun Pintu: ${row["Kondisi Daun Pintu"] || '-'}`,
+`Drat Stang: ${row["Kondisi Drat Stang"] || '-'}`,
+`Rangka: ${row["Kondisi Rangka"] || '-'}`
+];
 conditions.forEach(cond => { doc.text(cond, 14, yPos); yPos += 5; });
 yPos += 5; doc.setFontSize(12); doc.setTextColor(30, 64, 175); doc.text("KETERANGAN", 14, yPos); yPos += 8;
 doc.setTextColor(0, 0, 0); doc.setFontSize(9);
@@ -1346,6 +1526,7 @@ printWindow.document.close();
 
 function openImageZoom(src) { document.getElementById('zoomed-image').src = src; document.getElementById('image-zoom-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
 function closeImageZoom() { document.getElementById('image-zoom-modal').classList.add('hidden'); document.body.style.overflow = ''; }
+
 function exportToExcel() {
 if (!window.XLSX) { showToast('Library Excel belum dimuat.', 'warning'); return; }
 if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; }
@@ -1358,16 +1539,25 @@ XLSX.writeFile(wb, fileName);
 showToast(`File Excel berhasil diunduh: ${fileName}`, "success");
 } catch (error) { showToast("Gagal membuat file Excel", "error"); }
 }
-function exportToPDF() { if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; } if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; } showToast("Export PDF semua data belum didukung. Gunakan Export Excel.", "info"); }
 
-let homeMapInstance = null;
-let markersLayer = null;
+function exportToPDF() {
+if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; }
+if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; }
+showToast("Export PDF semua data belum didukung. Gunakan Export Excel.", "info");
+}
+
+// ============================================
+// MAP (IMPROVED LEGEND)
+// ============================================
 function getCoordinatesForMap() {
-return state.savedData.filter(item => item["Koordinat"] && item["Koordinat"] !== '-' && item["Koordinat"].includes(',')).map(item => {
+return state.savedData
+.filter(item => item["Koordinat"] && item["Koordinat"] !== '-' && item["Koordinat"].includes(','))
+.map(item => {
 const parts = item["Koordinat"].split(',').map(c => parseFloat(c.trim()));
 if (isNaN(parts[0]) || isNaN(parts[1])) return null;
 return { lat: parts[0], lng: parts[1], data: item };
-}).filter(c => c !== null);
+})
+.filter(c => c !== null);
 }
 
 function initLeafletMap(containerId, coordinates) {
@@ -1383,7 +1573,13 @@ markersLayer = L.layerGroup().addTo(homeMapInstance);
 const isMobile = window.innerWidth <= 640;
 coordinates.forEach((coord, idx) => {
 const data = coord.data || {};
-const markerIcon = L.divIcon({ className: '', html: '<div class="custom-marker-pin"><span>' + (idx + 1) + '</span></div>', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] });
+const markerIcon = L.divIcon({
+className: '',
+html: '<div class="custom-marker-pin"><span>' + (idx + 1) + '</span></div>',
+iconSize: [30, 30],
+iconAnchor: [15, 30],
+popupAnchor: [0, -30]
+});
 const marker = L.marker([coord.lat, coord.lng], { icon: markerIcon });
 const kondisiDaun = data["Kondisi Daun Pintu"] || '';
 let statusColor = '#94a3b8'; let statusText = 'Belum dicek';
@@ -1395,7 +1591,7 @@ if (isMobile) {
 popupHtml = '<div class="popup-card">' +
 '<div class="popup-header" style="padding:10px 12px !important;">' +
 '<p class="popup-header-title" style="font-size:12px !important;"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p>' +
-'<p class="popup-header-sub" style="font-size:10px !important;">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p>' +
+'<p class="popup-header-sub" style="font-size:10px !important;">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + ' | ' + escapeHtml(data["Nomen Klatur"] || '') + '</p>' +
 '</div>' +
 '<div class="popup-body" style="padding:8px 12px !important;">' +
 '<div class="popup-row" style="padding:5px 0 !important;font-size:10px !important;"><span class="popup-label" style="font-size:9px !important;"><i data-lucide="user" style="width:10px;height:10px;"></i> PPA</span><span class="popup-value" style="font-size:10px !important;">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div>' +
@@ -1408,7 +1604,7 @@ popupHtml = '<div class="popup-card">' +
 '</div>' +
 '</div>';
 } else {
-popupHtml = '<div class="popup-card"><div class="popup-header"><p class="popup-header-title"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p><p class="popup-header-sub">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p></div><div class="popup-body"><div class="popup-row"><span class="popup-label"><i data-lucide="user" style="width:14px;height:14px;"></i> Petugas/PPA</span><span class="popup-value">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="tag" style="width:14px;height:14px;"></i> Nomen Klatur</span><span class="popup-value">' + escapeHtml(data["Nomen Klatur"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="layers" style="width:14px;height:14px;"></i> Jenis Pintu</span><span class="popup-value">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + '">' + statusText + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Tanggal</span><span class="popup-value">' + formatDate(data["Timestamp"] || '') + '</span></div></div><div class="popup-footer"><button class="popup-btn popup-btn-primary" onclick="viewMapDetail(' + idx + ')"><i data-lucide="search" style="width:12px;height:12px;"></i> Detail</button><a class="popup-btn popup-btn-secondary" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank"><i data-lucide="map" style="width:12px;height:12px;"></i> Maps</a></div></div>';
+popupHtml = '<div class="popup-card"><div class="popup-header"><p class="popup-header-title"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p><p class="popup-header-sub">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + ' | ' + escapeHtml(data["Nomen Klatur"] || '') + '</p></div><div class="popup-body"><div class="popup-row"><span class="popup-label"><i data-lucide="user" style="width:14px;height:14px;"></i> Petugas/PPA</span><span class="popup-value">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="tag" style="width:14px;height:14px;"></i> Nomen Klatur</span><span class="popup-value">' + escapeHtml(data["Nomen Klatur"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="layers" style="width:14px;height:14px;"></i> Jenis Pintu</span><span class="popup-value">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + '">' + statusText + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Tanggal</span><span class="popup-value">' + formatDate(data["Timestamp"] || '') + '</span></div></div><div class="popup-footer"><button class="popup-btn popup-btn-primary" onclick="viewMapDetail(' + idx + ')"><i data-lucide="search" style="width:12px;height:12px;"></i> Detail</button><a class="popup-btn popup-btn-secondary" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank"><i data-lucide="map" style="width:12px;height:12px;"></i> Maps</a></div></div>';
 }
 const popupOptions = isMobile ? {
 maxWidth: 240,
@@ -1426,51 +1622,72 @@ autoPanPadding: [40, 40]
 marker.bindPopup(popupHtml, popupOptions);
 markersLayer.addLayer(marker);
 });
-if (coordinates.length > 1) { const bounds = L.latLngBounds(coordinates.map(c => [c.lat, c.lng])); homeMapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 }); }
+if (coordinates.length > 1) {
+const bounds = L.latLngBounds(coordinates.map(c => [c.lat, c.lng]));
+homeMapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+}
 setTimeout(function() { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 200);
 setTimeout(function() { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 800);
+
+// IMPROVED LEGEND
 const legend = L.control({ position: 'bottomright' });
 legend.onAdd = function() {
-const div = L.DomUtil.create('div', 'map-legend');
-div.innerHTML = '<div style="font-weight:700;margin-bottom:6px;color:#1e293b;display:flex;align-items:center;gap:6px;font-size:' + (isMobile ? '10' : '11') + 'px;"><i data-lucide="map" style="width:' + (isMobile ? '12' : '14') + 'px;height:' + (isMobile ? '12' : '14') + 'px;"></i> Legenda</div>' +
-'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#dc2626;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Lokasi (' + coordinates.length + ')</span></div>' +
-'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#10b981;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Baik</span></div>' +
-'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#f59e0b;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Rusak Ringan</span></div>' +
-'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#ef4444;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Rusak</span></div>';
+const div = L.DomUtil.create('div', 'map-legend-improved');
+div.innerHTML = `
+<div class="legend-title"><i data-lucide="map" style="width:14px;height:14px;"></i> Legenda</div>
+<div class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span><span class="legend-label">Lokasi (${coordinates.length})</span></div>
+<div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span><span class="legend-label">Baik</span></div>
+<div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span><span class="legend-label">Rusak Ringan</span></div>
+<div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span><span class="legend-label">Rusak</span></div>
+`;
+setTimeout(() => { renderIcons(div); }, 100);
 return div;
 };
 legend.addTo(homeMapInstance);
-setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 300);
+setTimeout(() => { renderIcons(); }, 300);
 }
 
-function viewMapDetail(index) { const coordinates = getCoordinatesForMap(); if (coordinates[index] && coordinates[index].data) { if (homeMapInstance) homeMapInstance.closePopup(); openPhotoModal(coordinates[index].data); } }
-function openFullMap() { const coordinates = getCoordinatesForMap(); if (coordinates.length === 0) { showToast('Belum ada data koordinat', 'warning'); return; } const points = coordinates.map(c => `${c.lat},${c.lng}`).join('/'); const mapUrl = `https://www.google.com/maps/dir/${points}/data=!3m1!4b1`; window.open(mapUrl, '_blank'); }
+function viewMapDetail(index) {
+const coordinates = getCoordinatesForMap();
+if (coordinates[index] && coordinates[index].data) {
+if (homeMapInstance) homeMapInstance.closePopup();
+openPhotoModal(coordinates[index].data);
+}
+}
+
+function openFullMap() {
+const coordinates = getCoordinatesForMap();
+if (coordinates.length === 0) { showToast('Belum ada data koordinat', 'warning'); return; }
+const points = coordinates.map(c => `${c.lat},${c.lng}`).join('/');
+const mapUrl = `https://www.google.com/maps/dir/${points}/data=!3m1!4b1`;
+window.open(mapUrl, '_blank');
+}
+
 function refreshMap() { if (homeMapInstance) setTimeout(() => homeMapInstance.invalidateSize(), 200); }
 window.addEventListener('resize', () => refreshMap());
 
 function searchLocations(query) {
-  const coordinates = getCoordinatesForMap();
-  const searchTerm = query.toLowerCase();
-  const listContainer = document.getElementById('location-list');
-  if (!listContainer) return;
-  
-  const filtered = coordinates.filter(coord => {
-    const data = coord.data || {};
-    // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
-    return String(data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) ||
-           String(data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) ||
-           String(data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) ||
-           String(data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
-  });
-  
-  if (filtered.length === 0) {
-    listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`;
-    return;
-  }
-  
-  listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${coordinates.indexOf(coord)})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div></div></div>`).join('');
-  
-  if (window.lucide) lucide.createIcons({ nodes: [listContainer] });
+const coordinates = getCoordinatesForMap();
+const searchTerm = query.toLowerCase();
+const listContainer = document.getElementById('location-list');
+if (!listContainer) return;
+const filtered = coordinates.filter(coord => {
+const data = coord.data || {};
+const safe = (val) => String(val || '').toLowerCase();
+return safe(data["Nama Daerah Irigasi"]).includes(searchTerm) ||
+safe(data["Nama Saluran"]).includes(searchTerm) ||
+safe(data["Nomen Klatur"]).includes(searchTerm) ||
+safe(data["Nama Petugas/PPA"]).includes(searchTerm);
+});
+if (filtered.length === 0) {
+listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`;
+return;
+}
+listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => {
+const realIndex = coordinates.indexOf(coord);
+return `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${realIndex})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div></div></div>`;
+}).join('');
+renderIcons(listContainer);
 }
 
 function focusLocation(lat, lng, index) {
@@ -1479,7 +1696,10 @@ homeMapInstance.setView([lat, lng], 16);
 const markers = markersLayer.getLayers();
 if (markers[index]) markers[index].openPopup();
 const listItems = document.querySelectorAll('#location-list > div');
-listItems.forEach((item, idx) => { if (idx === index) item.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30'); else item.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30'); });
+listItems.forEach((item, idx) => {
+if (idx === index) item.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30');
+else item.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30');
+});
 }
 }
 
@@ -1487,42 +1707,99 @@ function showAllLocations() {
 const coordinates = getCoordinatesForMap();
 const listContainer = document.getElementById('location-list');
 if (!listContainer) return;
-listContainer.innerHTML = coordinates.map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${idx})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div><span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full ml-2">${idx + 1}</span></div></div>`).join('');
-if (window.lucide) lucide.createIcons({ nodes: [listContainer] });
+listContainer.innerHTML = coordinates.map((coord, idx) => `
+<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${idx})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600">
+<div class="flex items-start justify-between">
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4>
+<p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p>
+</div>
+<span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full ml-2">${idx + 1}</span>
+</div>
+</div>
+`).join('');
+renderIcons(listContainer);
 }
 
+// ============================================
+// NAVIGATION
+// ============================================
 function renderNavigation() {
-const tabs = [{ id: 'home', icon: 'home', label: 'Beranda' }, { id: 'detail', icon: 'image', label: 'Detail' }, { id: 'input', icon: 'plus-circle', label: 'Input' }, { id: 'data', icon: 'database', label: 'Data' }, { id: 'sync', icon: 'refresh-cw', label: 'Antrean', badge: state.syncQueue.length }];
-const navHtml = tabs.map(tab => `<button onclick="switchTab('${tab.id}')" class="flex items-center justify-between p-3 rounded-xl transition-all ${state.activeTab === tab.id ? 'bg-white/20 text-white font-semibold' : 'text-blue-100 hover:bg-white/10'}"><div class="flex items-center space-x-3"><i data-lucide="${tab.icon}" class="w-5 h-5"></i><span>${tab.label}</span></div>${tab.badge > 0 ? `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${tab.badge}</span>` : ''}</button>`).join('');
+const tabs = [
+{ id: 'home', icon: 'home', label: 'Beranda' },
+{ id: 'detail', icon: 'image', label: 'Detail' },
+{ id: 'input', icon: 'plus-circle', label: 'Input' },
+{ id: 'data', icon: 'database', label: 'Data' },
+{ id: 'sync', icon: 'refresh-cw', label: 'Antrean', badge: state.syncQueue.length }
+];
+const navHtml = tabs.map(tab => `
+<button onclick="switchTab('${tab.id}')" class="flex items-center justify-between p-3 rounded-xl transition-all ${state.activeTab === tab.id ? 'bg-white/20 text-white font-semibold' : 'text-blue-100 hover:bg-white/10'}">
+<div class="flex items-center space-x-3"><i data-lucide="${tab.icon}" class="w-5 h-5"></i><span>${tab.label}</span></div>
+${tab.badge > 0 ? `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${tab.badge}</span>` : ''}
+</button>
+`).join('');
 document.getElementById('desktop-nav').innerHTML = navHtml;
 document.getElementById('mobile-nav').innerHTML = navHtml;
-const bottomNavHtml = tabs.map(tab => `<button onclick="switchTab('${tab.id}')" class="flex flex-col items-center justify-center p-2 flex-1 relative ${state.activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}"><div class="relative"><i data-lucide="${tab.icon}" class="w-6 h-6 mb-1"></i>${tab.badge > 0 ? `<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">${tab.badge}</span>` : ''}</div><span class="text-[10px] font-medium">${tab.label}</span></button>`).join('');
+const bottomNavHtml = tabs.map(tab => `
+<button onclick="switchTab('${tab.id}')" class="flex flex-col items-center justify-center p-2 flex-1 relative ${state.activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}">
+<div class="relative"><i data-lucide="${tab.icon}" class="w-6 h-6 mb-1"></i>${tab.badge > 0 ? `<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">${tab.badge}</span>` : ''}</div>
+<span class="text-[10px] font-medium">${tab.label}</span>
+</button>
+`).join('');
 document.getElementById('bottom-nav').innerHTML = bottomNavHtml;
-if (window.lucide) lucide.createIcons();
+renderIcons();
 }
 
 function renderOnlineStatus() {
-const icon = document.getElementById('desktop-status-icon'); const text = document.getElementById('desktop-status-text');
-if (state.isOnline) { icon.setAttribute('data-lucide', 'wifi'); icon.className = 'w-4 h-4 text-green-400'; text.textContent = 'Online'; document.getElementById('offline-banner').classList.remove('show'); }
-else { icon.setAttribute('data-lucide', 'wifi-off'); icon.className = 'w-4 h-4 text-red-400'; text.textContent = 'Offline'; document.getElementById('offline-banner').classList.add('show'); }
-if (window.lucide) lucide.createIcons({ nodes: [icon.parentElement] });
+const icon = document.getElementById('desktop-status-icon');
+const text = document.getElementById('desktop-status-text');
+if (state.isOnline) {
+icon.setAttribute('data-lucide', 'wifi');
+icon.className = 'w-4 h-4 text-green-400';
+text.textContent = 'Online';
+document.getElementById('offline-banner').classList.remove('show');
+} else {
+icon.setAttribute('data-lucide', 'wifi-off');
+icon.className = 'w-4 h-4 text-red-400';
+text.textContent = 'Offline';
+document.getElementById('offline-banner').classList.add('show');
+}
+renderIcons();
 }
 
-function switchTab(tabId) { state.activeTab = tabId; state.mobileMenuOpen = false; document.getElementById('mobile-menu').classList.add('hidden'); renderNavigation(); renderCurrentTab(); window.scrollTo(0, 0); }
+function switchTab(tabId) {
+state.activeTab = tabId;
+state.mobileMenuOpen = false;
+document.getElementById('mobile-menu').classList.add('hidden');
+renderNavigation();
+renderCurrentTab();
+window.scrollTo(0, 0);
+}
 
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
 function renderCurrentTab() {
 const content = document.getElementById('content-area');
-if (homeMapInstance && state.activeTab !== 'home') { try { homeMapInstance.remove(); } catch (e) {} homeMapInstance = null; markersLayer = null; }
+if (homeMapInstance && state.activeTab !== 'home') {
+try { homeMapInstance.remove(); } catch (e) {}
+homeMapInstance = null;
+markersLayer = null;
+}
 if (state.activeTab === 'home') { content.innerHTML = renderHomeTab(); setupHomeListeners(); }
 else if (state.activeTab === 'detail') { content.innerHTML = renderDetailPintuTab(); }
 else if (state.activeTab === 'input') { content.innerHTML = renderInputTab(); setupInputFormListeners(); renderPhotoPreview(); }
 else if (state.activeTab === 'data') { content.innerHTML = renderDataTab(); setupDataListeners(); }
 else if (state.activeTab === 'sync') { content.innerHTML = renderSyncTab(); }
-if (window.lucide) lucide.createIcons({ nodes: [content] });
+renderIcons(content);
 LazyLoader.observeAll('.lazy-image');
 PerfMonitor.mark('render'); PerfMonitor.update();
 }
 
+// ============================================
+// HOME TAB (dengan Nomen Klatur di popup dan daftar lokasi)
+// ============================================
 function renderHomeTab() {
 const totalData = state.savedData.length;
 const totalPhotos = state.savedData.reduce((acc, item) => acc + (item["URL Foto"] || '').split(',').filter(p => p.trim()).length, 0);
@@ -1532,20 +1809,28 @@ const pintuAngkat = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Angk
 const pintuSorong = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Sorong').length;
 const pintuRadial = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Radial').length;
 const allPhotos = [];
-state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
+state.savedData.forEach((item, idx) => {
+(item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx }));
+});
 const filteredPhotos = allPhotos.filter(photo => {
-  if (!state.homeSearchTerm) return true;
-  const term = state.homeSearchTerm.toLowerCase();
-  // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
-  return String(photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
+if (!state.homeSearchTerm) return true;
+const term = state.homeSearchTerm.toLowerCase();
+const safe = (val) => String(val || '').toLowerCase();
+return safe(photo.item["Nama Daerah Irigasi"]).includes(term) ||
+safe(photo.item["Nama Saluran"]).includes(term) ||
+safe(photo.item["Jenis Pintu"]).includes(term) ||
+safe(photo.item["Nama Petugas/PPA"]).includes(term) ||
+safe(photo.item["Nomen Klatur"]).includes(term) ||
+safe(photo.item["Koordinat"]).includes(term) ||
+safe(photo.item["Keterangan Kondisi"]).includes(term);
 });
 const coordinates = getCoordinatesForMap();
+
+// Hitung statistik kondisi
+const baik = state.savedData.filter(d => (d["Kondisi Daun Pintu"] || '').includes('baik')).length;
+const rusakRingan = state.savedData.filter(d => (d["Kondisi Daun Pintu"] || '').includes('kerusakan')).length;
+const rusak = state.savedData.filter(d => (d["Kondisi Daun Pintu"] || '').includes('rusak')).length;
+
 return `
 <div class="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-2xl overflow-hidden animate-fade-up">
 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
@@ -1579,7 +1864,7 @@ return `
 <div class="mb-6 animate-fade-up" style="animation-delay: 0.3s">
 <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
 <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-700">
-<div class="flex items-center justify-between">
+<div class="flex items-center justify-between flex-wrap gap-2">
 <div><h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center"><i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"></i>Peta Sebaran Lokasi Pintu Air</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1"></i>Klik marker untuk melihat detail lokasi</p></div>
 ${coordinates.length > 0 ? `<button onclick="openFullMap()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-1"><i data-lucide="external-link" class="w-3 h-3"></i><span>Peta Penuh</span></button>` : ''}
 </div>
@@ -1591,15 +1876,14 @@ ${coordinates.length > 0 ? `
 <div class="p-4 border-t border-slate-200 dark:border-slate-700">
 <div class="relative mb-4"><i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4"></i><input type="text" id="location-search" placeholder="Cari lokasi (nama saluran, nomen klatur, PPA)..." class="w-full pl-10 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none dark:bg-slate-700 dark:text-white text-sm" oninput="searchLocations(this.value)" /></div>
 <div id="location-list" class="space-y-2 max-h-64 overflow-y-auto">
-${coordinates.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${idx})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div><span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full ml-2">${idx + 1}</span></div></div>`).join('')}
+${coordinates.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${idx})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')} | ${escapeHtml(coord.data["Nomen Klatur"] || '')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div><span class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full ml-2">${idx + 1}</span></div></div>`).join('')}
 </div>
 ${coordinates.length > 10 ? `<div class="text-center mt-3"><button onclick="showAllLocations()" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 font-semibold">Tampilkan semua ${coordinates.length} lokasi <i data-lucide="arrow-right" class="w-3 h-3 inline"></i></button></div>` : ''}
 <div class="flex flex-wrap gap-2 text-xs mt-4">
 <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${coordinates.length} Lokasi</span>
-<span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="circle" class="w-3 h-3 fill-current"></i> ${pintuPlat} Pintu Plat</span>
-${pintuAngkat > 0 ? `<span class="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="arrow-up" class="w-3 h-3"></i> ${pintuAngkat} Pintu Angkat</span>` : ''}
-${pintuSorong > 0 ? `<span class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="arrow-right" class="w-3 h-3"></i> ${pintuSorong} Pintu Sorong</span>` : ''}
-${pintuRadial > 0 ? `<span class="px-2 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> ${pintuRadial} Pintu Radial</span>` : ''}
+<span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="circle" class="w-3 h-3 fill-current"></i> ${baik} Baik</span>
+<span class="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> ${rusakRingan} Rusak Ringan</span>
+<span class="px-2 py-1 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 rounded-md font-medium flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3 h-3"></i> ${rusak} Rusak</span>
 </div>
 </div>` : ''}
 </div>
@@ -1613,8 +1897,18 @@ ${state.isLoadingData ? `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-col
 
 function setupHomeListeners() {
 const searchInput = document.getElementById('home-search-input');
-if (searchInput) { searchInput.addEventListener('input', (e) => { debouncedSearch(e.target.value, (value) => { state.homeSearchTerm = value; renderHomeGalleryOnly(); }); }); }
-setTimeout(() => { const coordinates = getCoordinatesForMap(); if (coordinates.length > 0 && document.getElementById('home-map')) initLeafletMap('home-map', coordinates); }, 150);
+if (searchInput) {
+searchInput.addEventListener('input', (e) => {
+debouncedSearch(e.target.value, (value) => {
+state.homeSearchTerm = value;
+renderHomeGalleryOnly();
+});
+});
+}
+setTimeout(() => {
+const coordinates = getCoordinatesForMap();
+if (coordinates.length > 0 && document.getElementById('home-map')) initLeafletMap('home-map', coordinates);
+}, 150);
 }
 
 function renderHomeGalleryOnly() {
@@ -1622,18 +1916,20 @@ const content = document.getElementById('content-area');
 const gallerySection = content.querySelector('.animate-fade-up:last-child');
 if (!gallerySection) return;
 const allPhotos = [];
-state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
+state.savedData.forEach((item, idx) => {
+(item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx }));
+});
 const filteredPhotos = allPhotos.filter(photo => {
-  if (!state.homeSearchTerm) return true;
-  const term = state.homeSearchTerm.toLowerCase();
-  // ✅ PERBAIKAN: Gunakan String() untuk konversi ke string
-  return String(photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nama Saluran"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Jenis Pintu"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
-         String(photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
+if (!state.homeSearchTerm) return true;
+const term = state.homeSearchTerm.toLowerCase();
+const safe = (val) => String(val || '').toLowerCase();
+return safe(photo.item["Nama Daerah Irigasi"]).includes(term) ||
+safe(photo.item["Nama Saluran"]).includes(term) ||
+safe(photo.item["Jenis Pintu"]).includes(term) ||
+safe(photo.item["Nama Petugas/PPA"]).includes(term) ||
+safe(photo.item["Nomen Klatur"]).includes(term) ||
+safe(photo.item["Koordinat"]).includes(term) ||
+safe(photo.item["Keterangan Kondisi"]).includes(term);
 });
 const galleryGrid = gallerySection.querySelector('.grid.grid-cols-2') || gallerySection.querySelector('.bg-white');
 if (!galleryGrid) return;
@@ -1644,14 +1940,20 @@ newContent = `<div class="bg-white dark:bg-slate-800 p-8 rounded-2xl border bord
 newContent = `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">${filteredPhotos.slice(0, 8).map((photo, idx) => `<div onclick='openPhotoModal(${JSON.stringify(photo.item).replace(/'/g, "\\'")})' class="gallery-card relative aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer bg-slate-100 dark:bg-slate-700"><img data-src="${photo.url}" alt="Foto ${idx + 1}" class="lazy-image w-full h-full object-cover blur-placeholder" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-slate-400\\'><i data-lucide=\\'image-off\\' class=\\'w-6 h-6\\'></i></div>'" /><div class="gallery-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-2"><p class="text-white font-bold text-xs line-clamp-1">${escapeHtml(photo.item["Nama Daerah Irigasi"] || '-')}</p><p class="text-white/80 text-[10px] line-clamp-1">${escapeHtml(photo.item["Nama Saluran"] || '-')}</p><div class="flex items-center space-x-1 mt-1"><i data-lucide="calendar" class="w-2.5 h-2.5 text-white/60"></i><span class="text-white/60 text-[9px]">${formatDate(photo.item["Timestamp"])}</span></div></div></div>`).join('')}</div>${filteredPhotos.length > 8 ? `<div class="mt-4 text-center"><button onclick="switchTab('data')" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 font-semibold text-sm">Lihat semua ${filteredPhotos.length} foto <i data-lucide="arrow-right" class="w-3 h-3 inline"></i></button></div>` : `<div class="mt-4 text-center"><p class="text-xs text-slate-500 dark:text-slate-400">Menampilkan ${filteredPhotos.length} foto</p></div>`}`;
 }
 galleryGrid.outerHTML = newContent;
-if (window.lucide) lucide.createIcons({ nodes: [gallerySection] });
+renderIcons(gallerySection);
 LazyLoader.observeAll('.lazy-image');
 }
 
+// ============================================
+// DETAIL TAB
+// ============================================
 function renderDetailPintuTab() {
 return `<div class="max-w-7xl mx-auto"><div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-5 text-white mb-6 shadow-lg animate-fade-up"><h2 class="text-xl md:text-2xl font-bold mb-1">Detail Teknis Pintu Air Irigasi</h2><p class="text-blue-100 text-sm">Referensi gambar teknis dan spesifikasi pintu air untuk Kantor Benculuk</p></div><div class="space-y-6"><div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden animate-fade-up"><div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 text-white"><div class="flex items-center space-x-3"><i data-lucide="layers" class="w-5 h-5"></i><h3 class="text-lg font-bold">PINTU PLAT (Plate Gate)</h3></div></div><div class="p-5"><div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5"><div class="space-y-3"><div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600"><img data-src="https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w1000" alt="Tampak Depan Pintu Plat" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder" onclick="openImageZoom('https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w2000')" /></div><h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Tampak Depan Pintu Plat</h4></div><div class="space-y-3"><div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600"><img data-src="https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w1000" alt="Detail Mekanisme" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder" onclick="openImageZoom('https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w2000')" /></div><h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Ringkasan Teknis & Sosialisasi</h4></div></div><div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-200 dark:border-blue-800"><h4 class="font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center text-sm"><i data-lucide="settings" class="w-4 h-4 mr-2"></i>Spesifikasi Teknis</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"><div class="space-y-2"><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Material Daun Pintu</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Plat Besi 5 mm</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Rangka</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Besi Siku 50.60.5</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">As Ulir</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Besi As Ulir Ø 2"</span></div></div><div class="space-y-2"><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Mekanisme</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Stang Pemutar Ganda</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Pengunci</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Kunci Mekanis</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Dimensi Umum</span><span class="font-semibold text-slate-800 dark:text-white text-sm">B: 100 cm, H: 200 cm</span></div></div></div></div></div></div></div></div>`;
 }
 
+// ============================================
+// INPUT TAB
+// ============================================
 function renderInputTab() {
 const isEditing = state.isEditing;
 const headerTitle = isEditing ? 'Edit Data' : 'Input Data Baru';
@@ -1729,7 +2031,10 @@ function setupInputFormListeners() {
 const form = document.getElementById('input-form');
 if (!form) return;
 form.addEventListener('submit', handleSubmit);
-form.querySelectorAll('input, textarea, select').forEach(input => { input.addEventListener('input', handleInputChange); input.addEventListener('change', handleInputChange); });
+form.querySelectorAll('input, textarea, select').forEach(input => {
+input.addEventListener('input', handleInputChange);
+input.addEventListener('change', handleInputChange);
+});
 const jenisSelect = document.getElementById('select-jenis-pintu');
 const jenisLainnyaInput = document.getElementById('input-jenis-lainnya');
 if (jenisSelect && jenisLainnyaInput) {
@@ -1744,7 +2049,9 @@ if (cameraInput) cameraInput.addEventListener('change', (e) => handlePhotoUpload
 if (fileInput) fileInput.addEventListener('change', (e) => handlePhotoUpload(e, false));
 }
 
-// ✅ PERBAIKAN: renderDataTab dengan banner semi-transparan dan tombol refresh force
+// ============================================
+// DATA TAB (dengan desain profesional)
+// ============================================
 function renderDataTab() {
 const isConfigured = !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE");
 if (!isConfigured) return `<div class="max-w-6xl mx-auto"><div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 p-5 rounded-2xl text-center"><p class="font-bold text-base mb-2">Setup Belum Selesai</p><p class="text-sm">Ganti variabel <code class="bg-amber-100 dark:bg-amber-800 px-2 py-0.5 rounded">CONFIG.APPS_SCRIPT_URL</code> di dalam kode HTML.</p></div></div>`;
@@ -1752,84 +2059,196 @@ const filteredData = getFilteredData();
 const paginatedData = getPaginatedData(filteredData);
 const totalPages = Math.ceil(filteredData.length / CONFIG.ITEMS_PER_PAGE);
 const hasActiveFilter = state.searchTerm || state.filters.jenis || state.filters.kondisi || state.filters.tanggal;
+
+let dateValue = state.filters.tanggal || '';
+if (dateValue && dateValue.includes('T')) {
+try { dateValue = dateValue.split('T')[0]; } catch (e) { dateValue = ''; }
+}
+
 return `
-<div class="max-w-6xl mx-auto">
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 space-y-3 md:space-y-0">
-<div><h2 class="text-xl font-bold text-slate-800 dark:text-white">Database Pintu Irigasi</h2><p class="text-slate-500 dark:text-slate-400 text-sm">${filteredData.length} dari ${state.savedData.length} data${hasActiveFilter ? ' (terfilter)' : ''}</p></div>
-<div class="flex space-x-2 w-full md:w-auto">
-<button onclick="exportToPDF()" class="flex-1 md:flex-none flex items-center justify-center space-x-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/30 font-semibold transition-colors text-sm"><i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>PDF</span></button>
-<button onclick="exportToExcel()" class="flex-1 md:flex-none flex items-center justify-center space-x-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 font-semibold transition-colors text-sm"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i><span>Excel</span></button>
-<button onclick="fetchOnlineData(true)" class="flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2 rounded-xl border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors" title="Paksa refresh dari server"><i data-lucide="refresh-cw" class="w-4 h-4 ${state.isLoadingData ? 'animate-spin-custom' : ''}"></i></button>
-</div>
-</div>
-<div class="bg-white dark:bg-slate-800 rounded-xl p-4 mb-5 border border-slate-200 dark:border-slate-700 shadow-sm">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-<div><label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Cari</label><input type="text" id="search-input" placeholder="Ketik lalu Enter atau klik Terapkan..." value="${escapeHtml(state.searchTerm)}" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm" /></div>
-<div><label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Jenis Pintu</label><select id="filter-jenis" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm"><option value="">Semua</option><option value="Pintu Plat" ${state.filters.jenis === 'Pintu Plat' ? 'selected' : ''}>Pintu Plat</option><option value="Pintu Angkat" ${state.filters.jenis === 'Pintu Angkat' ? 'selected' : ''}>Pintu Angkat</option><option value="Pintu Sorong" ${state.filters.jenis === 'Pintu Sorong' ? 'selected' : ''}>Pintu Sorong</option><option value="Pintu Radial" ${state.filters.jenis === 'Pintu Radial' ? 'selected' : ''}>Pintu Radial</option></select></div>
-<div><label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Kondisi</label><select id="filter-kondisi" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm"><option value="">Semua</option><option value="baik" ${state.filters.kondisi === 'baik' ? 'selected' : ''}>Baik</option><option value="kerusakan" ${state.filters.kondisi === 'kerusakan' ? 'selected' : ''}>Ada Kerusakan</option><option value="rusak" ${state.filters.kondisi === 'rusak' ? 'selected' : ''}>Rusak</option></select></div>
-<div><label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Tanggal</label><input type="date" id="filter-tanggal" value="${state.filters.tanggal}" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm" /></div>
-</div>
-<div class="flex justify-end space-x-2 mt-3">
-<button onclick="resetFilters()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors font-semibold text-sm">Reset</button>
-<button onclick="applyFilters()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center space-x-1"><i data-lucide="filter" class="w-3.5 h-3.5"></i><span>Terapkan Filter</span></button>
-</div>
-</div>
-${state.isLoadingData ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${[1,2,3,4,5,6].map(() => `<div class="bg-white dark:bg-slate-800 rounded-2xl h-72 animate-skeleton border border-slate-200 dark:border-slate-700"></div>`).join('')}</div>` : paginatedData.length === 0 ? `<div class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400"><i data-lucide="database" class="w-10 h-10 mx-auto mb-3 text-slate-300 dark:text-slate-600"></i><p class="text-sm font-semibold mb-1">${hasActiveFilter ? 'Tidak ada data yang cocok dengan filter' : 'Belum ada data'}</p><p class="text-xs">${hasActiveFilter ? 'Coba ubah kata kunci atau reset filter' : 'Mulai input data untuk menambahkan'}</p>${hasActiveFilter ? '<button onclick="resetFilters()" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Reset Filter</button>' : ''}</div>` : `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${paginatedData.map((item, idx) => { const firstPhoto = (item["URL Foto"] || '').split(',')[0]; const photoCount = (item["URL Foto"] || '').split(',').filter(p => p.trim()).length; return `<div onclick='openPhotoModal(${JSON.stringify(item).replace(/'/g, "\\'")})' class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group"><div class="h-40 bg-slate-100 dark:bg-slate-700 relative overflow-hidden">${firstPhoto ? `<img data-src="${firstPhoto}" alt="Pintu" class="lazy-image w-full h-full object-cover blur-placeholder group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'" />` : `<div class="flex items-center justify-center h-full text-slate-400"><i data-lucide="camera" class="w-7 h-7"></i></div>`}<div class="photo-badge absolute bottom-2 right-2 text-[10px] px-2 py-1 rounded-md font-semibold text-slate-700 dark:text-slate-200">${escapeHtml(item["Jenis Pintu"] || '-')}</div></div><div class="p-4"><div class="flex justify-between items-start mb-2"><h3 class="font-bold text-sm text-slate-800 dark:text-white leading-tight">${escapeHtml(item["Nama Daerah Irigasi"] || '-')}</h3><span class="text-[9px] text-slate-400 bg-slate-50 dark:bg-slate-700 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 whitespace-nowrap ml-2">${formatDate(item["Timestamp"])}</span></div><p class="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2">${escapeHtml(item["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(item["Nama Petugas/PPA"] || '-')}</p><div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 mb-3"><div class="flex items-start"><i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-slate-400 shrink-0"></i><span class="line-clamp-1">${escapeHtml(item["Koordinat"] || '-')}</span></div><div class="flex items-start"><i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5 mt-0.5 text-slate-400 shrink-0"></i><span class="line-clamp-2">${escapeHtml(item["Keterangan Kondisi"] || '-')}</span></div></div>${photoCount > 1 ? `<div class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-lg inline-block">+${photoCount - 1} Foto lainnya</div>` : ''}</div></div>`; }).join('')}</div>${totalPages > 1 ? `<div class="flex justify-center items-center space-x-1.5 mt-6"><button onclick="changePage(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 ${state.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 dark:hover:bg-slate-700'} bg-white dark:bg-slate-800 dark:text-white text-sm"><i data-lucide="chevron-left" class="w-4 h-4 inline"></i> Prev</button><div class="flex space-x-0.5">${Array.from({length: Math.min(totalPages, 5)}, (_, i) => { let pageNum; if (totalPages <= 5) pageNum = i + 1; else if (state.currentPage <= 3) pageNum = i + 1; else if (state.currentPage >= totalPages - 2) pageNum = totalPages - 4 + i; else pageNum = state.currentPage - 2 + i; return `<button onclick="changePage(${pageNum})" class="w-8 h-8 rounded-lg border ${state.currentPage === pageNum ? 'bg-blue-600 text-white border-blue-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'} text-sm">${pageNum}</button>`; }).join('')}</div><button onclick="changePage(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 ${state.currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 dark:hover:bg-slate-700'} bg-white dark:bg-slate-800 dark:text-white text-sm">Next <i data-lucide="chevron-right" class="w-4 h-4 inline"></i></button></div>` : ''}`}
+<div class="max-w-7xl mx-auto px-2 md:px-4">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+        <i data-lucide="database" class="w-7 h-7 text-blue-600 dark:text-blue-400"></i>
+        Database Pintu Irigasi
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        ${filteredData.length} dari ${state.savedData.length} data
+        ${hasActiveFilter ? '<span class="ml-2 inline-flex items-center gap-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full"><i data-lucide="filter" class="w-3 h-3"></i> Terfilter</span>' : ''}
+      </p>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <button onclick="exportToPDF()" class="flex items-center gap-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-4 py-2 rounded-xl border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/30 font-semibold transition-all text-sm shadow-sm">
+        <i data-lucide="file-text" class="w-4 h-4"></i> PDF
+      </button>
+      <button onclick="exportToExcel()" class="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 font-semibold transition-all text-sm shadow-sm">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel
+      </button>
+      <button onclick="fetchOnlineData(true)" class="flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2 rounded-xl border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all shadow-sm" title="Refresh data dari server">
+        <i data-lucide="refresh-cw" class="w-5 h-5 ${state.isLoadingData ? 'animate-spin-custom' : ''}"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-glass rounded-2xl p-4 md:p-5 mb-6 border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">🔍 Cari</label>
+        <input type="text" id="search-input" placeholder="Ketik lalu Enter..." value="${escapeHtml(state.searchTerm)}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm text-slate-800 dark:text-white" />
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">📋 Jenis Pintu</label>
+        <select id="filter-jenis" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm text-slate-800 dark:text-white">
+          <option value="">Semua</option>
+          <option value="Pintu Plat" ${state.filters.jenis === 'Pintu Plat' ? 'selected' : ''}>Pintu Plat</option>
+          <option value="Pintu Angkat" ${state.filters.jenis === 'Pintu Angkat' ? 'selected' : ''}>Pintu Angkat</option>
+          <option value="Pintu Sorong" ${state.filters.jenis === 'Pintu Sorong' ? 'selected' : ''}>Pintu Sorong</option>
+          <option value="Pintu Radial" ${state.filters.jenis === 'Pintu Radial' ? 'selected' : ''}>Pintu Radial</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">📊 Kondisi</label>
+        <select id="filter-kondisi" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm text-slate-800 dark:text-white">
+          <option value="">Semua</option>
+          <option value="baik" ${state.filters.kondisi === 'baik' ? 'selected' : ''}>Baik</option>
+          <option value="kerusakan" ${state.filters.kondisi === 'kerusakan' ? 'selected' : ''}>Ada Kerusakan</option>
+          <option value="rusak" ${state.filters.kondisi === 'rusak' ? 'selected' : ''}>Rusak</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">📅 Tanggal</label>
+        <input type="date" id="filter-tanggal" value="${dateValue}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm text-slate-800 dark:text-white" />
+      </div>
+    </div>
+    <div class="flex flex-wrap justify-end gap-2 mt-4">
+      <button onclick="resetFilters()" class="px-4 py-2 bg-slate-200/80 dark:bg-slate-700/80 backdrop-blur-sm text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-300/80 dark:hover:bg-slate-600/80 transition-colors font-semibold text-sm border border-slate-300/50 dark:border-slate-600/50">
+        <i data-lucide="rotate-ccw" class="w-4 h-4 inline mr-1"></i> Reset
+      </button>
+      <button onclick="applyFilters()" class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm shadow-md flex items-center gap-1">
+        <i data-lucide="filter" class="w-4 h-4"></i> Terapkan Filter
+      </button>
+    </div>
+  </div>
+
+  ${state.isLoadingData ? `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">${[1,2,3,4,5,6].map(() => `<div class="glass-card rounded-2xl h-72 animate-skeleton border border-slate-200/60 dark:border-slate-700/60"></div>`).join('')}</div>` : 
+  paginatedData.length === 0 ? `<div class="glass-card rounded-2xl p-10 border border-slate-200/60 dark:border-slate-700/60 text-center text-slate-500 dark:text-slate-400"><i data-lucide="database" class="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600"></i><p class="text-sm font-semibold mb-1">${hasActiveFilter ? 'Tidak ada data yang cocok dengan filter' : 'Belum ada data'}</p><p class="text-xs">${hasActiveFilter ? 'Coba ubah kata kunci atau reset filter' : 'Mulai input data untuk menambahkan'}</p>${hasActiveFilter ? '<button onclick="resetFilters()" class="mt-4 px-5 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold shadow-md">Reset Filter</button>' : ''}</div>` : 
+  `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">${paginatedData.map((item, idx) => { 
+    const firstPhoto = (item["URL Foto"] || '').split(',')[0]; 
+    const photoCount = (item["URL Foto"] || '').split(',').filter(p => p.trim()).length; 
+    return `<div onclick='openPhotoModal(${JSON.stringify(item).replace(/'/g, "\\'")})' class="glass-card rounded-2xl border border-slate-200/60 dark:border-slate-700/60 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 group">
+      <div class="h-48 bg-slate-100 dark:bg-slate-700 relative overflow-hidden">
+        ${firstPhoto ? `<img data-src="${firstPhoto}" alt="Pintu" class="lazy-image w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 blur-placeholder" onerror="this.style.display='none'" />` : `<div class="flex items-center justify-center h-full text-slate-400"><i data-lucide="camera" class="w-10 h-10"></i></div>`}
+        <div class="absolute bottom-3 right-3 photo-badge-glass px-3 py-1.5 rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          ${escapeHtml(item["Jenis Pintu"] || '-')}
+        </div>
+        <div class="absolute top-3 left-3 bg-black/40 backdrop-blur-sm text-white text-[10px] px-2.5 py-1 rounded-full font-medium border border-white/20 flex items-center gap-1">
+          <i data-lucide="calendar" class="w-3 h-3"></i> ${formatDate(item["Timestamp"])}
+        </div>
+      </div>
+      <div class="p-4 space-y-2">
+        <h3 class="font-bold text-base text-slate-800 dark:text-white leading-tight line-clamp-1">${escapeHtml(item["Nama Daerah Irigasi"] || '-')}</h3>
+        <p class="text-sm text-blue-600 dark:text-blue-400 font-medium line-clamp-1">${escapeHtml(item["Nama Saluran"] || '-')}</p>
+        <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i>
+          <span class="truncate">${escapeHtml(item["Nama Petugas/PPA"] || '-')}</span>
+        </div>
+        <div class="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 mt-0.5 text-slate-400 shrink-0"></i>
+          <span class="line-clamp-1">${escapeHtml(item["Koordinat"] || '-')}</span>
+        </div>
+        ${photoCount > 1 ? `<div class="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100/60 dark:bg-slate-700/60 backdrop-blur-sm px-2.5 py-1 rounded-full inline-block">+${photoCount - 1} foto lainnya</div>` : ''}
+      </div>
+    </div>`; 
+  }).join('')}</div>`}
+
+  ${totalPages > 1 ? `<div class="flex flex-wrap justify-center items-center gap-2 mt-8">
+    <button onclick="changePage(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled' : ''} class="px-4 py-2 rounded-xl border border-slate-300/60 dark:border-slate-600/60 ${state.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/60 dark:hover:bg-slate-700/60'} bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm text-sm font-medium text-slate-700 dark:text-slate-200 transition-all">
+      <i data-lucide="chevron-left" class="w-4 h-4 inline"></i> Prev
+    </button>
+    <div class="flex gap-1">${Array.from({length: Math.min(totalPages, 5)}, (_, i) => { 
+      let pageNum; 
+      if (totalPages <= 5) pageNum = i + 1; 
+      else if (state.currentPage <= 3) pageNum = i + 1; 
+      else if (state.currentPage >= totalPages - 2) pageNum = totalPages - 4 + i; 
+      else pageNum = state.currentPage - 2 + i; 
+      return `<button onclick="changePage(${pageNum})" class="w-9 h-9 rounded-xl border ${state.currentPage === pageNum ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'border-slate-300/60 dark:border-slate-600/60 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm hover:bg-white/60 dark:hover:bg-slate-700/60'} text-sm font-medium text-slate-700 dark:text-slate-200 transition-all">${pageNum}</button>`; 
+    }).join('')}</div>
+    <button onclick="changePage(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-4 py-2 rounded-xl border border-slate-300/60 dark:border-slate-600/60 ${state.currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/60 dark:hover:bg-slate-700/60'} bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm text-sm font-medium text-slate-700 dark:text-slate-200 transition-all">
+      Next <i data-lucide="chevron-right" class="w-4 h-4 inline"></i>
+    </button>
+  </div>` : ''}
 </div>`;
 }
 
-// ✅ PERBAIKAN: setupDataListeners dengan real-time + Enter key
 function setupDataListeners() {
 const searchInput = document.getElementById('search-input');
-if (searchInput) { 
-  searchInput.addEventListener('input', (e) => { 
-    debouncedSearch(e.target.value, (value) => { 
-      state.searchTerm = value; 
-      state.currentPage = 1; 
-      MemoCache.clear(); 
-      renderCurrentTab(); 
-    }); 
-  });
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      state.searchTerm = e.target.value;
-      state.currentPage = 1;
-      MemoCache.clear();
-      renderCurrentTab();
-      showToast('🔍 Filter diterapkan', 'success', 1500);
-    }
-  });
+if (searchInput) {
+searchInput.addEventListener('input', (e) => {
+debouncedSearch(e.target.value, (value) => {
+state.searchTerm = value;
+state.currentPage = 1;
+MemoCache.clear();
+renderCurrentTab();
+});
+});
+searchInput.addEventListener('keydown', (e) => {
+if (e.key === 'Enter') {
+e.preventDefault();
+state.searchTerm = e.target.value;
+state.currentPage = 1;
+MemoCache.clear();
+renderCurrentTab();
+showToast('🔍 Filter diterapkan', 'success', 1500);
+}
+});
 }
 const jenisFilter = document.getElementById('filter-jenis');
 const kondisiFilter = document.getElementById('filter-kondisi');
 const tanggalFilter = document.getElementById('filter-tanggal');
 if (jenisFilter) jenisFilter.addEventListener('change', (e) => { state.filters.jenis = e.target.value; });
 if (kondisiFilter) kondisiFilter.addEventListener('change', (e) => { state.filters.kondisi = e.target.value; });
-if (tanggalFilter) tanggalFilter.addEventListener('change', (e) => { state.filters.tanggal = e.target.value; });
+if (tanggalFilter) tanggalFilter.addEventListener('change', (e) => {
+state.filters.tanggal = e.target.value;
+});
 }
 
+// ============================================
+// SYNC TAB
+// ============================================
 function renderSyncTab() {
 let queueHtml = '';
-if (state.syncQueue.length === 0) { queueHtml = `<div class="flex flex-col items-center justify-center py-8 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl"><i data-lucide="check-circle-2" class="w-10 h-10 text-emerald-400 dark:text-emerald-500 mb-3"></i><p class="text-sm">Semua data sudah tersinkronisasi.</p></div>`; }
-else {
-queueHtml = `<div class="space-y-3">${state.syncQueue.map(item => `<div class="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700/50"><div class="flex items-center space-x-3 overflow-hidden flex-1">${item.photos && item.photos[0] ? `<img src="${item.photos[0].base64}" alt="Thumb" class="w-12 h-12 object-cover rounded-lg shadow-sm shrink-0" />` : `<div class="w-12 h-12 bg-slate-200 dark:bg-slate-600 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="camera" class="w-5 h-5 text-slate-400"></i></div>`}<div class="truncate flex-1"><h4 class="font-bold text-slate-700 dark:text-white truncate text-sm">${escapeHtml(item.namaDaerahIrigasi)}</h4><p class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(item.jenisPintu)} • ${formatTime(item.timestamp)}</p></div></div><button onclick="deleteOfflineData('${item.id}')" class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('')}<button onclick="autoSync()" ${!state.isOnline || state.isSyncing ? 'disabled' : ''} class="w-full mt-5 py-3 rounded-xl font-bold text-white shadow-md transition-all flex items-center justify-center space-x-2 ${!state.isOnline ? 'bg-slate-400 cursor-not-allowed' : state.isSyncing ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'}"><i data-lucide="refresh-cw" class="w-4 h-4 ${state.isSyncing ? 'animate-spin-custom' : ''}"></i><span class="text-sm">${state.isSyncing ? 'Menyinkronkan Data...' : `Sinkronisasi Sekarang (${state.syncQueue.length})`}</span></button></div>`;
+if (state.syncQueue.length === 0) {
+queueHtml = `<div class="flex flex-col items-center justify-center py-8 text-slate-400 dark:text-slate-500 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl"><i data-lucide="check-circle-2" class="w-10 h-10 text-emerald-400 dark:text-emerald-500 mb-3"></i><p class="text-sm">Semua data sudah tersinkronisasi.</p></div>`;
+} else {
+queueHtml = `<div class="space-y-3">${state.syncQueue.map(item => {
+const thumb = (item.photos && item.photos.length > 0 && item.photos[0].base64) ? item.photos[0].base64 : null;
+return `<div class="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700/50"><div class="flex items-center space-x-3 overflow-hidden flex-1">${thumb ? `<img src="${thumb}" alt="Thumb" class="w-12 h-12 object-cover rounded-lg shadow-sm shrink-0" />` : `<div class="w-12 h-12 bg-slate-200 dark:bg-slate-600 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="camera" class="w-5 h-5 text-slate-400"></i></div>`}<div class="truncate flex-1"><h4 class="font-bold text-slate-700 dark:text-white truncate text-sm">${escapeHtml(item.namaDaerahIrigasi)}</h4><p class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(item.jenisPintu)} • ${formatTime(item.timestamp)}</p></div></div><button onclick="deleteOfflineData('${item.id}')" class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+}).join('')}<button onclick="autoSync()" ${!state.isOnline || state.isSyncing ? 'disabled' : ''} class="w-full mt-5 py-3 rounded-xl font-bold text-white shadow-md transition-all flex items-center justify-center space-x-2 ${!state.isOnline ? 'bg-slate-400 cursor-not-allowed' : state.isSyncing ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'}"><i data-lucide="refresh-cw" class="w-4 h-4 ${state.isSyncing ? 'animate-spin-custom' : ''}"></i><span class="text-sm">${state.isSyncing ? 'Menyinkronkan Data...' : `Sinkronisasi Sekarang (${state.syncQueue.length})`}</span></button></div>`;
 }
 return `<div class="max-w-3xl mx-auto"><div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700"><div class="flex items-center justify-between mb-6"><div><h2 class="text-lg font-bold text-slate-800 dark:text-white">Antrean Offline</h2><p class="text-slate-500 dark:text-slate-400 text-sm">Data menunggu dikirim ke server.</p></div><div class="p-2.5 rounded-full ${state.isOnline ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'}"><i data-lucide="${state.isOnline ? 'wifi' : 'wifi-off'}" class="w-5 h-5"></i></div></div>${queueHtml}</div></div>`;
 }
 
+// ============================================
+// GLOBAL LISTENERS
+// ============================================
 function setupGlobalListeners() {
 window.addEventListener('online', () => { state.isOnline = true; renderOnlineStatus(); showToast("Koneksi internet tersambung!", "success"); autoSync(); });
 window.addEventListener('offline', () => { state.isOnline = false; renderOnlineStatus(); showToast("Koneksi internet terputus. Mode offline aktif.", "warning"); });
 document.getElementById('mobile-menu-btn').addEventListener('click', () => {
 state.mobileMenuOpen = !state.mobileMenuOpen;
-const menu = document.getElementById('mobile-menu'); const btn = document.getElementById('mobile-menu-btn');
+const menu = document.getElementById('mobile-menu');
+const btn = document.getElementById('mobile-menu-btn');
 if (state.mobileMenuOpen) { menu.classList.remove('hidden'); btn.innerHTML = '<i data-lucide="x" class="w-6 h-6"></i>'; }
 else { menu.classList.add('hidden'); btn.innerHTML = '<i data-lucide="menu" class="w-6 h-6"></i>'; }
-if (window.lucide) lucide.createIcons({ nodes: [btn] });
+renderIcons(btn);
 });
 }
 
+// ============================================
+// INIT
+// ============================================
 async function init() {
 try {
 PerfMonitor.mark('init-start');
@@ -1840,15 +2259,17 @@ await loadQueueFromStorage();
 await loadDraft(); PerfMonitor.mark('data-load');
 renderNavigation(); renderOnlineStatus(); renderCurrentTab(); PerfMonitor.mark('ui-render');
 setupGlobalListeners(); setupBeforeUnload(); setupKeyboardShortcuts(); startAutoSave();
-if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) fetchOnlineData();
+if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
+await fetchOnlineData();
+}
 document.getElementById('app-loading').classList.add('hidden');
 PerfMonitor.mark('init-complete'); PerfMonitor.update();
 console.log("Sistem Inventarisasi Pintu Air - Kantor Benculuk berhasil dimuat!");
-console.log("Versi: 4.9.0 (Mobile Optimized + Anti Double Submit)");
+console.log("Versi: 4.9.0 (Fixed - Mobile Optimized + Anti Double Submit + Dark Mode + Map Legend Improved)");
 } catch (error) {
 console.error("Init error:", error);
-document.getElementById('app-loading').innerHTML = `<div class="text-center p-8"><i data-lucide="alert-triangle" class="w-16 h-16 text-amber-500 mx-auto mb-4"></i><h2 class="text-xl font-bold text-slate-800 mb-2">Gagal Memuat Aplikasi</h2><p class="text-slate-600 mb-4">${error.message}</p><button onclick="location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Coba Lagi</button></div>`;
-if (window.lucide) lucide.createIcons();
+document.getElementById('app-loading').innerHTML = `<div class="text-center p-8"><i data-lucide="alert-triangle" class="w-16 h-16 text-amber-500 mx-auto mb-4"></i><h2 class="text-xl font-bold text-slate-800 mb-2">Gagal Memuat Aplikasi</h2><p class="text-slate-600 mb-4">${escapeHtml(error.message)}</p><button onclick="location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Coba Lagi</button></div>`;
+renderIcons(document.getElementById('app-loading'));
 }
 }
 document.addEventListener('DOMContentLoaded', init);

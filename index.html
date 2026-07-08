@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://drive.google.com">
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -67,7 +66,14 @@ body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .leaflet-overlay-pane { z-index: 3 !important; }
 .leaflet-marker-pane { z-index: 4 !important; }
 .leaflet-popup-pane { z-index: 5 !important; }
-.leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important; overflow: hidden; }
+
+/* ===== DESKTOP POPUP STYLES ===== */
+.leaflet-popup-content-wrapper { 
+  border-radius: 14px !important; 
+  padding: 0 !important; 
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important; 
+  overflow: hidden; 
+}
 .leaflet-popup-content { margin: 0 !important; min-width: 260px !important; max-width: 300px !important; }
 .leaflet-popup-tip { box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important; }
 .leaflet-popup-close-button { color: white !important; font-size: 20px !important; padding: 8px 10px !important; z-index: 10 !important; }
@@ -92,21 +98,66 @@ body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .custom-marker-pin { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
 .custom-marker-pin:hover { transform: rotate(-45deg) scale(1.15); }
 .custom-marker-pin span { transform: rotate(45deg); color: white; font-weight: bold; font-size: 11px; }
+
+/* ===== MOBILE POPUP STYLES - PERBAIKAN UTAMA ===== */
 @media (max-width: 640px) {
-.container { padding-left: 12px; padding-right: 12px; }
-.header-sharp { border-radius: 0; }
-.card-mobile { border-radius: 12px; }
-.leaflet-popup-content { min-width: 230px !important; }
-.map-wrapper { height: 350px; }
+  .container { padding-left: 12px; padding-right: 12px; }
+  .header-sharp { border-radius: 0; }
+  .card-mobile { border-radius: 12px; }
+  .map-wrapper { height: 320px; }
+  
+  /* Popup lebih compact di mobile */
+  .leaflet-popup-content-wrapper { 
+    border-radius: 10px !important;
+    max-width: 240px !important;
+    min-width: 200px !important;
+  }
+  .leaflet-popup-content { 
+    min-width: 200px !important;
+    max-width: 240px !important;
+    font-size: 11px;
+  }
+  .leaflet-popup-tip { 
+    width: 16px !important;
+    height: 8px !important;
+  }
+  
+  /* Header popup lebih ringkas */
+  .popup-header { padding: 10px 12px !important; }
+  .popup-header-title { font-size: 12px !important; }
+  .popup-header-sub { font-size: 10px !important; }
+  
+  /* Body popup lebih ringkas */
+  .popup-body { padding: 8px 12px !important; }
+  .popup-row { padding: 5px 0 !important; font-size: 10px !important; }
+  .popup-label { font-size: 9px !important; margin-right: 6px !important; }
+  .popup-label i, .popup-label svg { width: 10px !important; height: 10px !important; }
+  .popup-value { font-size: 10px !important; }
+  
+  /* Footer popup lebih ringkas */
+  .popup-footer { padding: 8px 12px !important; gap: 6px !important; }
+  .popup-btn { padding: 6px 8px !important; font-size: 10px !important; border-radius: 6px !important; }
+  .popup-btn i, .popup-btn svg { width: 10px !important; height: 10px !important; }
+  
+  /* Close button lebih kecil */
+  .leaflet-popup-close-button { font-size: 16px !important; padding: 4px 6px !important; }
+  
+  /* Legend lebih compact & tidak menutupi popup */
+  .map-legend { 
+    padding: 8px 10px !important; 
+    font-size: 9px !important;
+    max-width: 150px !important;
+  }
+  .map-legend div { margin: 2px 0 !important; }
+  .map-legend-dot { width: 8px !important; height: 8px !important; }
 }
+
 body, .bg-white, .bg-slate-50, .bg-slate-100, .text-slate-800 { transition: background-color 0.3s ease, color 0.3s ease; }
 @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
 </style>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class', theme: { extend: {} } }</script>
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -264,7 +315,7 @@ Keyboard Shortcuts
 <i id="dark-mode-icon" data-lucide="moon" class="w-4 h-4"></i>
 </button>
 </div>
-<div class="text-xs text-blue-200 dark:text-slate-500 text-center">v4.8.0 - © 2024</div>
+<div class="text-xs text-blue-200 dark:text-slate-500 text-center">v4.9.0 - © 2024</div>
 </div>
 </aside>
 <main class="flex-1 flex flex-col h-full w-full relative">
@@ -440,7 +491,6 @@ if (window.lucide) lucide.createIcons({ nodes: [toast] });
 setTimeout(() => { if (toast.parentNode) { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); } }, duration);
 }
 
-// ✅ UPDATED: validateForm to support editing (allow 0 new photos if existing photos exist)
 function validateForm() {
 const errors = [];
 if (!state.formData.namaDaerahIrigasi) errors.push('Nama Daerah Irigasi wajib dipilih');
@@ -455,7 +505,7 @@ if (totalSize > CONFIG.MAX_FILE_SIZE * 10) errors.push('Total ukuran foto baru t
 return errors;
 }
 
-// Watermark & Image Compression (Unchanged)
+// Watermark & Image Compression
 function addWatermarkToImage(base64, koordinat, timestamp) {
 return new Promise((resolve, reject) => {
 const img = new Image();
@@ -667,19 +717,15 @@ renderCurrentTab();
 async function saveQueueToStorage() { try { for (const item of state.syncQueue) await IDB.set('syncQueue', item); await IDB.set('cache', { key: 'queueTimestamp', value: new Date().toISOString() }); } catch (e) { showToast("Penyimpanan lokal penuh!", "error"); } }
 async function loadQueueFromStorage() { try { const queue = await IDB.getAll('syncQueue'); state.syncQueue = queue || []; } catch (e) { console.warn('Gagal load queue:', e); state.syncQueue = []; } }
 
-// ✅ UPDATED: Search logic now includes ALL fields for comprehensive search
 function getFilteredData() {
 const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
 const cached = MemoCache.get(cacheKey);
 if (cached) return cached;
-
 let data = [...state.savedData];
-
 if (state.searchTerm) {
 const term = state.searchTerm.toLowerCase();
-data = data.filter(item => {
-// Search in ALL fields
-return (item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
+data = data.filter(item =>
+(item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
 (item["Nama Saluran"] || '').toLowerCase().includes(term) ||
 (item["Nama Petugas/PPA"] || '').toLowerCase().includes(term) ||
 (item["Nomen Klatur"] || '').toLowerCase().includes(term) ||
@@ -688,14 +734,9 @@ return (item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
 (item["Keterangan Kondisi"] || '').toLowerCase().includes(term) ||
 (item["Kondisi Daun Pintu"] || '').toLowerCase().includes(term) ||
 (item["Kondisi Drat Stang"] || '').toLowerCase().includes(term) ||
-(item["Kondisi Rangka"] || '').toLowerCase().includes(term) ||
-(item["H1"] || '').toString().toLowerCase().includes(term) ||
-(item["H"] || '').toString().toLowerCase().includes(term) ||
-(item["B"] || '').toString().toLowerCase().includes(term) ||
-(item["t"] || '').toString().toLowerCase().includes(term);
-});
+(item["Kondisi Rangka"] || '').toLowerCase().includes(term)
+);
 }
-
 if (state.filters.jenis) data = data.filter(item => item["Jenis Pintu"] === state.filters.jenis);
 if (state.filters.kondisi) {
 data = data.filter(item => {
@@ -707,7 +748,6 @@ if (state.filters.tanggal) {
 const filterDate = new Date(state.filters.tanggal).toDateString();
 data = data.filter(item => new Date(item["Timestamp"]).toDateString() === filterDate);
 }
-
 MemoCache.set(cacheKey, data);
 return data;
 }
@@ -867,7 +907,6 @@ container.appendChild(fragment);
 if (window.lucide) lucide.createIcons({ nodes: [container] });
 }
 
-// ✅ UPDATED: resetForm to clear editing state
 function resetForm() {
 state.isEditing = false;
 state.editingId = null;
@@ -884,17 +923,14 @@ renderPhotoPreview();
 clearDraft();
 }
 
-// ✅ UPDATED: handleSubmit to handle create vs update
 async function handleSubmit(e) {
 e.preventDefault();
 const errors = validateForm();
 if (errors.length > 0) { showToast(errors.join(', '), "error"); return; }
-
 const totalPhotos = state.formData.photos.length;
 const totalSize = formatBytes(state.formData.photos.reduce((acc, p) => acc + p.compressedSize, 0));
 let finalJenisPintu = state.formData.jenisPintu;
 if (finalJenisPintu === 'Lainnya') finalJenisPintu = state.formData.jenisPintuLainnya;
-
 showSubmitModal(totalPhotos, totalSize, async () => {
 const basePayload = {
 apiKey: CONFIG.API_KEY,
@@ -911,7 +947,6 @@ kondisiRangka: state.formData.kondisiRangka,
 keterangan: state.formData.keterangan,
 timestamp: new Date().toISOString()
 };
-
 if (state.isEditing) {
 basePayload.action = 'update';
 basePayload.id = state.editingId;
@@ -922,7 +957,6 @@ basePayload.action = 'create';
 basePayload.id = Date.now().toString();
 basePayload.photos = state.formData.photos;
 }
-
 if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
 state.isSyncing = true; renderCurrentTab();
 showToast("Mengirim data ke server...", 'info');
@@ -952,16 +986,13 @@ showToast("Data dihapus dari antrean", "success");
 });
 }
 
-// ✅ NEW: Edit, Delete, and Cancel Functions
 function editData(item) {
 state.isEditing = true;
 state.editingId = item["ID"];
-
 const validJenis = ['Pintu Plat', 'Pintu Angkat', 'Pintu Sorong', 'Pintu Radial'];
 let jenisPintuVal = item["Jenis Pintu"] || 'Pintu Plat';
 let jenisLainnyaVal = '';
 if (!validJenis.includes(jenisPintuVal)) { jenisLainnyaVal = jenisPintuVal; jenisPintuVal = 'Lainnya'; }
-
 state.formData = {
 namaDaerahIrigasi: item["Nama Daerah Irigasi"] || 'Baru',
 namaPetugasPPA: item["Nama Petugas/PPA"] || '',
@@ -978,7 +1009,6 @@ keterangan: item["Keterangan Kondisi"] || '',
 photos: [],
 existingPhotoUrls: (item["URL Foto"] || '').split(',').filter(p => p.trim())
 };
-
 closePhotoModal();
 switchTab('input');
 showToast('Mode Edit aktif. Ubah data lalu klik Update.', 'info');
@@ -1035,7 +1065,6 @@ const modal = document.getElementById('photo-modal');
 const content = document.getElementById('modal-content');
 const allPhotos = (item["URL Foto"] || '').split(',').filter(p => p.trim());
 const mapEmbedUrl = item["Koordinat"] && item["Koordinat"] !== '-' ? `https://maps.google.com/maps?q=${encodeURIComponent(item["Koordinat"])}&z=15&output=embed` : null;
-
 content.innerHTML = `
 <div class="space-y-6">
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1098,7 +1127,6 @@ LazyLoader.observeAll('.lazy-image');
 }
 function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); document.body.style.overflow = ''; currentItemData = null; }
 
-// Export PDF & Print Functions (Unchanged logic)
 function exportCurrentItemPDF() {
 if (!currentItemData) return;
 if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; }
@@ -1157,7 +1185,6 @@ printWindow.document.close();
 
 function openImageZoom(src) { document.getElementById('zoomed-image').src = src; document.getElementById('image-zoom-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
 function closeImageZoom() { document.getElementById('image-zoom-modal').classList.add('hidden'); document.body.style.overflow = ''; }
-
 function exportToExcel() {
 if (!window.XLSX) { showToast('Library Excel belum dimuat.', 'warning'); return; }
 if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; }
@@ -1170,7 +1197,6 @@ XLSX.writeFile(wb, fileName);
 showToast(`File Excel berhasil diunduh: ${fileName}`, "success");
 } catch (error) { showToast("Gagal membuat file Excel", "error"); }
 }
-
 function exportToPDF() { if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; } if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; } showToast("Export PDF semua data belum didukung. Gunakan Export Excel.", "info"); }
 
 // Leaflet Map Functions
@@ -1184,6 +1210,7 @@ return { lat: parts[0], lng: parts[1], data: item };
 }).filter(c => c !== null);
 }
 
+// ✅ PERBAIKAN UTAMA: initLeafletMap dengan mobile-responsive popup
 function initLeafletMap(containerId, coordinates) {
 if (homeMapInstance) { try { homeMapInstance.remove(); } catch (e) {} homeMapInstance = null; markersLayer = null; }
 const container = document.getElementById(containerId);
@@ -1194,6 +1221,10 @@ const centerLng = coordinates.reduce((sum, c) => sum + c.lng, 0) / coordinates.l
 homeMapInstance = L.map(containerId, { scrollWheelZoom: false, zoomControl: true, preferCanvas: coordinates.length > 100 }).setView([centerLat, centerLng], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19, minZoom: 2 }).addTo(homeMapInstance);
 markersLayer = L.layerGroup().addTo(homeMapInstance);
+
+// Deteksi mobile
+const isMobile = window.innerWidth <= 640;
+
 coordinates.forEach((coord, idx) => {
 const data = coord.data || {};
 const markerIcon = L.divIcon({ className: '', html: '<div class="custom-marker-pin"><span>' + (idx + 1) + '</span></div>', iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] });
@@ -1203,17 +1234,63 @@ let statusColor = '#94a3b8'; let statusText = 'Belum dicek';
 if (kondisiDaun.includes('baik')) { statusColor = '#10b981'; statusText = 'Baik'; }
 else if (kondisiDaun.includes('kerusakan')) { statusColor = '#f59e0b'; statusText = 'Ada Kerusakan'; }
 else if (kondisiDaun.includes('rusak')) { statusColor = '#ef4444'; statusText = 'Rusak'; }
-const popupHtml = '<div class="popup-card"><div class="popup-header"><p class="popup-header-title"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p><p class="popup-header-sub">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p></div><div class="popup-body"><div class="popup-row"><span class="popup-label"><i data-lucide="user" style="width:14px;height:14px;"></i> Petugas/PPA</span><span class="popup-value">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="tag" style="width:14px;height:14px;"></i> Nomen Klatur</span><span class="popup-value">' + escapeHtml(data["Nomen Klatur"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="layers" style="width:14px;height:14px;"></i> Jenis Pintu</span><span class="popup-value">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + '">' + statusText + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Tanggal</span><span class="popup-value">' + formatDate(data["Timestamp"] || '') + '</span></div></div><div class="popup-footer"><button class="popup-btn popup-btn-primary" onclick="viewMapDetail(' + idx + ')"><i data-lucide="search" style="width:12px;height:12px;"></i> Detail</button><a class="popup-btn popup-btn-secondary" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank"><i data-lucide="map" style="width:12px;height:12px;"></i> Maps</a></div></div>';
-marker.bindPopup(popupHtml, { maxWidth: 300, minWidth: 260, closeButton: true, autoPan: true, autoPanPadding: [40, 40] });
+
+// ✅ Popup berbeda untuk mobile (lebih compact)
+let popupHtml;
+if (isMobile) {
+// Mobile: popup lebih ringkas, hanya info penting
+popupHtml = '<div class="popup-card">' +
+'<div class="popup-header" style="padding:10px 12px !important;">' +
+'<p class="popup-header-title" style="font-size:12px !important;"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p>' +
+'<p class="popup-header-sub" style="font-size:10px !important;">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p>' +
+'</div>' +
+'<div class="popup-body" style="padding:8px 12px !important;">' +
+'<div class="popup-row" style="padding:5px 0 !important;font-size:10px !important;"><span class="popup-label" style="font-size:9px !important;"><i data-lucide="user" style="width:10px;height:10px;"></i> PPA</span><span class="popup-value" style="font-size:10px !important;">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div>' +
+'<div class="popup-row" style="padding:5px 0 !important;font-size:10px !important;"><span class="popup-label" style="font-size:9px !important;"><i data-lucide="layers" style="width:10px;height:10px;"></i> Jenis</span><span class="popup-value" style="font-size:10px !important;">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div>' +
+'<div class="popup-row" style="padding:5px 0 !important;font-size:10px !important;"><span class="popup-label" style="font-size:9px !important;"><i data-lucide="clipboard-list" style="width:10px;height:10px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + ';font-size:10px !important;font-weight:700;">' + statusText + '</span></div>' +
+'</div>' +
+'<div class="popup-footer" style="padding:8px 12px !important;">' +
+'<button class="popup-btn popup-btn-primary" style="padding:6px 8px !important;font-size:10px !important;" onclick="viewMapDetail(' + idx + ')"><i data-lucide="search" style="width:10px;height:10px;"></i> Detail</button>' +
+'<a class="popup-btn popup-btn-secondary" style="padding:6px 8px !important;font-size:10px !important;" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank"><i data-lucide="map" style="width:10px;height:10px;"></i> Maps</a>' +
+'</div>' +
+'</div>';
+} else {
+// Desktop: popup lengkap
+popupHtml = '<div class="popup-card"><div class="popup-header"><p class="popup-header-title"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p><p class="popup-header-sub">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p></div><div class="popup-body"><div class="popup-row"><span class="popup-label"><i data-lucide="user" style="width:14px;height:14px;"></i> Petugas/PPA</span><span class="popup-value">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="tag" style="width:14px;height:14px;"></i> Nomen Klatur</span><span class="popup-value">' + escapeHtml(data["Nomen Klatur"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="layers" style="width:14px;height:14px;"></i> Jenis Pintu</span><span class="popup-value">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + '">' + statusText + '</span></div><div class="popup-row"><span class="popup-label"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Tanggal</span><span class="popup-value">' + formatDate(data["Timestamp"] || '') + '</span></div></div><div class="popup-footer"><button class="popup-btn popup-btn-primary" onclick="viewMapDetail(' + idx + ')"><i data-lucide="search" style="width:12px;height:12px;"></i> Detail</button><a class="popup-btn popup-btn-secondary" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank"><i data-lucide="map" style="width:12px;height:12px;"></i> Maps</a></div></div>';
+}
+
+// ✅ Padding berbeda untuk mobile agar popup tidak tertutup legend
+const popupOptions = isMobile ? {
+maxWidth: 240,
+minWidth: 200,
+closeButton: true,
+autoPan: true,
+autoPanPadding: [20, 80]  // Padding bawah lebih besar untuk menghindari legend
+} : {
+maxWidth: 300,
+minWidth: 260,
+closeButton: true,
+autoPan: true,
+autoPanPadding: [40, 40]
+};
+
+marker.bindPopup(popupHtml, popupOptions);
 markersLayer.addLayer(marker);
 });
+
 if (coordinates.length > 1) { const bounds = L.latLngBounds(coordinates.map(c => [c.lat, c.lng])); homeMapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 }); }
 setTimeout(function() { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 200);
 setTimeout(function() { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 800);
+
+// ✅ Legend dengan posisi yang tidak menutupi popup
 const legend = L.control({ position: 'bottomright' });
 legend.onAdd = function() {
 const div = L.DomUtil.create('div', 'map-legend');
-div.innerHTML = '<div style="font-weight:700;margin-bottom:6px;color:#1e293b;display:flex;align-items:center;gap:6px;"><i data-lucide="map" style="width:14px;height:14px;"></i> Legenda</div><div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#dc2626;"></span><span style="color:#475569;">Lokasi Pintu (' + coordinates.length + ')</span></div><div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#10b981;"></span><span style="color:#475569;">Kondisi Baik</span></div><div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#f59e0b;"></span><span style="color:#475569;">Ada Kerusakan</span></div><div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#ef4444;"></span><span style="color:#475569;">Rusak</span></div>';
+div.innerHTML = '<div style="font-weight:700;margin-bottom:6px;color:#1e293b;display:flex;align-items:center;gap:6px;font-size:' + (isMobile ? '10' : '11') + 'px;"><i data-lucide="map" style="width:' + (isMobile ? '12' : '14') + 'px;height:' + (isMobile ? '12' : '14') + 'px;"></i> Legenda</div>' +
+'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#dc2626;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Lokasi (' + coordinates.length + ')</span></div>' +
+'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#10b981;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Baik</span></div>' +
+'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#f59e0b;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Rusak Ringan</span></div>' +
+'<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span class="map-legend-dot" style="background:#ef4444;width:' + (isMobile ? '8' : '12') + 'px;height:' + (isMobile ? '8' : '12') + 'px;"></span><span style="color:#475569;font-size:' + (isMobile ? '9' : '11') + 'px;">Rusak</span></div>';
 return div;
 };
 legend.addTo(homeMapInstance);
@@ -1232,10 +1309,7 @@ const listContainer = document.getElementById('location-list');
 if (!listContainer) return;
 const filtered = coordinates.filter(coord => {
 const data = coord.data || {};
-return (data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) ||
-(data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) ||
-(data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) ||
-(data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
+return (data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) || (data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) || (data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) || (data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
 });
 if (filtered.length === 0) { listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`; return; }
 listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => `<div onclick="focusLocation(${coord.lat}, ${coord.lng}, ${coordinates.indexOf(coord)})" class="p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600"><div class="flex items-start justify-between"><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4><p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p></div></div></div>`).join('');
@@ -1304,8 +1378,6 @@ const pintuSorong = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Soro
 const pintuRadial = state.savedData.filter(d => d["Jenis Pintu"] === 'Pintu Radial').length;
 const allPhotos = [];
 state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
-
-// ✅ UPDATED: Home search includes ALL fields for comprehensive search
 const filteredPhotos = allPhotos.filter(photo => {
 if (!state.homeSearchTerm) return true;
 const term = state.homeSearchTerm.toLowerCase();
@@ -1317,7 +1389,6 @@ return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
 (photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
 (photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
 });
-
 const coordinates = getCoordinatesForMap();
 return `
 <div class="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-2xl overflow-hidden animate-fade-up">
@@ -1325,7 +1396,7 @@ return `
 <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
 <div class="absolute top-1/2 right-1/4 w-32 h-32 bg-white/5 rounded-full animate-float"></div>
 <div class="relative z-10">
-<div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur px-3 py-1.5 rounded-full mb-4 text-xs"><i data-lucide="zap" class="w-3 h-3"></i><span class="font-semibold">Sistem Inventarisasi Digital v4.8 - Edit & Delete Enabled</span></div>
+<div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur px-3 py-1.5 rounded-full mb-4 text-xs"><i data-lucide="zap" class="w-3 h-3"></i><span class="font-semibold">Sistem Inventarisasi Digital v4.9 - Mobile Map Optimized</span></div>
 <h1 class="text-2xl md:text-4xl font-bold mb-3 leading-tight">Kantor Benculuk<br/><span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Inventarisasi Pintu Air</span></h1>
 <p class="text-blue-100 text-sm md:text-base mb-5 max-w-2xl">Platform digital untuk mendata dan memonitor kondisi pintu air irigasi dengan GPS, dokumentasi foto ber-watermark, peta sebaran interaktif, dan sinkronisasi.</p>
 <div class="flex flex-wrap gap-2">
@@ -1353,7 +1424,7 @@ return `
 <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
 <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-700">
 <div class="flex items-center justify-between">
-<div><h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center"><i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"></i>Peta Sebaran Lokasi Pintu Air</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1"></i>Klik marker untuk melihat detail lokasi (nama saluran, nomen klatur, PPA)</p></div>
+<div><h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center"><i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"></i>Peta Sebaran Lokasi Pintu Air</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1"></i>Klik marker untuk melihat detail lokasi</p></div>
 ${coordinates.length > 0 ? `<button onclick="openFullMap()" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-1"><i data-lucide="external-link" class="w-3 h-3"></i><span>Peta Penuh</span></button>` : ''}
 </div>
 </div>
@@ -1396,8 +1467,6 @@ const gallerySection = content.querySelector('.animate-fade-up:last-child');
 if (!gallerySection) return;
 const allPhotos = [];
 state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
-
-// ✅ UPDATED: Home search includes ALL fields
 const filteredPhotos = allPhotos.filter(photo => {
 if (!state.homeSearchTerm) return true;
 const term = state.homeSearchTerm.toLowerCase();
@@ -1409,7 +1478,6 @@ return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) ||
 (photo.item["Koordinat"] || '').toLowerCase().includes(term) ||
 (photo.item["Keterangan Kondisi"] || '').toLowerCase().includes(term);
 });
-
 const galleryGrid = gallerySection.querySelector('.grid.grid-cols-2') || gallerySection.querySelector('.bg-white');
 if (!galleryGrid) return;
 let newContent = '';
@@ -1428,7 +1496,7 @@ function renderDetailPintuTab() {
 return `<div class="max-w-7xl mx-auto"><div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-5 text-white mb-6 shadow-lg animate-fade-up"><h2 class="text-xl md:text-2xl font-bold mb-1">Detail Teknis Pintu Air Irigasi</h2><p class="text-blue-100 text-sm">Referensi gambar teknis dan spesifikasi pintu air untuk Kantor Benculuk</p></div><div class="space-y-6"><div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden animate-fade-up"><div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 text-white"><div class="flex items-center space-x-3"><i data-lucide="layers" class="w-5 h-5"></i><h3 class="text-lg font-bold">PINTU PLAT (Plate Gate)</h3></div></div><div class="p-5"><div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5"><div class="space-y-3"><div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600"><img data-src="https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w1000" alt="Tampak Depan Pintu Plat" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder" onclick="openImageZoom('https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w2000')" /></div><h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Tampak Depan Pintu Plat</h4></div><div class="space-y-3"><div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600"><img data-src="https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w1000" alt="Detail Mekanisme" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder" onclick="openImageZoom('https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w2000')" /></div><h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Ringkasan Teknis & Sosialisasi</h4></div></div><div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-200 dark:border-blue-800"><h4 class="font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center text-sm"><i data-lucide="settings" class="w-4 h-4 mr-2"></i>Spesifikasi Teknis</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"><div class="space-y-2"><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Material Daun Pintu</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Plat Besi 5 mm</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Rangka</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Besi Siku 50.60.5</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">As Ulir</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Besi As Ulir Ø 2"</span></div></div><div class="space-y-2"><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Mekanisme</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Stang Pemutar Ganda</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Pengunci</span><span class="font-semibold text-slate-800 dark:text-white text-sm">Kunci Mekanis</span></div><div class="flex justify-between py-2 border-b border-blue-200 dark:border-blue-800"><span class="text-slate-600 dark:text-slate-300 text-sm">Dimensi Umum</span><span class="font-semibold text-slate-800 dark:text-white text-sm">B: 100 cm, H: 200 cm</span></div></div></div></div></div></div></div></div>`;
 }
 
-// ✅ UPDATED: Input Tab with Edit Mode support
+// Input Tab with Edit Mode support
 function renderInputTab() {
 const isEditing = state.isEditing;
 const headerTitle = isEditing ? 'Edit Data' : 'Input Data Baru';
@@ -1438,9 +1506,7 @@ const btnColor = isEditing ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 ho
 const btnIcon = isEditing ? 'save' : 'upload';
 const headerGradient = isEditing ? 'bg-gradient-to-r from-amber-700 to-amber-600' : 'bg-gradient-to-r from-blue-700 to-blue-600';
 const textColor = isEditing ? 'text-amber-100' : 'text-blue-100';
-
 const daerahOptions = CONFIG.DAERAH_IRIGASI_OPTIONS.map(opt => `<option value="${opt}" ${state.formData.namaDaerahIrigasi === opt ? 'selected' : ''}>${opt}</option>`).join('');
-
 let existingPhotosHtml = '';
 if (isEditing && state.formData.existingPhotoUrls && state.formData.existingPhotoUrls.length > 0) {
 existingPhotosHtml = `
@@ -1459,7 +1525,6 @@ ${state.formData.existingPhotoUrls.map((url, idx) => `
 </div>
 `;
 }
-
 return `
 <div class="max-w-3xl mx-auto">
 <div class="${headerGradient} rounded-2xl p-5 text-white mb-5 shadow-lg">
@@ -1485,9 +1550,7 @@ return `
 <div class="space-y-1 md:col-span-2"><label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Drat Stang</label><select name="kondisiDratStang" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white transition-all text-sm"><option value="">Pilih Kondisi</option><option value="Beroperasi dengan baik" ${state.formData.kondisiDratStang === 'Beroperasi dengan baik' ? 'selected' : ''}>Beroperasi dengan baik</option><option value="Beroperasi terdapat kerusakan" ${state.formData.kondisiDratStang === 'Beroperasi terdapat kerusakan' ? 'selected' : ''}>Beroperasi terdapat kerusakan</option><option value="Rusak tidak dapat dioperasikan" ${state.formData.kondisiDratStang === 'Rusak tidak dapat dioperasikan' ? 'selected' : ''}>Rusak tidak dapat dioperasikan</option></select></div>
 <div class="space-y-1 md:col-span-2"><label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Rangka</label><select name="kondisiRangka" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white transition-all text-sm"><option value="">Pilih Kondisi</option><option value="Beroperasi dengan baik" ${state.formData.kondisiRangka === 'Beroperasi dengan baik' ? 'selected' : ''}>Beroperasi dengan baik</option><option value="Beroperasi terdapat kerusakan" ${state.formData.kondisiRangka === 'Beroperasi terdapat kerusakan' ? 'selected' : ''}>Beroperasi terdapat kerusakan</option><option value="Rusak tidak dapat dioperasikan" ${state.formData.kondisiRangka === 'Rusak tidak dapat dioperasikan' ? 'selected' : ''}>Rusak tidak dapat dioperasikan</option></select></div>
 <div class="space-y-1 md:col-span-2"><label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Keterangan Umum</label><textarea name="keterangan" rows="3" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Jelaskan kondisi secara detail...">${escapeHtml(state.formData.keterangan)}</textarea></div>
-
 ${existingPhotosHtml}
-
 <div class="space-y-3 md:col-span-2">
 <label class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between"><span>Foto Dokumentasi (Max 10 foto baru)</span><span class="text-xs font-normal text-slate-500">${state.formData.photos.length}/10</span></label>
 <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-xs text-blue-800 dark:text-blue-300"><div class="flex items-start space-x-2"><i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0"></i><div><p class="font-semibold mb-1">Tips Pengambilan Foto</p><p><i data-lucide="camera" class="w-3 h-3 inline"></i> <strong>Kamera:</strong> Foto langsung dari perangkat + watermark otomatis (koordinat, tanggal, jam)</p><p><i data-lucide="upload" class="w-3 h-3 inline"></i> <strong>File:</strong> Upload dari galeri (tanpa watermark)</p></div></div></div>
@@ -1605,7 +1668,7 @@ if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) f
 document.getElementById('app-loading').classList.add('hidden');
 PerfMonitor.mark('init-complete'); PerfMonitor.update();
 console.log("Sistem Inventarisasi Pintu Air - Kantor Benculuk berhasil dimuat!");
-console.log("Versi: 4.8.0 (Edit, Delete, & Advanced Search Enabled)");
+console.log("Versi: 4.9.0 (Mobile Map Popup Optimized)");
 } catch (error) {
 console.error("Init error:", error);
 document.getElementById('app-loading').innerHTML = `<div class="text-center p-8"><i data-lucide="alert-triangle" class="w-16 h-16 text-amber-500 mx-auto mb-4"></i><h2 class="text-xl font-bold text-slate-800 mb-2">Gagal Memuat Aplikasi</h2><p class="text-slate-600 mb-4">${error.message}</p><button onclick="location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Coba Lagi</button></div>`;

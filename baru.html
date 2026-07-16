@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="description" content="Inventarisasi Pintu Irigasi - DI Baru dan DI Porolinggo">
+<meta name="theme-color" content="#1e40af">
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://drive.google.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow-x:hidden}
+.app-loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f1f5f9;z-index:9999}
+.app-loading.hidden{display:none}
+.spinner{width:48px;height:48px;border:4px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slide-in{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes pulse-skeleton{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}
+.animate-slide-in{animation:slide-in .3s ease-out}
+.animate-skeleton{animation:pulse-skeleton 1.5s infinite}
+.animate-fade-up{animation:fade-up .6s ease-out}
+.animate-float{animation:float 3s ease-in-out infinite}
+.animate-pulse-dot{animation:pulse-dot 1.5s ease-in-out infinite}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+.dark ::-webkit-scrollbar-track{background:#1e293b}
+.dark ::-webkit-scrollbar-thumb{background:#475569}
+.modal-overlay{background:rgba(0,0,0,.7);backdrop-filter:blur(4px)}
+.gallery-card{transition:all .3s ease}
+.gallery-card:hover{transform:translateY(-4px);box-shadow:0 20px 25px -5px rgba(0,0,0,.1)}
+.lazy-image{opacity:0;transition:opacity .3s ease}
+.lazy-image.loaded{opacity:1}
+.lazy-image.error{opacity:.5}
+.blur-placeholder{background:linear-gradient(90deg,#f1f5f9 0%,#e2e8f0 50%,#f1f5f9 100%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.kbd{display:inline-block;padding:2px 6px;font-size:11px;font-family:monospace;color:#64748b;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;box-shadow:0 1px 0 #cbd5e1}
+.dark .kbd{color:#94a3b8;background:#334155;border-color:#475569}
+.draft-indicator{position:fixed;bottom:80px;right:16px;background:#fbbf24;color:#78350f;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:50;display:none;align-items:center;gap:6px}
+.draft-indicator.show{display:flex;animation:fade-up .3s ease-out}
+.perf-indicator{position:fixed;bottom:20px;left:20px;background:rgba(0,0,0,.7);color:white;padding:8px 12px;border-radius:8px;font-size:11px;font-family:monospace;z-index:50;display:none}
+.perf-indicator.show{display:block}
+.offline-banner{position:fixed;top:0;left:0;right:0;background:#fbbf24;color:#78350f;padding:8px;text-align:center;font-size:13px;font-weight:600;z-index:1000;display:none}
+.offline-banner.show{display:block}
+
+/* ===== MAP ===== */
+.map-wrapper{position:relative;width:100%;height:500px;background:#e5e7eb;border-radius:0 0 1rem 1rem;overflow:hidden}
+#home-map,.leaflet-container{height:100%!important;width:100%!important;z-index:1!important;font-family:system-ui,-apple-system,sans-serif!important;background:#e5e7eb}
+.leaflet-pane{z-index:1!important}
+.leaflet-tile-pane{z-index:2!important}
+.leaflet-overlay-pane{z-index:3!important}
+.leaflet-marker-pane{z-index:4!important}
+.leaflet-popup-pane{z-index:5!important}
+.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;box-shadow:0 8px 30px rgba(0,0,0,.2)!important;overflow:hidden}
+.leaflet-popup-content{margin:0!important;min-width:260px!important;max-width:300px!important}
+.leaflet-popup-tip{box-shadow:0 3px 10px rgba(0,0,0,.1)!important}
+.leaflet-popup-close-button{color:white!important;font-size:20px!important;padding:8px 10px!important;z-index:10!important}
+.leaflet-popup-close-button:hover{color:#fbbf24!important}
+.popup-card{width:100%}
+.popup-header{background:linear-gradient(135deg,#1e40af 0%,#3b82f6 100%);color:white;padding:14px 16px 12px}
+.popup-header-title{font-size:14px;font-weight:700;margin:0;padding-right:20px;display:flex;align-items:center;gap:6px}
+.popup-header-sub{font-size:12px;opacity:.9;margin:3px 0 0}
+.popup-body{padding:12px 16px;background:white}
+.popup-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.popup-row:last-child{border-bottom:none}
+.popup-label{color:#64748b;font-weight:500;white-space:nowrap;margin-right:10px;display:flex;align-items:center;gap:4px}
+.popup-value{color:#1e293b;font-weight:600;text-align:right;word-break:break-word}
+.popup-footer{padding:10px 16px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;gap:8px}
+.popup-btn{flex:1;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:600;text-align:center;text-decoration:none;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.popup-btn-primary{background:#3b82f6;color:white!important}
+.popup-btn-primary:hover{background:#2563eb}
+.popup-btn-secondary{background:#e2e8f0;color:#475569!important}
+.popup-btn-secondary:hover{background:#cbd5e1}
+
+/* ===== LEGEND FILTER ===== */
+.map-legend{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(10px) saturate(180%)!important;-webkit-backdrop-filter:blur(10px) saturate(180%)!important;padding:14px 16px!important;border-radius:14px!important;box-shadow:0 4px 20px rgba(0,0,0,.12)!important;font-size:12px!important;line-height:1.6;border:1px solid rgba(255,255,255,.4)!important;min-width:160px;cursor:default;transition:all .2s}
+.dark .map-legend{background:rgba(30,41,59,.92)!important;border-color:rgba(255,255,255,.1)!important;color:#e2e8f0!important}
+.map-legend-title{font-weight:700;font-size:12px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;gap:6px}
+.dark .map-legend-title{border-color:rgba(255,255,255,.1)}
+.legend-item{display:flex;align-items:center;gap:8px;padding:5px 8px;margin:2px -8px;border-radius:8px;cursor:pointer;transition:all .15s;user-select:none}
+.legend-item:hover{background:rgba(0,0,0,.06)}
+.legend-item.active{background:rgba(59,130,246,.12);box-shadow:inset 0 0 0 1.5px rgba(59,130,246,.3)}
+.dark .legend-item:hover{background:rgba(255,255,255,.08)}
+.dark .legend-item.active{background:rgba(96,165,250,.15);box-shadow:inset 0 0 0 1.5px rgba(96,165,250,.3)}
+.legend-item.dimmed{opacity:.35}
+.map-legend-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(255,255,255,.9);box-shadow:0 1px 4px rgba(0,0,0,.2);display:inline-block;flex-shrink:0;transition:transform .15s}
+.legend-item:hover .map-legend-dot{transform:scale(1.15)}
+.legend-item.active .map-legend-dot{transform:scale(1.2)}
+.dark .map-legend-dot{border-color:rgba(255,255,255,.3)}
+.legend-count{margin-left:auto;font-size:10px;font-weight:600;background:rgba(0,0,0,.06);padding:1px 6px;border-radius:10px;color:#64748b}
+.dark .legend-count{background:rgba(255,255,255,.08);color:#94a3b8}
+
+/* ===== MARKERS ===== */
+.custom-marker-good{background:#10b981;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(16,185,129,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.custom-marker-good:hover{transform:rotate(-45deg) scale(1.15)}
+.custom-marker-good span{transform:rotate(45deg);color:white;font-weight:bold;font-size:10px}
+.custom-marker-warning{background:#f59e0b;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.custom-marker-warning:hover{transform:rotate(-45deg) scale(1.15)}
+.custom-marker-warning span{transform:rotate(45deg);color:white;font-weight:bold;font-size:10px}
+.custom-marker-danger{background:#ef4444;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(239,68,68,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.custom-marker-danger:hover{transform:rotate(-45deg) scale(1.15)}
+.custom-marker-danger span{transform:rotate(45deg);color:white;font-weight:bold;font-size:10px}
+.custom-marker-default{background:#94a3b8;width:28px;height:28px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.custom-marker-default:hover{transform:rotate(-45deg) scale(1.15)}
+.custom-marker-default span{transform:rotate(45deg);color:white;font-weight:bold;font-size:10px}
+
+/* ===== SPEC FIELDS ===== */
+.spec-field-group{position:relative}
+.spec-input-wrap{position:relative}
+.spec-input{width:100%;padding:12px 60px 12px 14px;border:2px solid #e2e8f0;border-radius:12px;font-size:15px;font-weight:600;transition:all .2s;background:white;color:#1e293b}
+.spec-input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.dark .spec-input{background:#1e293b;border-color:#334155;color:#f1f5f9}
+.dark .spec-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.15)}
+.spec-unit-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:#eff6ff;color:#2563eb;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;pointer-events:none}
+.dark .spec-unit-badge{background:rgba(37,99,235,.15);color:#60a5fa}
+.spec-conversion{display:flex;align-items:center;gap:6px;margin-top:6px;padding:6px 12px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #bbf7d0;border-radius:8px;font-size:12px;color:#166534;min-height:32px;transition:all .3s}
+.dark .spec-conversion{background:linear-gradient(135deg,rgba(22,101,52,.1),rgba(22,101,52,.05));border-color:rgba(34,197,94,.2);color:#86efac}
+.spec-conversion.empty{background:#f8fafc;border-color:#e2e8f0;color:#94a3b8}
+.dark .spec-conversion.empty{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08);color:#64748b}
+.spec-example{font-size:11px;color:#94a3b8;margin-top:4px;padding-left:2px}
+.dark .spec-example{color:#64748b}
+.spec-example code{background:#f1f5f9;padding:1px 6px;border-radius:4px;font-size:11px;color:#475569}
+.dark .spec-example code{background:#334155;color:#cbd5e1}
+
+/* ===== IMAGE ZOOM VIEWER ===== */
+.zoom-viewer-container{position:relative;width:100%;height:100%;overflow:hidden;background:#0a0a0a;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none}
+.zoom-viewer-container img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;transform-origin:0 0;pointer-events:none;will-change:transform}
+.zoom-controls{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10}
+.zoom-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:18px;font-weight:700}
+.zoom-btn:hover{background:rgba(255,255,255,.3);transform:scale(1.05)}
+.zoom-btn:active{transform:scale(.95)}
+.zoom-info{position:absolute;top:16px;left:16px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:white;padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;z-index:10;pointer-events:none}
+.zoom-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(255,255,255,.4);font-size:14px;text-align:center;pointer-events:none;transition:opacity .5s}
+.zoom-hint.hidden{opacity:0}
+
+/* ===== GLASS ===== */
+.photo-badge-glass{background:rgba(255,255,255,.55)!important;backdrop-filter:blur(12px) saturate(180%)!important;-webkit-backdrop-filter:blur(12px) saturate(180%)!important;border:1px solid rgba(255,255,255,.5)!important;box-shadow:0 4px 16px rgba(0,0,0,.08)!important;color:#1e293b!important;transition:all .3s}
+.photo-badge-glass:hover{background:rgba(255,255,255,.75)!important;box-shadow:0 6px 20px rgba(0,0,0,.12)!important}
+.dark .photo-badge-glass{background:rgba(30,41,59,.6)!important;border-color:rgba(255,255,255,.15)!important;color:#f1f5f9!important}
+.dark .photo-badge-glass:hover{background:rgba(30,41,59,.8)!important}
+.glass-card{background:rgba(255,255,255,.7)!important;backdrop-filter:blur(8px) saturate(160%)!important;-webkit-backdrop-filter:blur(8px) saturate(160%)!important;border:1px solid rgba(255,255,255,.3)!important}
+.dark .glass-card{background:rgba(30,41,59,.7)!important;border-color:rgba(255,255,255,.05)!important}
+.filter-glass{background:rgba(255,255,255,.6)!important;backdrop-filter:blur(8px) saturate(180%)!important;-webkit-backdrop-filter:blur(8px) saturate(180%)!important;border:1px solid rgba(255,255,255,.3)!important}
+.dark .filter-glass{background:rgba(30,41,59,.6)!important;border-color:rgba(255,255,255,.05)!important}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){
+.photo-badge-glass{font-size:9px!important;padding:2px 8px!important;gap:2px!important}
+.photo-badge-glass i{width:12px!important;height:12px!important}
+.glass-card,.filter-glass{backdrop-filter:blur(4px)!important}
+.map-wrapper{height:350px}
+.map-legend{font-size:10px!important;padding:10px 12px!important;min-width:120px}
+.custom-marker-good,.custom-marker-warning,.custom-marker-danger,.custom-marker-default{width:22px;height:22px}
+.custom-marker-good span,.custom-marker-warning span,.custom-marker-danger span,.custom-marker-default span{font-size:8px}
+.zoom-btn{width:38px;height:38px;border-radius:10px;font-size:16px}
+.zoom-controls{bottom:12px;gap:6px}
+}
+@media(max-width:380px){
+.map-wrapper{height:280px}
+}
+body,.bg-white,.bg-slate-50,.bg-slate-100,.text-slate-800{transition:background-color .3s ease,color .3s ease}
+@media print{.no-print{display:none!important}.print-only{display:block!important}}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{}}}</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231e40af' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white'%3E%E2%9A%99%3C/text%3E%3C/svg%3E">
+<title>Inventarisasi Pintu Irigasi - DI Baru dan DI Porolinggo</title>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-200">
+
+<!-- Loading -->
+<div id="app-loading" class="app-loading"><div class="text-center"><div class="spinner mx-auto mb-4"></div><p class="text-slate-600 dark:text-slate-300 text-sm">Memuat aplikasi...</p></div></div>
+
+<!-- Offline Banner -->
+<div id="offline-banner" class="offline-banner"><i data-lucide="wifi-off" class="w-4 h-4 inline mr-1"></i>Anda sedang offline. Beberapa fitur mungkin tidak tersedia.</div>
+
+<!-- Toast -->
+<div id="toast-container" class="fixed top-5 right-5 z-[100] space-y-3"></div>
+
+<!-- Draft Indicator -->
+<div id="draft-indicator" class="draft-indicator"><span class="animate-pulse-dot"></span><span id="draft-text">Draft tersimpan</span></div>
+
+<!-- Perf Indicator -->
+<div id="perf-indicator" class="perf-indicator"><div>Load: <span id="perf-load">-</span></div><div>Render: <span id="perf-render">-</span></div><div>Memory: <span id="perf-memory">-</span></div></div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-triangle" class="w-8 h-8 text-amber-600 dark:text-amber-400"></i></div>
+<h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" id="confirm-title">Konfirmasi</h3>
+<p class="text-slate-600 dark:text-slate-300" id="confirm-message">Apakah Anda yakin?</p>
+</div>
+<div class="flex space-x-3">
+<button id="confirm-cancel" class="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Batal</button>
+<button id="confirm-ok" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">Hapus</button>
+</div></div></div>
+
+<!-- Submit Modal -->
+<div id="submit-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="upload-cloud" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i></div>
+<h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Konfirmasi Pengiriman</h3>
+<p class="text-slate-600 dark:text-slate-300" id="submit-message">Data akan dikirim ke server.</p>
+</div>
+<div id="submit-details" class="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 mb-6 text-sm space-y-2"></div>
+<div class="flex space-x-3">
+<button id="submit-cancel" class="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Batal</button>
+<button id="submit-ok" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"><i data-lucide="send" class="w-4 h-4"></i><span>Kirim Data</span></button>
+</div></div></div>
+
+<!-- Detail Modal -->
+<div id="photo-modal" class="hidden fixed inset-0 z-[200] modal-overlay flex items-center justify-center p-2 sm:p-4">
+<div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-5xl max-h-[95vh] overflow-y-auto shadow-2xl">
+<div class="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-between items-center z-10 rounded-t-2xl sm:rounded-t-3xl">
+<h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white">Detail Data</h3>
+<div class="flex space-x-1 sm:space-x-2">
+<button onclick="printCurrentItem()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Cetak"><i data-lucide="printer" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+<button onclick="exportCurrentItemPDF()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Export PDF"><i data-lucide="file-text" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+<button onclick="closePhotoModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"><i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i></button>
+</div></div>
+<div id="modal-content" class="p-4 sm:p-6"></div>
+</div></div>
+
+<!-- Image Zoom Modal (Responsif + Pan/Zoom) -->
+<div id="image-zoom-modal" class="hidden fixed inset-0 z-[250] bg-black/90 flex items-center justify-center" style="backdrop-filter:blur(4px)">
+<div class="relative w-full h-full max-w-[95vw] max-h-[95vh] m-auto flex items-center justify-center">
+<button onclick="closeImageZoom()" class="absolute top-3 right-3 z-20 p-2 bg-white/15 hover:bg-white/25 rounded-full transition-colors text-white" style="backdrop-filter:blur(8px)"><i data-lucide="x" class="w-6 h-6 sm:w-8 sm:h-8"></i></button>
+<div class="zoom-info" id="zoom-info">100%</div>
+<div class="zoom-viewer-container" id="zoom-viewer">
+<img id="zoomed-image" src="" alt="Zoom" draggable="false"/>
+<div class="zoom-hint" id="zoom-hint">Scroll/pinch untuk zoom &bull; Seret untuk geser</div>
+</div>
+<div class="zoom-controls">
+<button class="zoom-btn" onclick="zoomViewer.zoomIn()" title="Zoom In">+</button>
+<button class="zoom-btn" onclick="zoomViewer.zoomOut()" title="Zoom Out">&minus;</button>
+<button class="zoom-btn" onclick="zoomViewer.reset()" title="Reset" style="font-size:14px">⟲</button>
+</div>
+</div></div>
+
+<!-- Shortcuts Modal -->
+<div id="shortcuts-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2"><i data-lucide="keyboard" class="w-5 h-5"></i>Keyboard Shortcuts</h3>
+<button onclick="closeShortcutsModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+</div>
+<div class="space-y-3 text-sm">
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200">Input data baru</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">N</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200">Simpan data</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">S</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200">Fokus pencarian</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">F</span></div></div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-700 dark:text-slate-200">Toggle dark mode</span><div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">D</span></div></div>
+<div class="flex justify-between items-center py-2"><span class="text-slate-700 dark:text-slate-200">Tutup modal</span><span class="kbd">Esc</span></div>
+</div></div></div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Desktop -->
+<aside class="hidden md:flex flex-col w-72 bg-blue-800 dark:bg-slate-800 shadow-xl text-white">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-2">
+<div class="p-2 bg-white dark:bg-slate-700 rounded-xl"><i data-lucide="droplets" class="text-blue-700 dark:text-blue-400 w-6 h-6"></i></div>
+<div>
+<h1 class="text-lg font-bold tracking-tight leading-tight">Inventarisasi Pintu Irigasi</h1>
+<p class="text-xs text-blue-200 dark:text-slate-400 mt-0.5">DI Baru &amp; DI Porolinggo</p>
+</div>
+</div>
+</div>
+<nav id="desktop-nav" class="flex flex-col space-y-1 px-4 flex-1"></nav>
+<div class="mt-auto p-5 border-t border-white/10 dark:border-slate-700">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center space-x-2 text-sm"><i id="desktop-status-icon" data-lucide="wifi" class="w-4 h-4"></i><span id="desktop-status-text" class="text-blue-100 dark:text-slate-300">Memeriksa...</span></div>
+<button onclick="toggleDarkMode()" class="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Toggle Dark Mode"><i id="dark-mode-icon" data-lucide="moon" class="w-4 h-4"></i></button>
+</div>
+<div class="text-xs text-blue-200 dark:text-slate-500 text-center">&copy; Kantor Benculuk</div>
+</div>
+</aside>
+
+<main class="flex-1 flex flex-col h-full w-full relative">
+<!-- Header Mobile -->
+<header class="md:hidden bg-blue-800 text-white p-3 flex justify-between items-center shadow-md z-20">
+<div class="flex items-center space-x-2">
+<i data-lucide="droplets" class="w-5 h-5"></i>
+<div><h1 class="font-bold text-sm leading-tight">Inventarisasi Pintu Irigasi</h1><p class="text-[10px] text-blue-200">DI Baru &amp; DI Porolinggo</p></div>
+</div>
+<div class="flex items-center space-x-1">
+<button onclick="toggleDarkMode()" class="p-2 hover:bg-white/10 rounded-lg transition-colors"><i id="mobile-dark-mode-icon" data-lucide="moon" class="w-5 h-5"></i></button>
+<button id="mobile-menu-btn" class="p-2 hover:bg-white/10 rounded-lg transition-colors"><i data-lucide="menu" class="w-6 h-6"></i></button>
+</div>
+</header>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="hidden md:hidden absolute top-[52px] left-0 w-full h-[calc(100%-3.5rem)] bg-blue-800 z-30 p-4 shadow-xl overflow-y-auto">
+<nav id="mobile-nav" class="flex flex-col space-y-1"></nav>
+<div class="mt-auto pt-6 border-t border-white/10 text-xs text-blue-200 text-center">&copy; Kantor Benculuk</div>
+</div>
+
+<!-- Content Area -->
+<div id="content-area" class="flex-1 overflow-y-auto p-3 md:p-8 bg-slate-100 dark:bg-slate-900 pb-24 md:pb-8"></div>
+
+<!-- Bottom Nav Mobile -->
+<nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-700 flex justify-around p-2 z-40"></nav>
+</main>
+</div>
+
+<script>
+// ============================================
+// ZOOM VIEWER - Pan & Zoom responsif
+// ============================================
+const zoomViewer = {
+  container: null, img: null, infoEl: null, hintEl: null,
+  scale: 1, minScale: 0.5, maxScale: 8,
+  tx: 0, ty: 0,
+  isDragging: false, startX: 0, startY: 0, startTx: 0, startTy: 0,
+  lastDist: 0, lastCenter: null, hintTimeout: null,
+
+  init() {
+    this.container = document.getElementById('zoom-viewer');
+    this.img = document.getElementById('zoomed-image');
+    this.infoEl = document.getElementById('zoom-info');
+    this.hintEl = document.getElementById('zoom-hint');
+    if (!this.container || !this.img) return;
+
+    // Set ukuran container responsif
+    const resize = () => {
+      const parent = this.container.parentElement;
+      if (!parent) return;
+      const w = Math.min(parent.clientWidth, window.innerWidth * 0.95);
+      const h = Math.min(parent.clientHeight, window.innerHeight * 0.95);
+      this.container.style.width = w + 'px';
+      this.container.style.height = h + 'px';
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Mouse wheel zoom
+    this.container.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.hideHint();
+      const rect = this.container.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const delta = e.deltaY > 0 ? 0.85 : 1.18;
+      this.zoomAt(mx, my, delta);
+    }, { passive: false });
+
+    // Mouse drag
+    this.container.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      this.isDragging = true;
+      this.startX = e.clientX; this.startY = e.clientY;
+      this.startTx = this.tx; this.startTy = this.ty;
+      this.container.style.cursor = 'grabbing';
+      this.hideHint();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!this.isDragging) return;
+      this.tx = this.startTx + (e.clientX - this.startX);
+      this.ty = this.startTy + (e.clientY - this.startY);
+      this.applyTransform();
+    });
+    window.addEventListener('mouseup', () => {
+      this.isDragging = false;
+      if (this.container) this.container.style.cursor = this.scale > 1 ? 'grab' : 'default';
+    });
+
+    // Touch: pinch zoom + drag
+    this.container.addEventListener('touchstart', (e) => {
+      this.hideHint();
+      if (e.touches.length === 1) {
+        this.isDragging = true;
+        this.startX = e.touches[0].clientX; this.startY = e.touches[0].clientY;
+        this.startTx = this.tx; this.startTy = this.ty;
+      } else if (e.touches.length === 2) {
+        this.isDragging = false;
+        this.lastDist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+        this.lastCenter = { x: (e.touches[0].clientX + e.touches[1].clientX) / 2, y: (e.touches[0].clientY + e.touches[1].clientY) / 2 };
+      }
+    }, { passive: true });
+    this.container.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (e.touches.length === 1 && this.isDragging) {
+        this.tx = this.startTx + (e.touches[0].clientX - this.startX);
+        this.ty = this.startTy + (e.touches[0].clientY - this.startY);
+        this.applyTransform();
+      } else if (e.touches.length === 2) {
+        const dist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+        const center = { x: (e.touches[0].clientX + e.touches[1].clientX) / 2, y: (e.touches[0].clientY + e.touches[1].clientY) / 2 };
+        const rect = this.container.getBoundingClientRect();
+        const cx = center.x - rect.left, cy = center.y - rect.top;
+        const ratio = dist / Math.max(this.lastDist, 1);
+        this.zoomAt(cx, cy, ratio);
+        // Pan dengan pergeseran center
+        const ncx = center.x - rect.left, ncy = center.y - rect.top;
+        this.tx += ncx - cx; this.ty += ncy - cy;
+        this.applyTransform();
+        this.lastDist = dist;
+        this.lastCenter = center;
+      }
+    }, { passive: false });
+    this.container.addEventListener('touchend', () => { this.isDragging = false; });
+
+    // Double tap to toggle zoom
+    let lastTap = 0;
+    this.container.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTap < 300 && e.changedTouches.length === 1) {
+        const rect = this.container.getBoundingClientRect();
+        const tx = e.changedTouches[0].clientX - rect.left;
+        const ty = e.changedTouches[0].clientY - rect.top;
+        if (this.scale > 1.2) { this.reset(); } else { this.zoomAt(tx, ty, 3); }
+      }
+      lastTap = now;
+    });
+
+    // Double click desktop
+    this.container.addEventListener('dblclick', (e) => {
+      const rect = this.container.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      if (this.scale > 1.2) { this.reset(); } else { this.zoomAt(mx, my, 3); }
+    });
+  },
+
+  zoomAt(cx, cy, factor) {
+    const newScale = Math.min(this.maxScale, Math.max(this.minScale, this.scale * factor));
+    const ratio = newScale / this.scale;
+    this.tx = cx - ratio * (cx - this.tx);
+    this.ty = cy - ratio * (cy - this.ty);
+    this.scale = newScale;
+    this.applyTransform();
+  },
+
+  zoomIn() { const rect = this.container.getBoundingClientRect(); this.zoomAt(rect.width/2, rect.height/2, 1.4); },
+  zoomOut() { const rect = this.container.getBoundingClientRect(); this.zoomAt(rect.width/2, rect.height/2, 0.7); },
+
+  reset() {
+    this.scale = 1; this.tx = 0; this.ty = 0;
+    this.applyTransform();
+  },
+
+  applyTransform() {
+    if (!this.img) return;
+    this.img.style.transform = `translate(${this.tx}px, ${this.ty}px) scale(${this.scale})`;
+    if (this.infoEl) this.infoEl.textContent = Math.round(this.scale * 100) + '%';
+    this.container.style.cursor = this.scale > 1 ? 'grab' : 'default';
+  },
+
+  open(src) {
+    this.reset();
+    this.img.src = src;
+    document.getElementById('image-zoom-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    // Tampilkan hint sebentar
+    if (this.hintEl) { this.hintEl.classList.remove('hidden'); }
+    this.hintTimeout = setTimeout(() => this.hideHint(), 3000);
+  },
+
+  hideHint() {
+    if (this.hintEl) this.hintEl.classList.add('hidden');
+    if (this.hintTimeout) clearTimeout(this.hintTimeout);
+  }
+};
+
+function closeImageZoom() {
+  document.getElementById('image-zoom-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+  zoomViewer.reset();
+}
+
+// ============================================
+// PERF MONITOR
+// ============================================
+const PerfMonitor = {
+  startTime: performance.now(),
+  mark(label) { this[label] = performance.now() - this.startTime; },
+  update() {
+    const el = (id) => document.getElementById(id);
+    if (el('perf-load')) el('perf-load').textContent = `${(performance.now() - this.startTime).toFixed(0)}ms`;
+    if (el('perf-render')) el('perf-render').textContent = `${(this.render || 0).toFixed(0)}ms`;
+    if (el('perf-memory') && performance.memory) el('perf-memory').textContent = `${(performance.memory.usedJSHeapSize / 1048576).toFixed(1)}MB`;
+    else if (el('perf-memory')) el('perf-memory').textContent = 'N/A';
+  }
+};
+
+// ============================================
+// INDEXED DB
+// ============================================
+const IDB = {
+  dbName: 'IrigasiDB', dbVersion: 1, db: null,
+  async init() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(this.dbName, this.dbVersion);
+      req.onerror = () => reject(req.error);
+      req.onsuccess = () => { this.db = req.result; resolve(); };
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('syncQueue')) db.createObjectStore('syncQueue', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('cache')) db.createObjectStore('cache', { keyPath: 'key' });
+        if (!db.objectStoreNames.contains('draft')) db.createObjectStore('draft', { keyPath: 'id' });
+      };
+    });
+  },
+  async set(store, data) { return new Promise((r, j) => { const tx = this.db.transaction(store, 'readwrite'); const req = tx.objectStore(store).put(data); req.onsuccess = () => r(); req.onerror = () => j(req.error); }); },
+  async get(store, key) { return new Promise((r, j) => { const tx = this.db.transaction(store, 'readonly'); const req = tx.objectStore(store).get(key); req.onsuccess = () => r(req.result); req.onerror = () => j(req.error); }); },
+  async getAll(store) { return new Promise((r, j) => { const tx = this.db.transaction(store, 'readonly'); const req = tx.objectStore(store).getAll(); req.onsuccess = () => r(req.result); req.onerror = () => j(req.error); }); },
+  async delete(store, key) { return new Promise((r, j) => { const tx = this.db.transaction(store, 'readwrite'); const req = tx.objectStore(store).delete(key); req.onsuccess = () => r(); req.onerror = () => j(req.error); }); }
+};
+
+// ============================================
+// CONFIG
+// ============================================
+const CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwVYG0WhbzKlKgicPTVpyVvlJq0i8Yvvg5gCQz43J0SYteKkRZToN5POE2RvgMzrWM/exec",
+  API_KEY: "IRIGASI2024RAHASIA",
+  MAX_FILE_SIZE: 5 * 1024 * 1024,
+  COMPRESSION_QUALITY: 0.7,
+  MAX_WIDTH: 1024,
+  REQUEST_TIMEOUT: 60000,
+  MAX_RETRIES: 2,
+  ITEMS_PER_PAGE: 12,
+  SEARCH_DEBOUNCE: 300,
+  AUTO_SAVE_INTERVAL: 30000,
+  DRAFT_EXPIRY_HOURS: 24,
+  CACHE_EXPIRY: 5 * 60 * 1000,
+  DAERAH_OPTIONS: ['Baru', 'Porolinggo']
+};
+
+// ============================================
+// STATE
+// ============================================
+const state = {
+  activeTab: 'home', isOnline: navigator.onLine, syncQueue: [], savedData: [],
+  isSyncing: false, isLoadingData: false, mobileMenuOpen: false,
+  searchTerm: '', homeSearchTerm: '', darkMode: false, currentPage: 1,
+  filters: { jenis: '', kondisi: '' },
+  mapFilterKondisi: null, // null = semua, 'baik', 'kerusakan ringan', 'rusak berat'
+  isEditing: false, editingId: null,
+  formData: {
+    namaDaerahIrigasi: 'Baru', namaPetugasPPA: '', namaSaluran: '',
+    nomenKlatur: '', jenisPintu: 'Pintu Plat', jenisPintuLainnya: '',
+    koordinat: '', h1: '', h: '', b: '', t: '',
+    kondisiDaunPintu: '', kondisiDratStang: '', kondisiRangka: '',
+    keterangan: '', photos: [], existingPhotoUrls: []
+  },
+  currentItem: null, autoSaveTimer: null, searchTimer: null
+};
+
+let isSubmitting = false, homeMapInstance = null, markersLayer = null, currentItemData = null;
+
+// ============================================
+// NAVIGATION
+// ============================================
+const NAV_ITEMS = [
+  { id: 'home', icon: 'map', label: 'Peta', mobileLabel: 'Peta' },
+  { id: 'data', icon: 'database', label: 'Data', mobileLabel: 'Data' },
+  { id: 'input', icon: 'plus-circle', label: 'Input Baru', mobileLabel: 'Input' },
+  { id: 'sync', icon: 'refresh-cw', label: 'Sinkronisasi', mobileLabel: 'Sync' }
+];
+
+function renderNav() {
+  const desktopNav = document.getElementById('desktop-nav');
+  const mobileNav = document.getElementById('mobile-nav');
+  const bottomNav = document.getElementById('bottom-nav');
+
+  const renderItems = (items) => items.map(item => {
+    const isActive = state.activeTab === item.id;
+    const cls = isActive
+      ? 'flex items-center gap-3 px-4 py-3 rounded-xl text-white font-semibold transition-all bg-white/15'
+      : 'flex items-center gap-3 px-4 py-3 rounded-xl text-blue-100 hover:bg-white/10 font-medium transition-all';
+    return `<button onclick="switchTab('${item.id}')" class="${cls}"><i data-lucide="${item.icon}" class="w-5 h-5"></i><span>${item.label}</span></button>`;
+  }).join('');
+
+  desktopNav.innerHTML = renderItems(NAV_ITEMS);
+  mobileNav.innerHTML = renderItems(NAV_ITEMS);
+  bottomNav.innerHTML = NAV_ITEMS.map(item => {
+    const isActive = state.activeTab === item.id;
+    const color = isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500';
+    return `<button onclick="switchTab('${item.id}')" class="flex flex-col items-center gap-0.5 py-1 px-3 ${color} transition-colors"><i data-lucide="${item.icon}" class="w-5 h-5"></i><span class="text-[10px] font-semibold">${item.mobileLabel}</span></button>`;
+  }).join('');
+
+  renderIcons();
+}
+
+function switchTab(tab) {
+  state.activeTab = tab;
+  state.mobileMenuOpen = false;
+  document.getElementById('mobile-menu').classList.add('hidden');
+  renderNav();
+  renderCurrentTab();
+  if (tab === 'home') setTimeout(() => { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 100);
+}
+
+// ============================================
+// DARK MODE
+// ============================================
+function initDarkMode() {
+  const saved = localStorage.getItem('darkMode');
+  state.darkMode = saved ? saved === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyDarkMode();
+}
+function applyDarkMode() { document.documentElement.classList.toggle('dark', state.darkMode); updateDarkModeIcons(); }
+function toggleDarkMode() { state.darkMode = !state.darkMode; localStorage.setItem('darkMode', state.darkMode); applyDarkMode(); showToast(state.darkMode ? 'Mode gelap aktif' : 'Mode terang aktif', 'info', 2000); }
+function updateDarkModeIcons() {
+  const n = state.darkMode ? 'sun' : 'moon';
+  ['dark-mode-icon', 'mobile-dark-mode-icon'].forEach(id => { const el = document.getElementById(id); if (el) el.setAttribute('data-lucide', n); });
+  renderIcons();
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(message, type = 'info', duration = 4000) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  const colors = { success: 'bg-emerald-500', error: 'bg-rose-500', info: 'bg-blue-500', warning: 'bg-amber-500' };
+  const icons = { success: 'check-circle', error: 'x-circle', info: 'info', warning: 'alert-circle' };
+  t.className = `p-4 rounded-xl shadow-lg text-white flex items-center justify-between min-w-[280px] max-w-[380px] animate-slide-in ${colors[type] || colors.info}`;
+  t.innerHTML = `<div class="flex items-center space-x-3"><i data-lucide="${icons[type]||icons.info}" class="w-5 h-5 shrink-0"></i><span class="text-sm font-medium">${message}</span></div><button class="ml-3 p-1 hover:bg-white/20 rounded-full shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+  t.querySelector('button').onclick = () => { t.style.opacity='0'; t.style.transform='translateX(100%)'; setTimeout(()=>t.remove(),300); };
+  c.appendChild(t); renderIcons(t);
+  setTimeout(() => { if(t.parentNode){ t.style.opacity='0'; t.style.transform='translateX(100%)'; setTimeout(()=>t.remove(),300); }}, duration);
+}
+
+// ============================================
+// HELPERS
+// ============================================
+function renderIcons(container) { if(window.lucide){ try{ lucide.createIcons({nodes:container?[container]:undefined}); }catch(e){} } }
+function escapeHtml(t) { if(!t)return''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function formatDate(s) { try{return new Date(s).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}catch{return'-';} }
+function formatDateTime(s) { try{return new Date(s).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return'-';} }
+function formatBytes(b) { if(!b)return'0 B'; const k=1024,s=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(k)); return (b/Math.pow(k,i)).toFixed(1)+' '+s[i]; }
+function getStatusColor(k) {
+  if(!k) return 'text-slate-400 bg-slate-50';
+  if(k.toLowerCase().includes('baik')) return 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/30';
+  if(k.toLowerCase().includes('kerusakan')) return 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30';
+  if(k.toLowerCase().includes('rusak')) return 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-900/30';
+  return 'text-slate-600 bg-slate-50';
+}
+function getMarkerColor(k) {
+  if(!k) return 'default';
+  const kl = k.toLowerCase();
+  if(kl.includes('baik')) return 'good';
+  if(kl.includes('kerusakan')) return 'warning';
+  if(kl.includes('rusak')) return 'danger';
+  return 'default';
+}
+function getOverallKondisi(item) {
+  const parts = [item['Kondisi Daun Pintu'], item['Kondisi Drat Stang'], item['Kondisi Rangka']].filter(Boolean).join(' ').toLowerCase();
+  if (parts.includes('rusak berat') || parts.includes('rusak')) return 'danger';
+  if (parts.includes('kerusakan ringan') || parts.includes('kerusakan')) return 'warning';
+  if (parts.includes('baik')) return 'good';
+  return 'default';
+}
+
+// ============================================
+// SPEC CONVERSION HELPERS
+// ============================================
+function cmToM(cmStr) {
+  const v = parseFloat(cmStr);
+  if (isNaN(v)) return null;
+  return (v / 100).toFixed(2);
+}
+function mmToCm(mmStr) {
+  const v = parseFloat(mmStr);
+  if (isNaN(v)) return null;
+  return (v / 10).toFixed(1);
+}
+function updateSpecConversion(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const val = input.value.trim();
+  const convEl = document.getElementById(fieldId + '-conv');
+  if (!convEl) return;
+
+  if (!val) {
+    convEl.className = 'spec-conversion empty';
+    convEl.innerHTML = '<span class="opacity-50">Masukkan nilai untuk melihat konversi</span>';
+    return;
+  }
+
+  const num = parseFloat(val);
+  if (isNaN(num)) {
+    convEl.className = 'spec-conversion empty';
+    convEl.innerHTML = '<span style="color:#ef4444">Nilai tidak valid</span>';
+    return;
+  }
+
+  if (fieldId === 'spec-t') {
+    // mm -> cm
+    const cm = mmToCm(val);
+    convEl.className = 'spec-conversion';
+    convEl.innerHTML = `<i data-lucide="arrow-right" class="w-3 h-3 shrink-0"></i><span><strong>${val} mm</strong> = <strong>${cm} cm</strong></span>`;
+  } else {
+    // cm -> m
+    const m = cmToM(val);
+    convEl.className = 'spec-conversion';
+    convEl.innerHTML = `<i data-lucide="arrow-right" class="w-3 h-3 shrink-0"></i><span><strong>${val} cm</strong> = <strong>${m} m</strong></span>`;
+  }
+  renderIcons(convEl);
+}
+
+// ============================================
+// RENDER TABS
+// ============================================
+function renderCurrentTab() {
+  const t0 = performance.now();
+  const area = document.getElementById('content-area');
+  switch(state.activeTab) {
+    case 'home': renderHome(area); break;
+    case 'data': renderData(area); break;
+    case 'input': renderInput(area); break;
+    case 'sync': renderSync(area); break;
+  }
+  renderIcons(area);
+  PerfMonitor.render = performance.now() - t0;
+  PerfMonitor.update();
+}
+
+// ============================================
+// HOME TAB - PETA + LEGENDA FILTER
+// ============================================
+function renderHome(area) {
+  const kondisiCounts = { good: 0, warning: 0, danger: 0, default: 0 };
+  state.savedData.forEach(item => { kondisiCounts[getOverallKondisi(item)]++; });
+  const total = state.savedData.length;
+
+  area.innerHTML = `
+    <div class="mb-4">
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">Peta Pintu Irigasi</h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">DI Baru &amp; DI Porolinggo &mdash; ${total} titik tercatat</p>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-t-2xl shadow-lg overflow-hidden">
+      <div class="p-4 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div class="relative flex-1 w-full">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="home-search-input" type="text" placeholder="Cari nama saluran, petugas, koordinat..." 
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+            value="${escapeHtml(state.homeSearchTerm)}" oninput="onHomeSearch(this.value)"/>
+        </div>
+        <button onclick="fetchOnlineData(true)" class="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i> Muat Ulang
+        </button>
+      </div>
+    </div>
+    <div class="map-wrapper" style="border-radius:0 0 0.75rem 0.75rem">
+      <div id="home-map"></div>
+    </div>
+    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-2 text-center">Klik legenda untuk memfilter &bull; Klik pin untuk detail</p>
+  `;
+  renderIcons(area);
+  setTimeout(initHomeMap, 100);
+}
+
+function onHomeSearch(val) {
+  state.homeSearchTerm = val;
+  clearTimeout(state.searchTimer);
+  state.searchTimer = setTimeout(() => updateMapMarkers(), CONFIG.SEARCH_DEBOUNCE);
+}
+
+function initHomeMap() {
+  if (homeMapInstance) { homeMapInstance.remove(); homeMapInstance = null; }
+  const mapEl = document.getElementById('home-map');
+  if (!mapEl) return;
+
+  homeMapInstance = L.map(mapEl, { zoomControl: false }).setView([-8.35, 114.15], 12);
+  L.control.zoom({ position: 'topright' }).addTo(homeMapInstance);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap', maxZoom: 19
+  }).addTo(homeMapInstance);
+
+  markersLayer = L.layerGroup().addTo(homeMapInstance);
+  addMapLegend();
+  updateMapMarkers();
+}
+
+function addMapLegend() {
+  if (!homeMapInstance) return;
+  // Hapus legend lama
+  homeMapInstance.eachLayer(l => { if (l._isLegendControl) homeMapInstance.removeLayer(l); });
+
+  const kondisiCounts = { good: 0, warning: 0, danger: 0, default: 0 };
+  state.savedData.forEach(item => { kondisiCounts[getOverallKondisi(item)]++; });
+
+  const legendData = [
+    { key: null, label: 'Semua', color: '#64748b', count: state.savedData.length },
+    { key: 'good', label: 'Baik', color: '#10b981', count: kondisiCounts.good },
+    { key: 'warning', label: 'Kerusakan Ringan', color: '#f59e0b', count: kondisiCounts.warning },
+    { key: 'danger', label: 'Rusak Berat', color: '#ef4444', count: kondisiCounts.danger },
+    { key: 'default', label: 'Belum Dinilai', color: '#94a3b8', count: kondisiCounts.default }
+  ];
+
+  const legend = L.control({ position: 'topright' });
+  legend.onAdd = function() {
+    const div = L.DomUtil.create('div', 'map-legend');
+    this._isLegendControl = true;
+    div._isLegendControl = true;
+
+    let html = `<div class="map-legend-title"><i data-lucide="filter" style="width:13px;height:13px"></i> Filter Kondisi</div>`;
+    legendData.forEach(item => {
+      const isActive = state.mapFilterKondisi === item.key;
+      const isDimmed = state.mapFilterKondisi !== null && !isActive;
+      html += `<div class="legend-item ${isActive ? 'active' : ''} ${isDimmed ? 'dimmed' : ''}" data-kondisi="${item.key !== null ? item.key : ''}">
+        <span class="map-legend-dot" style="background:${item.color}"></span>
+        <span>${item.label}</span>
+        <span class="legend-count">${item.count}</span>
+      </div>`;
+    });
+    div.innerHTML = html;
+
+    // Event delegation untuk klik
+    L.DomEvent.disableClickPropagation(div);
+    div.addEventListener('click', (e) => {
+      const item = e.target.closest('.legend-item');
+      if (!item) return;
+      const key = item.dataset.kondisi || null;
+      // Toggle: jika klik yang sama, reset ke semua
+      state.mapFilterKondisi = (state.mapFilterKondisi === key) ? null : key;
+      updateMapMarkers();
+      // Update legend UI
+      div.querySelectorAll('.legend-item').forEach(el => {
+        const k = el.dataset.kondisi || null;
+        const isA = state.mapFilterKondisi === k;
+        const isD = state.mapFilterKondisi !== null && !isA;
+        el.classList.toggle('active', isA);
+        el.classList.toggle('dimmed', isD);
+      });
+    });
+
+    setTimeout(() => renderIcons(div), 50);
+    return div;
+  };
+  legend.addTo(homeMapInstance);
+}
+
+function updateMapMarkers() {
+  if (!markersLayer) return;
+  markersLayer.clearLayers();
+
+  let data = [...state.savedData];
+
+  // Filter pencarian
+  if (state.homeSearchTerm) {
+    const term = state.homeSearchTerm.toLowerCase();
+    data = data.filter(item => {
+      const s = (v) => String(v||'').toLowerCase();
+      return s(item['Nama Saluran']).includes(term) || s(item['Nama Petugas/PPA']).includes(term) || s(item['Koordinat']).includes(term) || s(item['Nomen Klatur']).includes(term);
+    });
+  }
+
+  // Filter kondisi dari legenda
+  if (state.mapFilterKondisi) {
+    data = data.filter(item => getOverallKondisi(item) === state.mapFilterKondisi);
+  }
+
+  // Hitung ulang counts dan update legend
+  const kondisiCounts = { good: 0, warning: 0, danger: 0, default: 0 };
+  state.savedData.forEach(item => { kondisiCounts[getOverallKondisi(item)]++; });
+
+  data.forEach((item, idx) => {
+    const coord = String(item['Koordinat'] || '').trim();
+    if (!coord) return;
+
+    const parts = coord.split(',').map(s => parseFloat(s.trim()));
+    if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1])) return;
+
+    const kondisi = getOverallKondisi(item);
+    const markerHtml = `<div class="custom-marker-custom-${kondisi}"><span>${idx+1}</span></div>`;
+    const icon = L.divIcon({
+      html: markerHtml.replace(`custom-custom-${kondisi}`, kondisi === 'good' ? 'custom-marker-good' : kondisi === 'warning' ? 'custom-marker-warning' : kondisi === 'danger' ? 'custom-marker-danger' : 'custom-marker-default'),
+      className: '', iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -28]
+    });
+
+    const popupContent = buildPopupContent(item);
+    const marker = L.marker([parts[0], parts[1]], { icon }).bindPopup(popupContent, { maxWidth: 300, minWidth: 260 });
+    markersLayer.addLayer(marker);
+  });
+
+  // Fit bounds jika ada marker
+  if (data.length > 0) {
+    const bounds = L.latLngBounds(data.filter(item => {
+      const c = String(item['Koordinat']||'').split(',').map(s=>parseFloat(s.trim()));
+      return c.length>=2 && !isNaN(c[0]) && !isNaN(c[1]);
+    }).map(item => {
+      const c = String(item['Koordinat']||'').split(',').map(s=>parseFloat(s.trim()));
+      return [c[0], c[1]];
+    }));
+    if (bounds.isValid()) homeMapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+  }
+}
+
+function buildPopupContent(item) {
+  const kondisi = getOverallKondisi(item);
+  const kondisiLabel = kondisi === 'good' ? 'Baik' : kondisi === 'warning' ? 'Kerusakan Ringan' : kondisi === 'danger' ? 'Rusak Berat' : 'Belum Dinilai';
+  const kondisiColor = kondisi === 'good' ? '#10b981' : kondisi === 'warning' ? '#f59e0b' : kondisi === 'danger' ? '#ef4444' : '#94a3b8';
+
+  // Spesifikasi teknis
+  const h1 = item['Hr/H1'] ? `${item['Hr/H1']} cm = ${cmToM(item['Hr/H1'])} m` : '-';
+  const h = item['Hp/H'] ? `${item['Hp/H']} cm = ${cmToM(item['Hp/H'])} m` : '-';
+  const b = item['B'] ? `${item['B']} cm = ${cmToM(item['B'])} m` : '-';
+  const t = item['t'] ? `${item['t']} mm = ${mmToCm(item['t'])} cm` : '-';
+
+  return `<div class="popup-card">
+    <div class="popup-header">
+      <p class="popup-header-title"><i data-lucide="droplets" style="width:14px;height:14px"></i>${escapeHtml(item['Nama Saluran']||'Tanpa Nama')}</p>
+      <p class="popup-header-sub">${escapeHtml(item['Nama Daerah Irigasi']||'')} &bull; ${escapeHtml(item['Nomen Klatur']||'')}</p>
+    </div>
+    <div class="popup-body">
+      <div class="popup-row"><span class="popup-label">Petugas</span><span class="popup-value">${escapeHtml(item['Nama Petugas/PPA']||'-')}</span></div>
+      <div class="popup-row"><span class="popup-label">Kondisi</span><span class="popup-value" style="color:${kondisiColor};font-weight:700">${kondisiLabel}</span></div>
+      <div class="popup-row"><span class="popup-label">Hr/H1</span><span class="popup-value">${h1}</span></div>
+      <div class="popup-row"><span class="popup-label">Hp/H</span><span class="popup-value">${h}</span></div>
+      <div class="popup-row"><span class="popup-label">B</span><span class="popup-value">${b}</span></div>
+      <div class="popup-row"><span class="popup-label">t</span><span class="popup-value">${t}</span></div>
+      <div class="popup-row"><span class="popup-label">Jenis</span><span class="popup-value">${escapeHtml(item['Jenis Pintu']||'-')}</span></div>
+      <div class="popup-row"><span class="popup-label">Tanggal</span><span class="popup-value">${formatDate(item['Timestamp'])}</span></div>
+    </div>
+    <div class="popup-footer">
+      <button class="popup-btn popup-btn-primary" onclick="viewDetail(${state.savedData.indexOf(item)})"><i data-lucide="eye" style="width:12px;height:12px"></i> Detail</button>
+      <button class="popup-btn popup-btn-secondary" onclick="navigateToCoord('${escapeHtml(String(item['Koordinat']||''))}')"><i data-lucide="navigation" style="width:12px;height:12px"></i> Navigasi</button>
+    </div>
+  </div>`;
+}
+
+function navigateToCoord(coord) {
+  if (!coord) return;
+  const parts = coord.split(',').map(s => parseFloat(s.trim()));
+  if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${parts[0]},${parts[1]}`, '_blank');
+  }
+}
+
+function viewDetail(idx) {
+  if (idx < 0 || idx >= state.savedData.length) return;
+  currentItemData = state.savedData[idx];
+  showDetailModal(currentItemData);
+}
+
+// ============================================
+// DETAIL MODAL
+// ============================================
+function showDetailModal(item) {
+  const modal = document.getElementById('photo-modal');
+  const content = document.getElementById('modal-content');
+  const kondisi = getOverallKondisi(item);
+  const kondisiLabel = kondisi === 'good' ? 'Baik' : kondisi === 'warning' ? 'Kerusakan Ringan' : kondisi === 'danger' ? 'Rusak Berat' : 'Belum Dinilai';
+  const kondisiBg = kondisi === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : kondisi === 'warning' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : kondisi === 'danger' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+
+  const h1 = item['Hr/H1'] ? `${item['Hr/H1']} cm = <strong>${cmToM(item['Hr/H1'])} m</strong>` : '-';
+  const h = item['Hp/H'] ? `${item['Hp/H']} cm = <strong>${cmToM(item['Hp/H'])} m</strong>` : '-';
+  const b = item['B'] ? `${item['B']} cm = <strong>${cmToM(item['B'])} m</strong>` : '-';
+  const t = item['t'] ? `${item['t']} mm = <strong>${mmToCm(item['t'])} cm</strong>` : '-';
+
+  // Foto
+  const photos = [];
+  if (item['Foto 1']) photos.push(item['Foto 1']);
+  if (item['Foto 2']) photos.push(item['Foto 2']);
+  if (item['Foto 3']) photos.push(item['Foto 3']);
+  if (item['Foto 4']) photos.push(item['Foto 4']);
+  if (item['Foto 5']) photos.push(item['Foto 5']);
+
+  const photosHtml = photos.length > 0 ? `
+    <div class="mt-6">
+      <h4 class="font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4"></i> Foto (${photos.length})</h4>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        ${photos.map((url, i) => `
+          <div class="relative group cursor-pointer rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 aspect-square" onclick="zoomViewer.open('${escapeHtml(url)}')">
+            <img src="${escapeHtml(url)}" alt="Foto ${i+1}" class="w-full h-full object-cover transition-transform group-hover:scale-105" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-slate-400\\'>Gagal memuat</div>'"/>
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+              <i data-lucide="zoom-in" class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2">Klik foto untuk zoom &bull; Scroll/pinch untuk perbesar &bull; Seret untuk geser</p>
+    </div>
+  ` : '<p class="text-sm text-slate-400 mt-4">Tidak ada foto tersedia.</p>';
+
+  content.innerHTML = `
+    <div class="space-y-6">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-white">${escapeHtml(item['Nama Saluran']||'Tanpa Nama')}</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400">${escapeHtml(item['Nama Daerah Irigasi']||'')} &bull; ${escapeHtml(item['Nomen Klatur']||'')}</p>
+        </div>
+        <span class="inline-flex px-3 py-1.5 rounded-full text-xs font-bold ${kondisiBg}">${kondisiLabel}</span>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-3">
+          <h4 class="font-bold text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Informasi Umum</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-slate-500">Petugas/PPA</span><span class="font-semibold text-slate-800 dark:text-white">${escapeHtml(item['Nama Petugas/PPA']||'-')}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Jenis Pintu</span><span class="font-semibold text-slate-800 dark:text-white">${escapeHtml(item['Jenis Pintu']||'-')}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Koordinat</span><span class="font-semibold text-slate-800 dark:text-white text-xs">${escapeHtml(item['Koordinat']||'-')}</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Tanggal</span><span class="font-semibold text-slate-800 dark:text-white">${formatDateTime(item['Timestamp'])}</span></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-3">
+          <h4 class="font-bold text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2"><i data-lucide="ruler" class="w-4 h-4"></i> Spesifikasi Teknis</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between items-start"><span class="text-slate-500">Hr/H1 (Tinggi Rangka)</span><span class="font-semibold text-slate-800 dark:text-white text-right">${h1}</span></div>
+            <div class="flex justify-between items-start"><span class="text-slate-500">Hp/H (Tinggi Daun)</span><span class="font-semibold text-slate-800 dark:text-white text-right">${h}</span></div>
+            <div class="flex justify-between items-start"><span class="text-slate-500">B (Lebar Daun)</span><span class="font-semibold text-slate-800 dark:text-white text-right">${b}</span></div>
+            <div class="flex justify-between items-start"><span class="text-slate-500">t (Ketebalan Pelat)</span><span class="font-semibold text-slate-800 dark:text-white text-right">${t}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kondisi -->
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4">
+        <h4 class="font-bold text-sm text-slate-600 dark:text-slate-300 mb-3 flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4"></i> Kondisi</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p class="text-xs text-slate-500 mb-1">Daun Pintu</p>
+            <p class="text-sm font-bold ${getStatusColor(item['Kondisi Daun Pintu'])} px-2 py-1 rounded-md">${escapeHtml(item['Kondisi Daun Pintu']||'-')}</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p class="text-xs text-slate-500 mb-1">Drat Stang</p>
+            <p class="text-sm font-bold ${getStatusColor(item['Kondisi Drat Stang'])} px-2 py-1 rounded-md">${escapeHtml(item['Kondisi Drat Stang']||'-')}</p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 rounded-lg p-3 text-center">
+            <p class="text-xs text-slate-500 mb-1">Rangka</p>
+            <p class="text-sm font-bold ${getStatusColor(item['Kondisi Rangka'])} px-2 py-1 rounded-md">${escapeHtml(item['Kondisi Rangka']||'-')}</p>
+          </div>
+        </div>
+      </div>
+
+      ${item['Keterangan Kondisi'] ? `<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4"><h4 class="font-bold text-sm text-amber-700 dark:text-amber-400 mb-1 flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4"></i> Keterangan</h4><p class="text-sm text-amber-800 dark:text-amber-200">${escapeHtml(item['Keterangan Kondisi'])}</p></div>` : ''}
+
+      ${photosHtml}
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderIcons(content);
+}
+
+function closePhotoModal() {
+  document.getElementById('photo-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+  currentItemData = null;
+}
+
+function printCurrentItem() { if(currentItemData) window.print(); }
+function exportCurrentItemPDF() {
+  if (!currentItemData || !window.jspdf) { showToast('Library PDF belum dimuat', 'warning'); return; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Detail Pintu Irigasi', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`DI Baru & DI Porolinggo - Kantor Benculuk`, 14, 28);
+    doc.text(`Tanggal: ${formatDateTime(currentItemData['Timestamp'])}`, 14, 34);
+    const rows = [
+      ['Nama Saluran', currentItemData['Nama Saluran'] || '-'],
+      ['Daerah Irigasi', currentItemData['Nama Daerah Irigasi'] || '-'],
+      ['Petugas/PPA', currentItemData['Nama Petugas/PPA'] || '-'],
+      ['Nomen Klatur', currentItemData['Nomen Klatur'] || '-'],
+      ['Jenis Pintu', currentItemData['Jenis Pintu'] || '-'],
+      ['Koordinat', currentItemData['Koordinat'] || '-'],
+      ['Hr/H1', currentItemData['Hr/H1'] ? `${currentItemData['Hr/H1']} cm = ${cmToM(currentItemData['Hr/H1'])} m` : '-'],
+      ['Hp/H', currentItemData['Hp/H'] ? `${currentItemData['Hp/H']} cm = ${cmToM(currentItemData['Hp/H'])} m` : '-'],
+      ['B', currentItemData['B'] ? `${currentItemData['B']} cm = ${cmToM(currentItemData['B'])} m` : '-'],
+      ['t', currentItemData['t'] ? `${currentItemData['t']} mm = ${mmToCm(currentItemData['t'])} cm` : '-'],
+      ['Kondisi Daun Pintu', currentItemData['Kondisi Daun Pintu'] || '-'],
+      ['Kondisi Drat Stang', currentItemData['Kondisi Drat Stang'] || '-'],
+      ['Kondisi Rangka', currentItemData['Kondisi Rangka'] || '-'],
+      ['Keterangan', currentItemData['Keterangan Kondisi'] || '-'],
+    ];
+    doc.autoTable({ startY: 40, head: [['Field', 'Nilai']], body: rows, theme: 'grid', headStyles: { fillColor: [30, 64, 175] }, styles: { fontSize: 9 } });
+    doc.save(`pintu-${currentItemData['Nama Saluran']||'data'}.pdf`);
+    showToast('PDF berhasil diunduh', 'success');
+  } catch(e) { showToast('Gagal export PDF: ' + e.message, 'error'); }
+}
+
+// ============================================
+// DATA TAB
+// ============================================
+function renderData(area) {
+  const filtered = getFilteredData();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CONFIG.ITEMS_PER_PAGE));
+  if (state.currentPage > totalPages) state.currentPage = totalPages;
+  const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
+  const pageData = filtered.slice(start, start + CONFIG.ITEMS_PER_PAGE);
+
+  const kondisiOptions = ['Baik', 'Kerusakan Ringan', 'Rusak Berat'];
+  const jenisOptions = [...new Set(state.savedData.map(i => i['Jenis Pintu']).filter(Boolean))];
+
+  area.innerHTML = `
+    <div class="mb-4">
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">Data Pintu Irigasi</h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">${filtered.length} dari ${state.savedData.length} data</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-4 mb-4 filter-glass">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="search-input" type="text" placeholder="Cari..." value="${escapeHtml(state.searchTerm)}" oninput="onDataSearch(this.value)"
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+        </div>
+        <select id="filter-jenis" onchange="state.filters.jenis=this.value;state.currentPage=1;renderCurrentTab()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+          <option value="">Semua Jenis</option>
+          ${jenisOptions.map(j => `<option value="${escapeHtml(j)}" ${state.filters.jenis===j?'selected':''}>${escapeHtml(j)}</option>`).join('')}
+        </select>
+        <select id="filter-kondisi" onchange="state.filters.kondisi=this.value;state.currentPage=1;renderCurrentTab()" class="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+          <option value="">Semua Kondisi</option>
+          ${kondisiOptions.map(k => `<option value="${k}" ${state.filters.kondisi===k?'selected':''}>${k}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <!-- Data Cards -->
+    ${state.isLoadingData ? `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${Array(6).fill('<div class="bg-white dark:bg-slate-800 rounded-2xl p-5 animate-skeleton"><div class="h-4 bg-slate-200 dark:bg-slate-700 rounded mb-3 w-3/4"></div><div class="h-3 bg-slate-200 dark:bg-slate-700 rounded mb-2 w-1/2"></div><div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div></div>').join('')}
+      </div>
+    ` : pageData.length === 0 ? `
+      <div class="text-center py-16">
+        <i data-lucide="inbox" class="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4"></i>
+        <p class="text-slate-500 dark:text-slate-400 text-lg font-medium">Tidak ada data ditemukan</p>
+        <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Coba ubah filter atau kata kunci pencarian</p>
+      </div>
+    ` : `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${pageData.map((item, i) => {
+          const globalIdx = state.savedData.indexOf(item);
+          const kondisi = getOverallKondisi(item);
+          const kondisiLabel = kondisi === 'good' ? 'Baik' : kondisi === 'warning' ? 'Kerusakan Ringan' : kondisi === 'danger' ? 'Rusak Berat' : '-';
+          const kondisiCls = kondisi === 'good' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : kondisi === 'warning' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : kondisi === 'danger' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' : 'bg-slate-100 text-slate-500';
+          const borderColor = kondisi === 'good' ? 'border-l-emerald-500' : kondisi === 'warning' ? 'border-l-amber-500' : kondisi === 'danger' ? 'border-l-rose-500' : 'border-l-slate-300';
+          return `<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all border-l-4 ${borderColor} overflow-hidden cursor-pointer" onclick="viewDetail(${globalIdx})">
+            <div class="p-4">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-sm text-slate-800 dark:text-white leading-tight">${escapeHtml(item['Nama Saluran']||'Tanpa Nama')}</h3>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${kondisiCls} shrink-0 ml-2">${kondisiLabel}</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">${escapeHtml(item['Nama Daerah Irigasi']||'')} &bull; ${escapeHtml(item['Nomen Klatur']||'')}</p>
+              <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <span class="text-slate-400">Petugas:</span><span class="font-medium truncate">${escapeHtml(item['Nama Petugas/PPA']||'-')}</span>
+                <span class="text-slate-400">Hr/H1:</span><span class="font-medium">${item['Hr/H1'] ? item['Hr/H1']+' cm' : '-'}</span>
+                <span class="text-slate-400">Hp/H:</span><span class="font-medium">${item['Hp/H'] ? item['Hp/H']+' cm' : '-'}</span>
+                <span class="text-slate-400">B:</span><span class="font-medium">${item['B'] ? item['B']+' cm' : '-'}</span>
+                <span class="text-slate-400">t:</span><span class="font-medium">${item['t'] ? item['t']+' mm' : '-'}</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2">${formatDate(item['Timestamp'])}</p>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Pagination -->
+      ${totalPages > 1 ? `
+      <div class="flex justify-center items-center gap-2 mt-6">
+        <button onclick="state.currentPage=Math.max(1,state.currentPage-1);renderCurrentTab()" ${state.currentPage===1?'disabled':''} class="px-3 py-2 rounded-lg text-sm font-semibold ${state.currentPage===1?'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500':'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm'} transition-colors">Prev</button>
+        <span class="text-sm text-slate-500 px-3">${state.currentPage} / ${totalPages}</span>
+        <button onclick="state.currentPage=Math.min(${totalPages},state.currentPage+1);renderCurrentTab()" ${state.currentPage===totalPages?'disabled':''} class="px-3 py-2 rounded-lg text-sm font-semibold ${state.currentPage===totalPages?'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500':'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm'} transition-colors">Next</button>
+      </div>` : ''}
+    `}
+  `;
+  renderIcons(area);
+}
+
+function getFilteredData() {
+  let data = [...state.savedData];
+  if (state.searchTerm) {
+    const t = state.searchTerm.toLowerCase();
+    data = data.filter(i => {
+      const s = v => String(v||'').toLowerCase();
+      return s(i['Nama Saluran']).includes(t) || s(i['Nama Petugas/PPA']).includes(t) || s(i['Koordinat']).includes(t) || s(i['Nomen Klatur']).includes(t) || s(i['Jenis Pintu']).includes(t);
+    });
+  }
+  if (state.filters.jenis) data = data.filter(i => i['Jenis Pintu'] === state.filters.jenis);
+  if (state.filters.kondisi) {
+    const kw = state.filters.kondisi.toLowerCase();
+    data = data.filter(i => [i['Kondisi Daun Pintu'], i['Kondisi Drat Stang'], i['Kondisi Rangka']].join(' ').toLowerCase().includes(kw));
+  }
+  return data;
+}
+
+function onDataSearch(val) {
+  state.searchTerm = val;
+  state.currentPage = 1;
+  clearTimeout(state.searchTimer);
+  state.searchTimer = setTimeout(() => renderCurrentTab(), CONFIG.SEARCH_DEBOUNCE);
+}
+
+// ============================================
+// INPUT TAB - dengan Spesifikasi Teknis
+// ============================================
+function renderInput(area) {
+  const fd = state.formData;
+  area.innerHTML = `
+    <div class="mb-4">
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">${state.isEditing ? 'Edit Data' : 'Input Data Baru'}</h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Lengkapi formulir berikut dengan data pintu irigasi</p>
+    </div>
+
+    <form id="input-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+      <!-- Daerah Irigasi -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5">
+        <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> Daerah Irigasi</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nama Daerah Irigasi *</label>
+            <select name="namaDaerahIrigasi" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+              ${CONFIG.DAERAH_OPTIONS.map(d => `<option value="${d}" ${fd.namaDaerahIrigasi===d?'selected':''}>DI ${d}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nama Saluran *</label>
+            <input type="text" name="namaSaluran" required value="${escapeHtml(fd.namaSaluran)}" placeholder="Contoh: Saluran Sekunder A" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nama Petugas/PPA *</label>
+            <input type="text" name="namaPetugasPPA" required value="${escapeHtml(fd.namaPetugasPPA)}" placeholder="Nama petugas" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Nomen Klatur</label>
+            <input type="text" name="nomenKlatur" value="${escapeHtml(fd.nomenKlatur)}" placeholder="Contoh: PP.01.A" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jenis Pintu & Koordinat -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5">
+        <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-blue-500"></i> Jenis &amp; Lokasi</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Jenis Pintu *</label>
+            <select name="jenisPintu" required onchange="toggleJenisLainnya(this.value)" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="Pintu Plat" ${fd.jenisPintu==='Pintu Plat'?'selected':''}>Pintu Plat</option>
+              <option value="Pintu Rollo" ${fd.jenisPintu==='Pintu Rollo'?'selected':''}>Pintu Rollo</option>
+              <option value="Pintu Sluice" ${fd.jenisPintu==='Pintu Sluice'?'selected':''}>Pintu Sluice</option>
+              <option value="Lainnya" ${fd.jenisPintu==='Lainnya'?'selected':''}>Lainnya</option>
+            </select>
+          </div>
+          <div id="jenis-lainnya-wrap" class="${fd.jenisPintu==='Lainnya'?'':'hidden'}">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Jenis Pintu Lainnya *</label>
+            <input type="text" name="jenisPintuLainnya" value="${escapeHtml(fd.jenisPintuLainnya)}" placeholder="Tuliskan jenis pintu" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Koordinat (Lat, Lng)</label>
+            <div class="flex gap-2">
+              <input type="text" name="koordinat" value="${escapeHtml(fd.koordinat)}" placeholder="-8.3500, 114.1500" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"/>
+              <button type="button" onclick="getMyLocation()" class="shrink-0 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"><i data-lucide="crosshair" class="w-4 h-4"></i> Lokasi</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPESIFIKASI TEKNIS PINTU -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5">
+        <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-2"><i data-lucide="ruler" class="w-5 h-5 text-blue-500"></i> Spesifikasi Teknis Pintu</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mb-5">Format: Hr/H1, Hp/H, B dalam <strong>cm</strong> (otomatis dikonversi ke m) &bull; t dalam <strong>mm</strong> (otomatis dikonversi ke cm)</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <!-- Hr/H1 -->
+          <div class="spec-field-group">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hr / H1 &mdash; Tinggi Rangka</label>
+            <div class="spec-input-wrap">
+              <input id="spec-h1" type="number" step="any" min="0" name="h1" value="${fd.h1}" placeholder="Contoh: 150" oninput="updateSpecConversion('spec-h1');state.formData.h1=this.value" class="spec-input"/>
+              <span class="spec-unit-badge">cm</span>
+            </div>
+            <div id="spec-h1-conv" class="spec-conversion empty"><span class="opacity-50">Masukkan nilai untuk melihat konversi</span></div>
+            <p class="spec-example">Contoh: <code>150</code> &rarr; <code>150 cm = 1,50 m</code></p>
+          </div>
+
+          <!-- Hp/H -->
+          <div class="spec-field-group">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Hp / H &mdash; Tinggi Daun Pintu</label>
+            <div class="spec-input-wrap">
+              <input id="spec-h" type="number" step="any" min="0" name="h" value="${fd.h}" placeholder="Contoh: 130" oninput="updateSpecConversion('spec-h');state.formData.h=this.value" class="spec-input"/>
+              <span class="spec-unit-badge">cm</span>
+            </div>
+            <div id="spec-h-conv" class="spec-conversion empty"><span class="opacity-50">Masukkan nilai untuk melihat konversi</span></div>
+            <p class="spec-example">Contoh: <code>130</code> &rarr; <code>130 cm = 1,30 m</code></p>
+          </div>
+
+          <!-- B -->
+          <div class="spec-field-group">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">B &mdash; Lebar Daun Pintu</label>
+            <div class="spec-input-wrap">
+              <input id="spec-b" type="number" step="any" min="0" name="b" value="${fd.b}" placeholder="Contoh: 100" oninput="updateSpecConversion('spec-b');state.formData.b=this.value" class="spec-input"/>
+              <span class="spec-unit-badge">cm</span>
+            </div>
+            <div id="spec-b-conv" class="spec-conversion empty"><span class="opacity-50">Masukkan nilai untuk melihat konversi</span></div>
+            <p class="spec-example">Contoh: <code>100</code> &rarr; <code>100 cm = 1,00 m</code></p>
+          </div>
+
+          <!-- t -->
+          <div class="spec-field-group">
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">t &mdash; Ketebalan Pelat</label>
+            <div class="spec-input-wrap">
+              <input id="spec-t" type="number" step="any" min="0" name="t" value="${fd.t}" placeholder="Contoh: 5" oninput="updateSpecConversion('spec-t');state.formData.t=this.value" class="spec-input"/>
+              <span class="spec-unit-badge">mm</span>
+            </div>
+            <div id="spec-t-conv" class="spec-conversion empty"><span class="opacity-50">Masukkan nilai untuk melihat konversi</span></div>
+            <p class="spec-example">Contoh: <code>5</code> &rarr; <code>5 mm = 0,5 cm</code></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kondisi -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5">
+        <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i> Kondisi</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Kondisi Daun Pintu</label>
+            <select name="kondisiDaunPintu" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="">-- Pilih --</option>
+              <option value="Baik" ${fd.kondisiDaunPintu==='Baik'?'selected':''}>Baik</option>
+              <option value="Kerusakan Ringan" ${fd.kondisiDaunPintu==='Kerusakan Ringan'?'selected':''}>Kerusakan Ringan</option>
+              <option value="Rusak Berat" ${fd.kondisiDaunPintu==='Rusak Berat'?'selected':''}>Rusak Berat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Kondisi Drat Stang</label>
+            <select name="kondisiDratStang" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="">-- Pilih --</option>
+              <option value="Baik" ${fd.kondisiDratStang==='Baik'?'selected':''}>Baik</option>
+              <option value="Kerusakan Ringan" ${fd.kondisiDratStang==='Kerusakan Ringan'?'selected':''}>Kerusakan Ringan</option>
+              <option value="Rusak Berat" ${fd.kondisiDratStang==='Rusak Berat'?'selected':''}>Rusak Berat</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Kondisi Rangka</label>
+            <select name="kondisiRangka" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+              <option value="">-- Pilih --</option>
+              <option value="Baik" ${fd.kondisiRangka==='Baik'?'selected':''}>Baik</option>
+              <option value="Kerusakan Ringan" ${fd.kondisiRangka==='Kerusakan Ringan'?'selected':''}>Kerusakan Ringan</option>
+              <option value="Rusak Berat" ${fd.kondisiRangka==='Rusak Berat'?'selected':''}>Rusak Berat</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">Keterangan Kondisi</label>
+          <textarea name="keterangan" rows="3" placeholder="Deskripsikan kondisi secara detail..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none">${escapeHtml(fd.keterangan)}</textarea>
+        </div>
+      </div>
+
+      <!-- Foto -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5">
+        <h3 class="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2"><i data-lucide="camera" class="w-5 h-5 text-blue-500"></i> Foto (maks. 5)</h3>
+        <div id="photo-preview-area" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-4">
+          ${fd.photos.map((p, i) => `
+            <div class="relative group aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700">
+              <img src="${p.base64}" class="w-full h-full object-cover" alt="Foto ${i+1}"/>
+              <button type="button" onclick="removePhoto(${i})" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
+            </div>
+          `).join('')}
+        </div>
+        <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+          <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+          <span class="text-sm text-slate-500 font-medium">Klik atau seret foto ke sini</span>
+          <span class="text-xs text-slate-400">JPG/PNG, maks 5MB per foto</span>
+          <input type="file" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(this.files)"/>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="submit" id="submit-btn" class="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25">
+          <i data-lucide="send" class="w-4 h-4"></i> ${state.isEditing ? 'Perbarui Data' : 'Kirim Data'}
+        </button>
+        <button type="button" onclick="resetForm()" class="px-6 py-3.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold text-sm hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">Reset</button>
+      </div>
+    </form>
+  `;
+  renderIcons(area);
+  // Inisialisasi konversi jika sudah ada nilai
+  ['spec-h1','spec-h','spec-b','spec-t'].forEach(id => updateSpecConversion(id));
+}
+
+function toggleJenisLainnya(val) {
+  const wrap = document.getElementById('jenis-lainnya-wrap');
+  if (wrap) wrap.classList.toggle('hidden', val !== 'Lainnya');
+}
+
+function getMyLocation() {
+  if (!navigator.geolocation) { showToast('Geolocation tidak didukung browser', 'error'); return; }
+  showToast('Mengambil lokasi...', 'info', 2000);
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      const input = document.querySelector('input[name="koordinat"]');
+      if (input) input.value = `${lat}, ${lng}`;
+      state.formData.koordinat = `${lat}, ${lng}`;
+      showToast('Lokasi berhasil diambil', 'success');
+    },
+    (err) => showToast('Gagal mengambil lokasi: ' + err.message, 'error'),
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+// ============================================
+// PHOTO HANDLING
+// ============================================
+function handlePhotoUpload(files) {
+  const remaining = 5 - state.formData.photos.length;
+  if (remaining <= 0) { showToast('Maksimal 5 foto', 'warning'); return; }
+  const toProcess = Array.from(files).slice(0, remaining);
+  let processed = 0;
+  toProcess.forEach(file => {
+    if (file.size > CONFIG.MAX_FILE_SIZE) { showToast(`${file.name} terlalu besar (maks 5MB)`, 'warning'); processed++; return; }
+    compressImage(file).then(result => {
+      state.formData.photos.push(result);
+      processed++;
+      if (processed === toProcess.length) {
+        renderCurrentTab();
+        showToast(`${state.formData.photos.length} foto siap`, 'success', 2000);
+      }
+    }).catch(() => { processed++; showToast(`Gagal memproses ${file.name}`, 'error'); });
+  });
+}
+
+function removePhoto(idx) {
+  state.formData.photos.splice(idx, 1);
+  renderCurrentTab();
+}
+
+function compressImage(file, maxWidth = CONFIG.MAX_WIDTH, quality = CONFIG.COMPRESSION_QUALITY) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(img, 0, 0, w, h);
+        const base64 = canvas.toDataURL('image/jpeg', quality);
+        resolve({ base64, mimeType: 'image/jpeg', name: file.name, originalSize: file.size, compressedSize: (base64.length * 3) / 4 });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================
+// FORM SUBMIT
+// ============================================
+function handleFormSubmit(e) {
+  e.preventDefault();
+  if (isSubmitting) return;
+  const form = e.target;
+  const fd = new FormData(form);
+
+  // Validasi
+  const errors = [];
+  if (!fd.get('namaPetugasPPA')?.trim()) errors.push('Nama Petugas/PPA wajib diisi');
+  if (!fd.get('namaSaluran')?.trim()) errors.push('Nama Saluran wajib diisi');
+  if (fd.get('jenisPintu') === 'Lainnya' && !fd.get('jenisPintuLainnya')?.trim()) errors.push('Jenis pintu lainnya wajib diketik');
+  if (state.formData.photos.length === 0 && !state.isEditing) errors.push('Minimal harus ada 1 foto');
+
+  if (errors.length > 0) { errors.forEach(err => showToast(err, 'error', 5000)); return; }
+
+  // Bangun payload
+  const payload = {
+    API_KEY: CONFIG.API_KEY,
+    action: state.isEditing ? 'update' : 'create',
+    'Nama Daerah Irigasi': fd.get('namaDaerahIrigasi'),
+    'Nama Saluran': fd.get('namaSaluran')?.trim(),
+    'Nama Petugas/PPA': fd.get('namaPetugasPPA')?.trim(),
+    'Nomen Klatur': fd.get('nomenKlatur')?.trim() || '',
+    'Jenis Pintu': fd.get('jenisPintu') === 'Lainnya' ? fd.get('jenisPintuLainnya')?.trim() : fd.get('jenisPintu'),
+    'Koordinat': fd.get('koordinat')?.trim() || '',
+    'Hr/H1': fd.get('h1') || '',
+    'Hp/H': fd.get('h') || '',
+    'B': fd.get('b') || '',
+    't': fd.get('t') || '',
+    'Kondisi Daun Pintu': fd.get('kondisiDaunPintu') || '',
+    'Kondisi Drat Stang': fd.get('kondisiDratStang') || '',
+    'Kondisi Rangka': fd.get('kondisiRangka') || '',
+    'Keterangan Kondisi': fd.get('keterangan')?.trim() || '',
+    'Timestamp': new Date().toISOString()
+  };
+
+  if (state.isEditing && state.editingId) {
+    payload.id = state.editingId;
+  }
+
+  // Tambahkan foto
+  const addPhotos = async () => {
+    const photos = state.formData.photos;
+    for (let i = 0; i < Math.min(photos.length, 5); i++) {
+      try {
+        const watermarked = await addWatermarkToImage(photos[i].base64, payload['Koordinat'], payload['Timestamp']);
+        payload[`Foto ${i + 1}`] = watermarked;
+      } catch {
+        payload[`Foto ${i + 1}`] = photos[i].base64;
+      }
+    }
+    // Kirim
+    showSubmitConfirm(payload);
+  };
+
+  if (state.formData.photos.length > 0) { addPhotos(); }
+  else { showSubmitConfirm(payload); }
+}
+
+function addWatermarkToImage(base64, coord, timestamp) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas');
+        c.width = img.width; c.height = img.height;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const d = new Date(timestamp);
+        const fs = Math.max(12, Math.floor(c.width / 60));
+        const lh = fs * 1.4;
+        ctx.font = `${fs}px system-ui,sans-serif`;
+        const lines = [
+          coord || 'Koordinat tidak tersedia',
+          d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+          d.toLocaleTimeString('id-ID')
+        ];
+        const mw = Math.max(...lines.map(l => ctx.measureText(l).width));
+        const pad = 10, margin = 12;
+        const bw = mw + pad * 2, bh = lh * lines.length + pad * 2;
+        const x = c.width - bw - margin, y = c.height - bh - margin;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(x, y, bw, bh);
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        lines.forEach((line, i) => ctx.fillText(line, x + pad, y + pad + i * lh));
+        resolve(c.toDataURL('image/jpeg', 0.7));
+      } catch (e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('Gagal memuat gambar'));
+    img.src = base64;
+  });
+}
+
+function showSubmitConfirm(payload) {
+  const modal = document.getElementById('submit-modal');
+  const details = document.getElementById('submit-details');
+  details.innerHTML = `
+    <div class="flex justify-between"><span class="text-slate-500">Saluran:</span><span class="font-semibold">${escapeHtml(payload['Nama Saluran'])}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">DI:</span><span class="font-semibold">${escapeHtml(payload['Nama Daerah Irigasi'])}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Petugas:</span><span class="font-semibold">${escapeHtml(payload['Nama Petugas/PPA'])}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Hr/H1:</span><span class="font-semibold">${payload['Hr/H1'] ? payload['Hr/H1']+' cm = '+cmToM(payload['Hr/H1'])+' m' : '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Hp/H:</span><span class="font-semibold">${payload['Hp/H'] ? payload['Hp/H']+' cm = '+cmToM(payload['Hp/H'])+' m' : '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">B:</span><span class="font-semibold">${payload['B'] ? payload['B']+' cm = '+cmToM(payload['B'])+' m' : '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">t:</span><span class="font-semibold">${payload['t'] ? payload['t']+' mm = '+mmToCm(payload['t'])+' cm' : '-'}</span></div>
+    <div class="flex justify-between"><span class="text-slate-500">Foto:</span><span class="font-semibold">${Object.keys(payload).filter(k => k.startsWith('Foto ')).length} foto</span></div>
+  `;
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  renderIcons(details);
+
+  document.getElementById('submit-ok').onclick = async () => {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    isSubmitting = true;
+    const btn = document.getElementById('submit-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Mengirim...'; }
+
+    try {
+      const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      showToast('Data berhasil dikirim!', 'success');
+      resetForm();
+      fetchOnlineData(true);
+    } catch (e) {
+      showToast('Gagal mengirim: ' + e.message, 'error');
+      // Simpan ke queue
+      payload.id = 'local_' + Date.now();
+      state.syncQueue.push(payload);
+      IDB.set('syncQueue', payload);
+    } finally {
+      isSubmitting = false;
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Kirim Data'; renderIcons(btn); }
+    }
+  };
+  document.getElementById('submit-cancel').onclick = () => { modal.classList.add('hidden'); document.body.style.overflow = ''; };
+}
+
+function resetForm() {
+  state.formData = { namaDaerahIrigasi:'Baru', namaPetugasPPA:'', namaSaluran:'', nomenKlatur:'', jenisPintu:'Pintu Plat', jenisPintuLainnya:'', koordinat:'', h1:'', h:'', b:'', t:'', kondisiDaunPintu:'', kondisiDratStang:'', kondisiRangka:'', keterangan:'', photos:[], existingPhotoUrls:[] };
+  state.isEditing = false; state.editingId = null;
+  renderCurrentTab();
+}
+
+// ============================================
+// SYNC TAB
+// ============================================
+function renderSync(area) {
+  area.innerHTML = `
+    <div class="mb-4">
+      <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-1">Sinkronisasi</h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Kelola data offline dan sinkronisasi dengan server</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 text-center">
+        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-3"><i data-lucide="database" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i></div>
+        <p class="text-2xl font-bold text-slate-800 dark:text-white">${state.savedData.length}</p>
+        <p class="text-xs text-slate-500">Data Server</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 text-center">
+        <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center mx-auto mb-3"><i data-lucide="clock" class="w-6 h-6 text-amber-600 dark:text-amber-400"></i></div>
+        <p class="text-2xl font-bold text-slate-800 dark:text-white">${state.syncQueue.length}</p>
+        <p class="text-xs text-slate-500">Antrian Offline</p>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm p-5 text-center">
+        <div class="w-12 h-12 ${state.isOnline?'bg-emerald-100 dark:bg-emerald-900/30':'bg-rose-100 dark:bg-rose-900/30'} rounded-xl flex items-center justify-center mx-auto mb-3"><i data-lucide="${state.isOnline?'wifi':'wifi-off'}" class="w-6 h-6 ${state.isOnline?'text-emerald-600 dark:text-emerald-400':'text-rose-600 dark:text-rose-400'}"></i></div>
+        <p class="text-lg font-bold ${state.isOnline?'text-emerald-600':'text-rose-600'}">${state.isOnline?'Online':'Offline'}</p>
+        <p class="text-xs text-slate-500">Status Koneksi</p>
+      </div>
+    </div>
+    <div class="space-y-3">
+      <button onclick="fetchOnlineData(true)" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/25"><i data-lucide="download-cloud" class="w-4 h-4"></i> Muat Data dari Server</button>
+      <button onclick="autoSync()" ${state.syncQueue.length===0||!state.isOnline?'disabled':''} class="w-full py-3.5 ${state.syncQueue.length>0&&state.isOnline?'bg-emerald-600 hover:bg-emerald-700':'bg-slate-300 dark:bg-slate-600 cursor-not-allowed'} text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="upload-cloud" class="w-4 h-4"></i> Kirim Antrian Offline (${state.syncQueue.length})</button>
+      ${state.syncQueue.length > 0 ? `
+      <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+        <p class="text-sm text-amber-700 dark:text-amber-300 font-semibold mb-2">Data dalam antrian:</p>
+        <div class="space-y-2 max-h-48 overflow-y-auto">
+          ${state.syncQueue.map((q, i) => `<div class="flex justify-between items-center text-xs bg-white dark:bg-slate-800 rounded-lg p-2"><span class="truncate flex-1">${escapeHtml(q['Nama Saluran']||'Data #'+(i+1))}</span><button onclick="removeFromQueue(${i})" class="text-red-500 hover:text-red-700 ml-2 shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>
+  `;
+  renderIcons(area);
+}
+
+function removeFromQueue(idx) {
+  const item = state.syncQueue.splice(idx, 1)[0];
+  if (item?.id) IDB.delete('syncQueue', item.id);
+  renderCurrentTab();
+  showToast('Data dihapus dari antrian', 'info', 2000);
+}
+
+// ============================================
+// FETCH DATA
+// ============================================
+async function fetchOnlineData(forceRefresh = false) {
+  if (CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) return;
+  state.isLoadingData = true;
+  renderCurrentTab();
+  showToast("Memuat data dari server...", 'info', 2000);
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+    const resp = await fetch(CONFIG.APPS_SCRIPT_URL, { signal: controller.signal });
+    clearTimeout(tid);
+    const data = await resp.json();
+    state.savedData = Array.isArray(data) ? data : [];
+    showToast(`${state.savedData.length} data berhasil dimuat`, "success");
+  } catch (e) {
+    console.error("Gagal mengambil data:", e);
+    showToast("Gagal memuat data: " + e.message, "error");
+  } finally {
+    state.isLoadingData = false;
+    renderCurrentTab();
+  }
+}
+
+async function autoSync() {
+  if (state.syncQueue.length === 0 || state.isSyncing || !state.isOnline) return;
+  state.isSyncing = true; renderCurrentTab();
+  let ok = 0;
+  for (let i = state.syncQueue.length - 1; i >= 0; i--) {
+    try {
+      await fetch(CONFIG.APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(state.syncQueue[i]) });
+      const removed = state.syncQueue.splice(i, 1)[0];
+      if (removed?.id) await IDB.delete('syncQueue', removed.id);
+      ok++;
+    } catch (e) { showToast("Gagal sync: " + e.message, "warning"); break; }
+  }
+  state.isSyncing = false;
+  if (ok > 0) { showToast(`${ok} data berhasil disinkronkan!`, "success"); fetchOnlineData(true); }
+  renderCurrentTab();
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    const typing = ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName);
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='n') { e.preventDefault(); switchTab('input'); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s') { e.preventDefault(); if(state.activeTab==='input'){const f=document.getElementById('input-form');if(f)f.requestSubmit();} }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f' && !typing) { e.preventDefault(); const s=document.getElementById('search-input')||document.getElementById('home-search-input'); if(s)s.focus(); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='d') { e.preventDefault(); toggleDarkMode(); }
+    if (e.key==='Escape') { closePhotoModal(); closeImageZoom(); closeShortcutsModal(); if(state.mobileMenuOpen){state.mobileMenuOpen=false;document.getElementById('mobile-menu').classList.add('hidden');} }
+  });
+}
+function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.add('hidden'); document.body.style.overflow=''; }
+
+// ============================================
+// ONLINE/OFFLINE
+// ============================================
+function setupOnlineStatus() {
+  const update = () => {
+    state.isOnline = navigator.onLine;
+    document.getElementById('offline-banner').classList.toggle('show', !state.isOnline);
+    const icon = state.isOnline ? 'wifi' : 'wifi-off';
+    const text = state.isOnline ? 'Online' : 'Offline';
+    ['desktop-status-icon'].forEach(id => { const el = document.getElementById(id); if(el) el.setAttribute('data-lucide', icon); });
+    ['desktop-status-text'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = text; });
+    renderIcons();
+    if (state.activeTab === 'sync') renderCurrentTab();
+  };
+  window.addEventListener('online', update);
+  window.addEventListener('offline', update);
+  update();
+}
+
+// ============================================
+// MOBILE MENU
+// ============================================
+function setupMobileMenu() {
+  document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+    state.mobileMenuOpen = !state.mobileMenuOpen;
+    document.getElementById('mobile-menu').classList.toggle('hidden', !state.mobileMenuOpen);
+  });
+}
+
+// ============================================
+// INIT
+// ============================================
+async function init() {
+  try {
+    await IDB.init();
+    const queue = await IDB.getAll('syncQueue');
+    state.syncQueue = queue || [];
+  } catch(e) { console.warn('IDB init error:', e); }
+
+  initDarkMode();
+  setupOnlineStatus();
+  setupMobileMenu();
+  setupKeyboardShortcuts();
+  zoomViewer.init();
+  renderNav();
+  renderCurrentTab();
+  fetchOnlineData();
+
+  document.getElementById('app-loading').classList.add('hidden');
+  PerfMonitor.update();
+}
+
+// Wait for DOM & scripts
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(init, 100));
+} else {
+  setTimeout(init, 100);
+}
+</script>
+</body>
+</html>

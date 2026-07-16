@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Sistem Inventarisasi Pintu Air - Kantor Benculuk">
+<meta name="theme-color" content="#1e40af">
+<!-- ✅ PWA META TAGS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pintu Air">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Pintu Air Benculuk">
+<meta name="msapplication-TileColor" content="#1e40af">
+<meta name="msapplication-tap-highlight" content="no">
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://drive.google.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow-x: hidden; }
+.app-loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #f1f5f9; z-index: 9999; }
+.app-loading.hidden { display: none; }
+.spinner { width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes pulse-skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+@keyframes spin-custom { to { transform: rotate(360deg); } }
+.animate-slide-in { animation: slide-in 0.3s ease-out; }
+.animate-skeleton { animation: pulse-skeleton 1.5s infinite; }
+.animate-fade-up { animation: fade-up 0.6s ease-out; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+.animate-spin-custom { animation: spin-custom 1s linear infinite; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.dark ::-webkit-scrollbar-track { background: #1e293b; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+.modal-overlay { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); }
+.gallery-card { transition: all 0.3s ease; }
+.gallery-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.gallery-card:hover .gallery-overlay { opacity: 1; }
+.gallery-overlay { opacity: 0; transition: opacity 0.3s ease; }
+.lazy-image { opacity: 0; transition: opacity 0.3s ease; }
+.lazy-image.loaded { opacity: 1; }
+.lazy-image.error { opacity: 0.5; }
+.blur-placeholder { background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.image-zoom { cursor: zoom-in; transition: transform 0.3s ease; }
+.image-zoom:hover { transform: scale(1.02); }
+.loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+.kbd { display: inline-block; padding: 2px 6px; font-size: 11px; font-family: monospace; color: #64748b; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; box-shadow: 0 1px 0 #cbd5e1; }
+.dark .kbd { color: #94a3b8; background: #334155; border-color: #475569; }
+.draft-indicator { position: fixed; bottom: 80px; right: 16px; background: #fbbf24; color: #78350f; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50; display: none; align-items: center; gap: 6px; }
+.draft-indicator.show { display: flex; animation: fade-up 0.3s ease-out; }
+.perf-indicator { position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-family: monospace; z-index: 50; display: none; }
+.perf-indicator.show { display: block; }
+.offline-banner { position: fixed; top: 0; left: 0; right: 0; background: #fbbf24; color: #78350f; padding: 8px; text-align: center; font-size: 13px; font-weight: 600; z-index: 1000; display: none; }
+.offline-banner.show { display: block; }
+.watermark-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(59, 130, 246, 0.1); color: #1e40af; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2); }
+.dark .watermark-badge { background: rgba(96, 165, 250, 0.15); color: #93c5fd; border-color: rgba(96, 165, 250, 0.3); }
+/* ✅ PWA Install Button */
+.pwa-install-btn { position: fixed; bottom: 90px; left: 16px; background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 50; display: none; align-items: center; gap: 6px; border: none; cursor: pointer; transition: all 0.3s; }
+.pwa-install-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
+.pwa-install-btn.show { display: flex; animation: fade-up 0.3s ease-out; }
+/* Map Styles */
+.map-wrapper { position: relative; width: 100%; height: 400px; background: #e5e7eb; border-radius: 0 0 1rem 1rem; overflow: hidden; }
+#home-map, .leaflet-container { height: 100% !important; width: 100% !important; z-index: 1 !important; font-family: system-ui, -apple-system, sans-serif !important; background: #e5e7eb; }
+.leaflet-pane { z-index: 1 !important; }
+.leaflet-tile-pane { z-index: 2 !important; }
+.leaflet-overlay-pane { z-index: 3 !important; }
+.leaflet-marker-pane { z-index: 4 !important; }
+.leaflet-popup-pane { z-index: 5 !important; }
+.leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important; overflow: hidden; }
+.leaflet-popup-content { margin: 0 !important; min-width: 260px !important; max-width: 300px !important; }
+.leaflet-popup-tip { box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important; }
+.leaflet-popup-close-button { color: white !important; font-size: 20px !important; padding: 8px 10px !important; z-index: 10 !important; }
+.leaflet-popup-close-button:hover { color: #fbbf24 !important; }
+.popup-card { width: 100%; }
+.popup-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 14px 16px 12px 16px; }
+.popup-header-title { font-size: 14px; font-weight: 700; margin: 0; padding-right: 20px; display: flex; align-items: center; gap: 6px; }
+.popup-header-sub { font-size: 12px; opacity: 0.9; margin: 3px 0 0 0; }
+.popup-body { padding: 12px 16px; background: white; }
+.popup-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+.popup-row:last-child { border-bottom: none; }
+.popup-label { color: #64748b; font-weight: 500; white-space: nowrap; margin-right: 10px; display: flex; align-items: center; gap: 4px; }
+.popup-value { color: #1e293b; font-weight: 600; text-align: right; word-break: break-word; }
+.popup-footer { padding: 10px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; }
+.popup-btn { flex: 1; padding: 8px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; text-align: center; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.popup-btn-primary { background: #3b82f6; color: white !important; }
+.popup-btn-primary:hover { background: #2563eb; }
+.popup-btn-secondary { background: #e2e8f0; color: #475569 !important; }
+.popup-btn-secondary:hover { background: #cbd5e1; }
+.map-legend { background: white !important; padding: 10px 14px !important; border-radius: 10px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; font-size: 11px !important; line-height: 1.6; max-width: 200px; }
+.map-legend-title { font-weight: 700; margin-bottom: 8px; color: #1e293b; display: flex; align-items: center; gap: 6px; font-size: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+.map-legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; padding: 4px 6px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; user-select: none; border: 1px solid transparent; }
+.map-legend-item:hover { background: #f1f5f9; transform: translateX(2px); }
+.map-legend-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: 600; }
+.map-legend-item.dimmed { opacity: 0.4; }
+.map-legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.3); display: inline-block; flex-shrink: 0; }
+.map-legend-count { margin-left: auto; background: #e2e8f0; color: #475569; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.map-legend-item.active .map-legend-count { background: #3b82f6; color: white; }
+.map-legend-reset { margin-top: 6px; padding-top: 6px; border-top: 1px solid #e2e8f0; font-size: 10px; color: #64748b; text-align: center; cursor: pointer; transition: color 0.2s; }
+.map-legend-reset:hover { color: #3b82f6; }
+.custom-marker-pin { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+.custom-marker-pin:hover { transform: rotate(-45deg) scale(1.15); }
+.custom-marker-pin span { transform: rotate(45deg); color: white; font-weight: bold; font-size: 11px; }
+.marker-baik { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+.marker-kerusakan { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+.marker-rusak { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+.marker-default { background: linear-gradient(135deg, #475569 0%, #64748b 100%); }
+/* ✅ Spec Display */
+.spec-display-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 12px 16px; }
+.dark .spec-display-card { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-color: #475569; border-left-color: #60a5fa; }
+.spec-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
+.spec-row:last-child { border-bottom: none; }
+.dark .spec-row { border-bottom-color: #475569; }
+.spec-label { font-size: 13px; color: #475569; font-weight: 500; }
+.dark .spec-label { color: #cbd5e1; }
+.spec-value { font-size: 14px; color: #1e293b; font-weight: 700; font-family: 'Courier New', monospace; }
+.dark .spec-value { color: #f1f5f9; }
+.spec-conversion-inline { font-size: 11px; color: #3b82f6; font-weight: 500; margin-left: 6px; }
+.dark .spec-conversion-inline { color: #60a5fa; }
+.spec-input-wrapper { position: relative; }
+.spec-conversion { display: block; margin-top: 4px; font-size: 11px; color: #3b82f6; font-weight: 600; font-family: 'Courier New', monospace; min-height: 16px; transition: all 0.2s; }
+.dark .spec-conversion { color: #60a5fa; }
+.spec-conversion.empty { color: #94a3b8; font-weight: 400; font-style: italic; }
+@media (max-width: 640px) {
+.container { padding-left: 12px; padding-right: 12px; }
+.header-sharp { border-radius: 0; }
+.card-mobile { border-radius: 12px; }
+.leaflet-popup-content { min-width: 230px !important; }
+.map-wrapper { height: 350px; }
+.map-legend { max-width: 160px; font-size: 10px; bottom: 8px; right: 8px; }
+}
+/* ✅ Safe area untuk notch iPhone */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+body, .bg-white, .bg-slate-50, .bg-slate-100, .text-slate-800 { transition: background-color 0.3s ease, color 0.3s ease; }
+@media print { .no-print { display: none !important; } .print-only { display: block !important; } }
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class', theme: { extend: {} } }</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+<!-- ✅ PWA ICON - SVG inline -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231e40af' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E%F0%9F%9A%B0%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231e40af' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E%F0%9F%9A%B0%3C/text%3E%3C/svg%3E">
+<title>Kantor Benculuk - Inventarisasi Pintu Air</title>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-200">
+<div id="app-loading" class="app-loading">
+<div class="text-center">
+<div class="spinner mx-auto mb-4"></div>
+<p class="text-slate-600 text-sm">Memuat aplikasi...</p>
+</div>
+</div>
+<div id="offline-banner" class="offline-banner">
+<i data-lucide="wifi-off" class="w-4 h-4 inline mr-1"></i>
+Anda sedang offline. Beberapa fitur mungkin tidak tersedia.
+</div>
+<div id="toast-container" class="fixed top-5 right-5 z-[100] space-y-3"></div>
+<div id="draft-indicator" class="draft-indicator">
+<span class="animate-pulse-dot"></span>
+<span id="draft-text">Draft tersimpan</span>
+</div>
+<!-- ✅ PWA Install Button -->
+<button id="pwa-install-btn" class="pwa-install-btn" aria-label="Install aplikasi">
+<i data-lucide="download" class="w-4 h-4"></i>
+<span>Install Aplikasi</span>
+</button>
+<div id="perf-indicator" class="perf-indicator">
+<div>Load: <span id="perf-load">-</span></div>
+<div>Render: <span id="perf-render">-</span></div>
+<div>Memory: <span id="perf-memory">-</span></div>
+<div>Cache: <span id="perf-cache">-</span></div>
+</div>
+<!-- Modals -->
+<div id="confirm-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+<i data-lucide="alert-triangle" class="w-8 h-8 text-amber-600 dark:text-amber-400"></i>
+</div>
+<h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" id="confirm-title">Konfirmasi</h3>
+<p class="text-slate-600 dark:text-slate-300" id="confirm-message">Apakah Anda yakin?</p>
+</div>
+<div class="flex space-x-3">
+<button id="confirm-cancel" class="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Batal</button>
+<button id="confirm-ok" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">Hapus</button>
+</div>
+</div>
+</div>
+<div id="submit-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+<i data-lucide="upload-cloud" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i>
+</div>
+<h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Konfirmasi Pengiriman</h3>
+<p class="text-slate-600 dark:text-slate-300" id="submit-message">Data akan dikirim ke server.</p>
+</div>
+<div id="submit-details" class="bg-slate-50 dark:bg-slate-700 rounded-xl p-4 mb-6 text-sm space-y-2"></div>
+<div class="flex space-x-3">
+<button id="submit-cancel" class="flex-1 py-3 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Batal</button>
+<button id="submit-ok" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+<i data-lucide="send" class="w-4 h-4"></i><span>Kirim Data</span>
+</button>
+</div>
+</div>
+</div>
+<div id="photo-modal" class="hidden fixed inset-0 z-[200] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+<div class="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 flex justify-between items-center z-10">
+<h3 class="font-bold text-lg text-slate-800 dark:text-white">Detail Data</h3>
+<div class="flex space-x-2">
+<button id="btn-print" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Cetak" aria-label="Cetak laporan">
+<i data-lucide="printer" class="w-5 h-5"></i>
+</button>
+<button id="btn-pdf" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" title="Export PDF" aria-label="Export PDF">
+<i data-lucide="file-text" class="w-5 h-5"></i>
+</button>
+<button id="btn-close-modal" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" aria-label="Tutup">
+<i data-lucide="x" class="w-5 h-5"></i>
+</button>
+</div>
+</div>
+<div id="modal-content" class="p-6"></div>
+</div>
+</div>
+<div id="image-zoom-modal" class="hidden fixed inset-0 z-[250] modal-overlay flex items-center justify-center p-4">
+<div class="relative max-w-6xl w-full max-h-[95vh]">
+<button id="btn-close-zoom" class="absolute -top-12 right-0 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors text-white" aria-label="Tutup zoom">
+<i data-lucide="x" class="w-8 h-8"></i>
+</button>
+<img id="zoomed-image" src="" alt="Zoom" class="w-full h-full object-contain rounded-lg shadow-2xl" />
+</div>
+</div>
+<div id="shortcuts-modal" class="hidden fixed inset-0 z-[300] modal-overlay flex items-center justify-center p-4">
+<div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-up">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+<i data-lucide="keyboard" class="w-5 h-5"></i>
+Keyboard Shortcuts
+</h3>
+<button id="btn-close-shortcuts" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors" aria-label="Tutup">
+<i data-lucide="x" class="w-5 h-5"></i>
+</button>
+</div>
+<div class="space-y-3 text-sm">
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+<span class="text-slate-700 dark:text-slate-200">Input data baru</span>
+<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">N</span></div>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+<span class="text-slate-700 dark:text-slate-200">Simpan data</span>
+<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">S</span></div>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+<span class="text-slate-700 dark:text-slate-200">Fokus pencarian</span>
+<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">F</span></div>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700">
+<span class="text-slate-700 dark:text-slate-200">Toggle dark mode</span>
+<div class="flex gap-1"><span class="kbd">Ctrl</span><span class="kbd">D</span></div>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-slate-700 dark:text-slate-200">Tutup modal</span>
+<span class="kbd">Esc</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex h-screen overflow-hidden">
+<aside class="hidden md:flex flex-col w-72 bg-blue-800 dark:bg-slate-800 shadow-xl text-white">
+<div class="p-6">
+<div class="flex items-center space-x-3 mb-10">
+<div class="p-2 bg-white dark:bg-slate-700 rounded-xl">
+<i data-lucide="building-2" class="text-blue-700 dark:text-blue-400 w-6 h-6"></i>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight">Kantor Benculuk</h1>
+<p class="text-xs text-blue-200 dark:text-slate-400">Inventarisasi Pintu Air</p>
+</div>
+</div>
+<nav id="desktop-nav" class="flex flex-col space-y-2"></nav>
+</div>
+<div class="mt-auto p-6 border-t border-white/10 dark:border-slate-700">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center space-x-2 text-sm">
+<i id="desktop-status-icon" data-lucide="wifi" class="w-4 h-4"></i>
+<span id="desktop-status-text" class="text-blue-100 dark:text-slate-300">Memeriksa...</span>
+</div>
+<button id="btn-toggle-dark" class="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Toggle Dark Mode (Ctrl+D)" aria-label="Toggle dark mode">
+<i id="dark-mode-icon" data-lucide="moon" class="w-4 h-4"></i>
+</button>
+</div>
+<div class="text-xs text-blue-200 dark:text-slate-500 text-center">v5.1.0 - PWA Edition - © 2026</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full w-full relative">
+<header class="md:hidden bg-blue-800 text-white p-3 flex justify-between items-center shadow-md z-20 header-sharp">
+<div class="flex items-center space-x-2">
+<i data-lucide="building-2" class="w-5 h-5"></i>
+<h1 class="font-bold text-base">Benculuk</h1>
+</div>
+<div class="flex items-center space-x-1">
+<button id="btn-toggle-dark-mobile" class="p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="Toggle dark mode">
+<i id="mobile-dark-mode-icon" data-lucide="moon" class="w-5 h-5"></i>
+</button>
+<button id="mobile-menu-btn" class="p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="Menu">
+<i data-lucide="menu" class="w-6 h-6"></i>
+</button>
+</div>
+</header>
+<div id="mobile-menu" class="hidden md:hidden absolute top-14 left-0 w-full h-[calc(100%-3.5rem)] bg-blue-800 z-30 p-4 shadow-xl">
+<nav id="mobile-nav" class="flex flex-col space-y-2"></nav>
+</div>
+<div id="content-area" class="flex-1 overflow-y-auto p-3 md:p-8 bg-slate-100 dark:bg-slate-900 pb-24 md:pb-8 container mx-auto"></div>
+<nav id="bottom-nav" class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-700 flex justify-around p-2 pb-safe z-40"></nav>
+</main>
+</div>
+<script>
+// ============================================
+// ✅ PWA SETUP - Manifest & Service Worker via Blob URL
+// ============================================
+(function setupPWA() {
+  // 1. Inline Manifest (karena single file HTML)
+  const manifest = {
+    name: 'Inventarisasi Pintu Air - Kantor Benculuk',
+    short_name: 'Pintu Air',
+    description: 'Sistem inventarisasi pintu air irigasi dengan GPS, foto watermark, dan peta sebaran',
+    start_url: '.',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#1e40af',
+    theme_color: '#1e40af',
+    lang: 'id-ID',
+    icons: [
+      {
+        src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"%3E%3Crect fill="%231e40af" width="192" height="192" rx="32"/%3E%3Ctext x="96" y="128" font-size="96" text-anchor="middle" fill="white"%3E%F0%9F%9A%B0%3C/text%3E%3C/svg%3E',
+        sizes: '192x192',
+        type: 'image/svg+xml',
+        purpose: 'any maskable'
+      },
+      {
+        src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect fill="%231e40af" width="512" height="512" rx="80"/%3E%3Ctext x="256" y="340" font-size="256" text-anchor="middle" fill="white"%3E%F0%9F%9A%B0%3C/text%3E%3C/svg%3E',
+        sizes: '512x512',
+        type: 'image/svg+xml',
+        purpose: 'any maskable'
+      }
+    ]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const manifestUrl = URL.createObjectURL(manifestBlob);
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = manifestUrl;
+  document.head.appendChild(link);
+
+  // 2. Service Worker via Blob URL (cache-first strategy)
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE_NAME = 'pintu-air-v5.1';
+      const ASSETS_TO_CACHE = [
+        './',
+        'https://cdn.tailwindcss.com',
+        'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+        'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+        'https://unpkg.com/lucide@latest/dist/umd/lucide.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+      ];
+
+      self.addEventListener('install', (event) => {
+        event.waitUntil(
+          caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS_TO_CACHE).catch(err => {
+              console.warn('Some assets failed to cache:', err);
+            });
+          })
+        );
+        self.skipWaiting();
+      });
+
+      self.addEventListener('activate', (event) => {
+        event.waitUntil(
+          caches.keys().then((keys) => {
+            return Promise.all(
+              keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+            );
+          })
+        );
+        self.clients.claim();
+      });
+
+      self.addEventListener('fetch', (event) => {
+        // Skip non-GET requests and cross-origin (except CDN)
+        if (event.request.method !== 'GET') return;
+        const url = new URL(event.request.url);
+        
+        event.respondWith(
+          caches.match(event.request).then((cached) => {
+            // Network-first for Apps Script API
+            if (url.hostname.includes('script.google.com')) {
+              return fetch(event.request).catch(() => cached || new Response('Offline', { status: 503 }));
+            }
+            // Cache-first for everything else
+            if (cached) return cached;
+            return fetch(event.request).then((response) => {
+              if (!response || response.status !== 200) return response;
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+              return response;
+            }).catch(() => {
+              // Offline fallback
+              if (event.request.destination === 'document') {
+                return caches.match('./');
+              }
+              return new Response('Offline', { status: 503 });
+            });
+          })
+        );
+      });
+    `;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(swBlob);
+    
+    // Note: Blob URL SW hanya bekerja di localhost/some browsers
+    // Untuk production, simpan sebagai file sw.js terpisah
+    navigator.serviceWorker.register(swUrl).then((reg) => {
+      console.log('✅ PWA Service Worker registered:', reg.scope);
+    }).catch((err) => {
+      console.warn('⚠️ SW registration failed (expected for blob URL):', err.message);
+      console.log('💡 Tip: Untuk PWA penuh, simpan sebagai file sw.js terpisah');
+    });
+  }
+
+  // 3. PWA Install Prompt
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('pwa-install-btn');
+  
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) installBtn.classList.add('show');
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        showToast('Aplikasi sudah terinstall atau browser tidak mendukung', 'info');
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        showToast('Aplikasi berhasil diinstall!', 'success');
+      }
+      deferredPrompt = null;
+      installBtn.classList.remove('show');
+    });
+  }
+
+  window.addEventListener('appinstalled', () => {
+    showToast('🎉 Aplikasi terinstall! Buka dari home screen.', 'success', 5000);
+    if (installBtn) installBtn.classList.remove('show');
+  });
+})();
+
+// ============================================
+// PERFORMANCE MONITOR & CORE UTILITIES
+// ============================================
+const PerfMonitor = {
+  startTime: performance.now(), cache: new Map(),
+  mark(label) { this.cache.set(label, performance.now() - this.startTime); },
+  update() {
+    const loadEl = document.getElementById('perf-load');
+    const renderEl = document.getElementById('perf-render');
+    if (loadEl) loadEl.textContent = `${(performance.now() - this.startTime).toFixed(0)}ms`;
+    if (renderEl) renderEl.textContent = `${this.cache.get('render')?.toFixed(0) || '-'}ms`;
+  }
+};
+PerfMonitor.mark('script-start');
+
+const IDB = {
+  dbName: 'IrigasiDB', dbVersion: 1, db: null,
+  async init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, this.dbVersion);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => { this.db = request.result; resolve(this.db); };
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains('syncQueue')) db.createObjectStore('syncQueue', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('cache')) db.createObjectStore('cache', { keyPath: 'key' });
+        if (!db.objectStoreNames.contains('draft')) db.createObjectStore('draft', { keyPath: 'id' });
+      };
+    });
+  },
+  async set(storeName, data) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const r = tx.objectStore(storeName).put(data); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); },
+  async get(storeName, key) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readonly'); const r = tx.objectStore(storeName).get(key); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }); },
+  async getAll(storeName) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readonly'); const r = tx.objectStore(storeName).getAll(); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }); },
+  async delete(storeName, key) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const r = tx.objectStore(storeName).delete(key); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); },
+  async clear(storeName) { return new Promise((resolve, reject) => { const tx = this.db.transaction(storeName, 'readwrite'); const r = tx.objectStore(storeName).clear(); r.onsuccess = () => resolve(); r.onerror = () => reject(r.error); }); }
+};
+
+const MemoCache = { cache: new Map(), maxSize: 100, get(k) { return this.cache.get(k); }, set(k, v) { if (this.cache.size >= this.maxSize) { const fk = this.cache.keys().next().value; this.cache.delete(fk); } this.cache.set(k, v); }, clear() { this.cache.clear(); }, generateKey(...a) { return JSON.stringify(a); } };
+
+const LazyLoader = {
+  observer: null,
+  init() {
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.dataset.src;
+          if (src) { img.src = src; img.onload = () => img.classList.add('loaded'); img.onerror = () => img.classList.add('error'); this.observer.unobserve(img); }
+        }
+      });
+    }, { rootMargin: '50px 0px', threshold: 0.01 });
+  },
+  observe(element) { if (this.observer && element) this.observer.observe(element); },
+  observeAll(selector) { document.querySelectorAll(selector).forEach(el => this.observe(el)); }
+};
+
+// ============================================
+// ✅ ITEM STORE - Solusi XSS & Performa
+// Simpan data item by ID, hindari JSON.stringify di inline onclick
+// ============================================
+const ItemStore = {
+  _map: new Map(),
+  _counter: 0,
+  
+  // Simpan item, return ID
+  set(item) {
+    const id = `item-${++this._counter}`;
+    this._map.set(id, item);
+    return id;
+  },
+  
+  // Ambil item by ID
+  get(id) {
+    return this._map.get(id);
+  },
+  
+  // Clear semua (saat data refresh)
+  clear() {
+    this._map.clear();
+    this._counter = 0;
+  },
+  
+  // Size
+  get size() { return this._map.size; }
+};
+
+const CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwVYG0WhbzKlKgicPTVpyVvlJq0i8Yvvg5gCQz43J0SYteKkRZToN5POE2RvgMzrWM/exec",
+  API_KEY: "IRIGASI2024RAHASIA",
+  MAX_FILE_SIZE: 5 * 1024 * 1024,
+  COMPRESSION_QUALITY: 0.7,
+  MAX_WIDTH: 1024,
+  REQUEST_TIMEOUT: 60000,
+  MAX_RETRIES: 2,
+  ITEMS_PER_PAGE: 12,
+  SEARCH_DEBOUNCE: 300,
+  AUTO_SAVE_INTERVAL: 30000,
+  DRAFT_EXPIRY_HOURS: 24,
+  CACHE_EXPIRY: 5 * 60 * 1000,
+  DAERAH_IRIGASI_OPTIONS: ['Baru', 'Porolinggo', 'Lainnya'],
+  JENIS_PINTU_OPTIONS: ['Type A', 'Type B', 'Type C2', 'Type C3', 'Type C5', 'Lainnya']
+};
+
+const state = {
+  activeTab: 'home', isOnline: navigator.onLine, syncQueue: [], savedData: [],
+  isSyncing: false, isLoadingData: false, mobileMenuOpen: false,
+  searchTerm: '', homeSearchTerm: '', darkMode: false, currentPage: 1,
+  filters: { jenis: '', kondisi: '', tanggal: '' },
+  formData: {
+    namaDaerahIrigasi: 'Baru', namaPetugasPPA: '', namaSaluran: '', nomenKlatur: '',
+    jenisPintu: 'Type A', jenisPintuLainnya: '', koordinat: '',
+    h1: '', h: '', b: '', t: '',
+    kondisiDaunPintu: '', kondisiDratStang: '', kondisiRangka: '',
+    keterangan: '', photos: []
+  },
+  currentItem: null, autoSaveTimer: null, searchTimer: null,
+  activeMapFilter: null
+};
+
+// ============================================
+// ✅ SPECIFICATION DISPLAY HELPERS
+// ============================================
+function formatSpecDisplay(value, field) {
+  if (!value || value === '' || value === '-') return { primary: '-', conversion: '' };
+  const num = parseFloat(value);
+  if (isNaN(num)) return { primary: '-', conversion: '' };
+  if (field === 't') {
+    const cm = (num / 10).toFixed(2).replace(/\.?0+$/, '');
+    return { primary: `${num} mm`, conversion: `(${cm} cm)` };
+  } else {
+    const m = (num / 100).toFixed(2).replace(/\.?0+$/, '');
+    return { primary: `${num} cm`, conversion: `(${m} m)` };
+  }
+}
+
+function formatSpecRow(label, value, field) {
+  const display = formatSpecDisplay(value, field);
+  if (display.primary === '-') {
+    return `<div class="spec-row"><span class="spec-label">${label}</span><span class="spec-value" style="color:#94a3b8;">-</span></div>`;
+  }
+  return `<div class="spec-row">
+    <span class="spec-label">${label}</span>
+    <span>
+      <span class="spec-value">${display.primary}</span>
+      <span class="spec-conversion-inline">${display.conversion}</span>
+    </span>
+  </div>`;
+}
+
+function updateSpecConversion(field, value) {
+  const display = formatSpecDisplay(value, field);
+  const el = document.getElementById(`conversion-${field}`);
+  if (!el) return;
+  if (!value || value === '') {
+    el.textContent = field === 't' ? 'Contoh: 5 mm = 0,5 cm' : 'Contoh: 150 cm = 1,50 m';
+    el.classList.add('empty');
+  } else {
+    el.textContent = `= ${display.primary} ${display.conversion}`;
+    el.classList.remove('empty');
+  }
+}
+
+// ============================================
+// DARK MODE & UTILITIES
+// ============================================
+function initDarkMode() {
+  const saved = localStorage.getItem('darkMode');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  state.darkMode = saved ? saved === 'true' : prefersDark;
+  applyDarkMode();
+}
+function applyDarkMode() {
+  document.documentElement.classList.toggle('dark', state.darkMode);
+  updateDarkModeIcons();
+}
+function toggleDarkMode() {
+  state.darkMode = !state.darkMode;
+  localStorage.setItem('darkMode', state.darkMode);
+  applyDarkMode();
+  showToast(state.darkMode ? 'Mode gelap aktif' : 'Mode terang aktif', 'info', 2000);
+}
+function updateDarkModeIcons() {
+  const iconName = state.darkMode ? 'sun' : 'moon';
+  ['dark-mode-icon', 'mobile-dark-mode-icon'].forEach(id => {
+    const icon = document.getElementById(id);
+    if (icon) icon.setAttribute('data-lucide', iconName);
+  });
+  if (window.lucide) lucide.createIcons();
+}
+
+function showToast(message, type = 'info', duration = 4000) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  const colors = { success: 'bg-emerald-500', error: 'bg-rose-500', info: 'bg-blue-500', warning: 'bg-amber-500' };
+  const icons = { success: 'check-circle', error: 'x-circle', info: 'info', warning: 'alert-circle' };
+  toast.className = `p-4 rounded-xl shadow-lg text-white flex items-center justify-between min-w-[300px] animate-slide-in ${colors[type] || colors.info}`;
+  toast.innerHTML = `
+    <div class="flex items-center space-x-3">
+      <i data-lucide="${icons[type] || icons.info}" class="w-5 h-5"></i>
+      <span class="text-sm font-medium">${message}</span>
+    </div>
+    <button class="ml-4 p-1 hover:bg-white/20 rounded-full transition-colors" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button>
+  `;
+  const closeBtn = toast.querySelector('button');
+  closeBtn.onclick = () => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => toast.remove(), 300);
+  };
+  container.appendChild(toast);
+  if (window.lucide) lucide.createIcons({ nodes: [toast] });
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, duration);
+}
+
+function validateForm() {
+  const errors = [];
+  if (!state.formData.namaDaerahIrigasi) errors.push('Nama Daerah Irigasi wajib dipilih');
+  if (!state.formData.namaPetugasPPA.trim()) errors.push('Nama Petugas/PPA wajib diisi');
+  if (!state.formData.namaSaluran.trim()) errors.push('Nama Saluran wajib diisi');
+  if (state.formData.jenisPintu === 'Lainnya' && !state.formData.jenisPintuLainnya?.trim()) {
+    errors.push('Jenis pintu lainnya wajib diketik');
+    setTimeout(() => {
+      const input = document.getElementById('input-jenis-lainnya');
+      if (input) { input.classList.remove('hidden'); input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    }, 100);
+  }
+  if (state.formData.photos.length === 0) errors.push('Minimal upload 1 foto');
+  if (state.formData.photos.length > 10) errors.push('Maksimal upload 10 foto');
+  const totalSize = state.formData.photos.reduce((acc, photo) => acc + (photo.base64.length * 3) / 4, 0);
+  if (totalSize > CONFIG.MAX_FILE_SIZE * 10) errors.push('Total ukuran foto terlalu besar (max 50MB)');
+  return errors;
+}
+
+function addWatermarkToImage(base64, koordinat, timestamp) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width; canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const date = new Date(timestamp);
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const text1 = koordinat || 'Koordinat tidak tersedia';
+        const text2 = `${days[date.getDay()]}, ${String(date.getDate()).padStart(2,'0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        const text3 = `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}:${String(date.getSeconds()).padStart(2,'0')}`;
+        const fontSize = Math.max(14, Math.floor(canvas.width / 50));
+        const lineHeight = fontSize * 1.4;
+        const padding = 16;
+        ctx.font = `${fontSize}px system-ui, -apple-system, sans-serif`;
+        const maxWidth = Math.max(ctx.measureText(text1).width, ctx.measureText(text2).width, ctx.measureText(text3).width);
+        const margin = 20;
+        const boxWidth = maxWidth + (padding * 2);
+        const boxHeight = (lineHeight * 3) + (padding * 2);
+        const x = canvas.width - boxWidth - margin;
+        const y = canvas.height - boxHeight - margin;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(x, y, boxWidth, boxHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `${fontSize}px system-ui, -apple-system, sans-serif`;
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'; ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+        const textX = x + padding;
+        let textY = y + padding;
+        ctx.fillText(text1, textX, textY); textY += lineHeight;
+        ctx.fillText(text2, textX, textY); textY += lineHeight;
+        ctx.fillText(text3, textX, textY);
+        resolve(canvas.toDataURL('image/jpeg', CONFIG.COMPRESSION_QUALITY));
+      } catch (err) { reject(err); }
+    };
+    img.onerror = () => reject(new Error('Gagal memuat gambar untuk watermark'));
+    img.src = base64;
+  });
+}
+
+function compressImage(file, maxWidth = CONFIG.MAX_WIDTH, quality = CONFIG.COMPRESSION_QUALITY) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width, height = img.height;
+        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'medium';
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve({ base64: compressedBase64, mimeType: 'image/jpeg', name: file.name, originalSize: file.size, compressedSize: (compressedBase64.length * 3) / 4 });
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+function formatDate(dateStr) { try { return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return '-'; } }
+function formatDateTime(dateStr) { try { return new Date(dateStr).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch { return '-'; } }
+function formatTime(dateStr) { try { return new Date(dateStr).toLocaleTimeString('id-ID'); } catch { return '-'; } }
+function formatBytes(bytes) { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]; }
+function getStatusColor(kondisi) {
+  if (!kondisi) return 'text-slate-400';
+  if (kondisi.includes('baik')) return 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/30';
+  if (kondisi.includes('kerusakan')) return 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30';
+  if (kondisi.includes('rusak')) return 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-900/30';
+  return 'text-slate-600 bg-slate-50';
+}
+function getConditionCategory(kondisiStr) {
+  if (!kondisiStr) return 'default';
+  const k = kondisiStr.toLowerCase();
+  if (k.includes('baik')) return 'baik';
+  if (k.includes('kerusakan')) return 'kerusakan';
+  if (k.includes('rusak')) return 'rusak';
+  return 'default';
+}
+function getMarkerColorClass(category) {
+  switch(category) {
+    case 'baik': return 'marker-baik';
+    case 'kerusakan': return 'marker-kerusakan';
+    case 'rusak': return 'marker-rusak';
+    default: return 'marker-default';
+  }
+}
+function getConditionLabel(category) {
+  switch(category) {
+    case 'baik': return 'Kondisi Baik';
+    case 'kerusakan': return 'Ada Kerusakan';
+    case 'rusak': return 'Rusak';
+    default: return 'Belum Dicek';
+  }
+}
+
+// ============================================
+// AUTO-SAVE DRAFT
+// ============================================
+function hasFormData() {
+  return Object.values(state.formData).some(v => v !== '' && v !== 'Type A' && v !== 'Baru' && !(Array.isArray(v) && v.length === 0));
+}
+async function saveDraft() {
+  if (state.activeTab === 'input' && hasFormData()) {
+    try {
+      const draft = { id: 'current', ...state.formData, photos: state.formData.photos.map(p => ({ name: p.name, base64: p.base64.substring(0, 100) + '...', compressedSize: p.compressedSize })), _timestamp: Date.now(), _hasPhotos: state.formData.photos.length > 0 };
+      await IDB.set('draft', draft);
+      showDraftIndicator('Draft tersimpan otomatis');
+    } catch (e) { console.warn('Gagal simpan draft:', e); }
+  }
+}
+async function loadDraft() {
+  try {
+    const draft = await IDB.get('draft', 'current');
+    if (draft) {
+      const hoursAgo = (Date.now() - draft._timestamp) / (1000 * 60 * 60);
+      if (hoursAgo < CONFIG.DRAFT_EXPIRY_HOURS) {
+        const hasPhotos = draft._hasPhotos;
+        delete draft._timestamp; delete draft._hasPhotos; delete draft.id;
+        if (confirm(`Ada draft dari ${hoursAgo.toFixed(1)} jam lalu${hasPhotos ? ' (tanpa foto)' : ''}. Muat draft?`)) {
+          state.formData = { ...state.formData, ...draft };
+          if (hasPhotos) showToast('Foto perlu diupload ulang', 'warning');
+          return true;
+        }
+      }
+      await IDB.delete('draft', 'current');
+    }
+  } catch (e) { console.warn('Gagal load draft:', e); }
+  return false;
+}
+async function clearDraft() { try { await IDB.delete('draft', 'current'); } catch (e) {} hideDraftIndicator(); }
+function startAutoSave() { if (state.autoSaveTimer) clearInterval(state.autoSaveTimer); state.autoSaveTimer = setInterval(saveDraft, CONFIG.AUTO_SAVE_INTERVAL); }
+function showDraftIndicator(text = 'Draft tersimpan') { const indicator = document.getElementById('draft-indicator'); document.getElementById('draft-text').textContent = text; indicator.classList.add('show'); setTimeout(() => indicator.classList.remove('show'), 3000); }
+function hideDraftIndicator() { document.getElementById('draft-indicator').classList.remove('show'); }
+function setupBeforeUnload() {
+  window.addEventListener('beforeunload', (e) => {
+    if (state.activeTab === 'input' && hasFormData()) { e.preventDefault(); e.returnValue = 'Anda memiliki data yang belum disimpan. Yakin ingin keluar?'; return e.returnValue; }
+  });
+}
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') { e.preventDefault(); switchTab('input'); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (state.activeTab === 'input') { const form = document.getElementById('input-form'); if (form) form.requestSubmit(); } }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f' && !isTyping) { e.preventDefault(); const searchInput = document.getElementById('search-input') || document.getElementById('home-search-input'); if (searchInput) searchInput.focus(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') { e.preventDefault(); toggleDarkMode(); }
+    if (e.key === 'Escape') { closePhotoModal(); closeImageZoom(); closeShortcutsModal(); if (state.mobileMenuOpen) { state.mobileMenuOpen = false; document.getElementById('mobile-menu').classList.add('hidden'); } }
+  });
+}
+function closeShortcutsModal() { document.getElementById('shortcuts-modal').classList.add('hidden'); document.body.style.overflow = ''; }
+function debouncedSearch(value, callback) { clearTimeout(state.searchTimer); state.searchTimer = setTimeout(() => callback(value), CONFIG.SEARCH_DEBOUNCE); }
+
+const pendingRequests = new Map();
+async function fetchWithRetry(url, options, retries = CONFIG.MAX_RETRIES) {
+  const requestKey = url + JSON.stringify(options);
+  if (pendingRequests.has(requestKey)) return pendingRequests.get(requestKey);
+  const promise = (async () => {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (response.type === 'opaque') return { opaque: true, ok: true };
+        if (!response.ok && response.type !== 'opaque') throw new Error(`HTTP error! status: ${response.status}`);
+        return response;
+      } catch (error) {
+        if (i === retries) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+  })();
+  pendingRequests.set(requestKey, promise);
+  try { return await promise; } finally { pendingRequests.delete(requestKey); }
+}
+
+async function fetchOnlineData() {
+  if (CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) return;
+  const cacheKey = 'onlineData';
+  const cached = MemoCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CONFIG.CACHE_EXPIRY) { state.savedData = cached.data; return; }
+  state.isLoadingData = true;
+  renderCurrentTab();
+  try {
+    const response = await fetchWithRetry(CONFIG.APPS_SCRIPT_URL, { method: 'GET' });
+    if (response.opaque) throw new Error('Response tidak dapat dibaca (opaque)');
+    const data = await response.json();
+    state.savedData = Array.isArray(data) ? data : [];
+    MemoCache.clear();
+    MemoCache.set(cacheKey, { data: state.savedData, timestamp: Date.now() });
+    showToast(`${state.savedData.length} data berhasil dimuat`, "success");
+  } catch (error) {
+    console.error("Gagal mengambil data:", error);
+    showToast("Gagal mengambil data dari server.", "error");
+  } finally { state.isLoadingData = false; renderCurrentTab(); }
+}
+
+async function sendDataToSheet(dataPayload) {
+  const jsonBody = JSON.stringify(dataPayload);
+  try {
+    await fetchWithRetry(CONFIG.APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: jsonBody });
+    MemoCache.clear();
+    return { status: 'success' };
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('Request timeout.');
+    throw new Error(`Gagal mengirim: ${error.message}`);
+  }
+}
+
+async function autoSync() {
+  if (state.syncQueue.length === 0 || state.isSyncing) return;
+  state.isSyncing = true;
+  renderCurrentTab();
+  let successCount = 0;
+  const queueLength = state.syncQueue.length;
+  for (let i = 0; i < queueLength; i++) {
+    try {
+      await sendDataToSheet(state.syncQueue[0]);
+      const removed = state.syncQueue.shift();
+      await IDB.delete('syncQueue', removed.id);
+      successCount++;
+      renderCurrentTab();
+    } catch (error) { showToast(`Gagal sync: ${error.message}`, "warning"); break; }
+  }
+  state.isSyncing = false;
+  if (successCount > 0) { showToast(`${successCount} data berhasil disinkronkan!`, "success"); fetchOnlineData(); }
+  renderCurrentTab();
+}
+
+async function saveQueueToStorage() {
+  try { for (const item of state.syncQueue) await IDB.set('syncQueue', item); }
+  catch (e) { showToast("Penyimpanan lokal penuh!", "error"); }
+}
+async function loadQueueFromStorage() {
+  try { const queue = await IDB.getAll('syncQueue'); state.syncQueue = queue || []; }
+  catch (e) { state.syncQueue = []; }
+}
+
+function getFilteredData() {
+  const cacheKey = MemoCache.generateKey('filter', state.searchTerm, state.filters);
+  const cached = MemoCache.get(cacheKey);
+  if (cached) return cached;
+  let data = [...state.savedData];
+  if (state.searchTerm) {
+    const term = state.searchTerm.toLowerCase();
+    data = data.filter(item => (item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) || (item["Nama Saluran"] || '').toLowerCase().includes(term) || (item["Nama Petugas/PPA"] || '').toLowerCase().includes(term));
+  }
+  if (state.filters.jenis) data = data.filter(item => item["Jenis Pintu"] === state.filters.jenis);
+  if (state.filters.kondisi) { data = data.filter(item => { const k = [item["Kondisi Daun Pintu"], item["Kondisi Drat Stang"], item["Kondisi Rangka"]].join(' ').toLowerCase(); return k.includes(state.filters.kondisi); }); }
+  if (state.filters.tanggal) { const fd = new Date(state.filters.tanggal).toDateString(); data = data.filter(item => new Date(item["Timestamp"]).toDateString() === fd); }
+  MemoCache.set(cacheKey, data);
+  return data;
+}
+function getPaginatedData(data) { const start = (state.currentPage - 1) * CONFIG.ITEMS_PER_PAGE; return data.slice(start, start + CONFIG.ITEMS_PER_PAGE); }
+function changePage(page) { state.currentPage = page; renderCurrentTab(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function applyFilters() { state.currentPage = 1; renderCurrentTab(); showToast('Filter diterapkan', 'success', 1500); }
+function resetFilters() { state.filters = { jenis: '', kondisi: '', tanggal: '' }; state.searchTerm = ''; state.currentPage = 1; MemoCache.clear(); renderCurrentTab(); }
+
+function showConfirm(title, message, onConfirm, okText = 'Hapus', okColor = 'bg-red-600') {
+  const modal = document.getElementById('confirm-modal');
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+  const okBtn = document.getElementById('confirm-ok');
+  okBtn.textContent = okText;
+  okBtn.className = `flex-1 py-3 rounded-xl ${okColor} text-white font-semibold hover:opacity-90 transition-colors`;
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons({ nodes: [modal] });
+  const handleOk = () => { modal.classList.add('hidden'); onConfirm(); cleanup(); };
+  const handleCancel = () => { modal.classList.add('hidden'); cleanup(); };
+  function cleanup() {
+    const newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
+    const cancelBtn = document.getElementById('confirm-cancel');
+    const newCancel = cancelBtn.cloneNode(true); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+    newOk.addEventListener('click', handleOk); newCancel.addEventListener('click', handleCancel);
+  }
+  okBtn.addEventListener('click', handleOk);
+  document.getElementById('confirm-cancel').addEventListener('click', handleCancel);
+}
+
+function showSubmitModal(totalPhotos, totalSize, onConfirm) {
+  const modal = document.getElementById('submit-modal');
+  const details = document.getElementById('submit-details');
+  const displayJenisPintu = state.formData.jenisPintu === 'Lainnya' ? state.formData.jenisPintuLainnya : state.formData.jenisPintu;
+  document.getElementById('submit-message').textContent = `Data akan dikirim dengan ${totalPhotos} foto (${totalSize}). Lanjutkan?`;
+  details.innerHTML = `
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Daerah Irigasi:</span><span class="font-semibold">${escapeHtml(state.formData.namaDaerahIrigasi)}</span></div>
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Petugas/PPA:</span><span class="font-semibold">${escapeHtml(state.formData.namaPetugasPPA)}</span></div>
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Nama Saluran:</span><span class="font-semibold">${escapeHtml(state.formData.namaSaluran)}</span></div>
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Jenis Pintu:</span><span class="font-semibold">${escapeHtml(displayJenisPintu)}</span></div>
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Jumlah Foto:</span><span class="font-semibold">${totalPhotos} foto</span></div>
+    <div class="flex justify-between dark:text-slate-200"><span class="text-slate-600 dark:text-slate-400">Total Ukuran:</span><span class="font-semibold">${totalSize}</span></div>
+  `;
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons({ nodes: [modal] });
+  const okBtn = document.getElementById('submit-ok');
+  const cancelBtn = document.getElementById('submit-cancel');
+  const handleOk = () => { modal.classList.add('hidden'); onConfirm(); cleanup(); };
+  const handleCancel = () => { modal.classList.add('hidden'); cleanup(); };
+  function cleanup() {
+    const newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
+    const newCancel = cancelBtn.cloneNode(true); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+    newOk.addEventListener('click', handleOk); newCancel.addEventListener('click', handleCancel);
+  }
+  okBtn.addEventListener('click', handleOk); cancelBtn.addEventListener('click', handleCancel);
+}
+
+function handleInputChange(e) {
+  const { name, value } = e.target;
+  if (name === 'namaPetugasPPA') state.formData[name] = value.toUpperCase();
+  else state.formData[name] = value;
+  if (['h1', 'h', 'b', 't'].includes(name)) updateSpecConversion(name, value);
+}
+
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) { showToast("Geolokasi tidak didukung.", "error"); reject(new Error('Geolocation not supported')); return; }
+    showToast("Mengambil lokasi GPS...", "info");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coord = `${position.coords.latitude}, ${position.coords.longitude}`;
+        state.formData.koordinat = coord;
+        const input = document.querySelector('input[name="koordinat"]');
+        if (input) input.value = coord;
+        showToast("Lokasi GPS berhasil diambil!", "success");
+        resolve(coord);
+      },
+      (error) => { showToast("Gagal mengambil lokasi.", "error"); reject(error); },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  });
+}
+
+function triggerCamera() {
+  if (state.formData.photos.length >= 10) { showToast("Maksimal 10 foto", "warning"); return; }
+  if (!state.formData.koordinat) {
+    showToast("Mengambil lokasi GPS terlebih dahulu...", "info");
+    getLocation().then(() => { document.getElementById('camera-input').click(); }).catch(() => {
+      if (confirm("Lokasi GPS tidak tersedia. Foto akan diambil TANPA watermark. Lanjutkan?")) document.getElementById('camera-input').click();
+    });
+  } else { document.getElementById('camera-input').click(); }
+}
+function triggerFile() {
+  if (state.formData.photos.length >= 10) { showToast("Maksimal 10 foto", "warning"); return; }
+  document.getElementById('file-input').click();
+}
+
+async function handlePhotoUpload(e, isFromCamera = false) {
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
+  if (state.formData.photos.length + files.length > 10) { showToast("Maksimal upload 10 foto", "error"); return; }
+  showToast(`Mengompres ${files.length} foto...`, 'info');
+  try {
+    const processedPhotos = [];
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) throw new Error(`${file.name} bukan gambar`);
+      if (file.size > CONFIG.MAX_FILE_SIZE) throw new Error(`${file.name} terlalu besar (max 5MB)`);
+      let photo = await compressImage(file);
+      if (isFromCamera) {
+        const timestamp = new Date().toISOString();
+        const koordinat = state.formData.koordinat || 'Koordinat tidak tersedia';
+        try {
+          const watermarked = await addWatermarkToImage(photo.base64, koordinat, timestamp);
+          photo.base64 = watermarked;
+          photo.compressedSize = (watermarked.length * 3) / 4;
+          photo.hasWatermark = true;
+        } catch (wmErr) { showToast("Watermark gagal ditambahkan", "warning"); }
+      }
+      processedPhotos.push(photo);
+    }
+    state.formData.photos = [...state.formData.photos, ...processedPhotos];
+    renderPhotoPreview();
+    showToast(`${files.length} foto berhasil ditambahkan!`, 'success');
+  } catch (error) { showToast(error.message || 'Gagal memproses foto.', 'error'); }
+  e.target.value = '';
+}
+
+function removePhoto(index) {
+  showConfirm("Hapus Foto", "Yakin ingin menghapus foto ini?", () => {
+    state.formData.photos.splice(index, 1);
+    renderPhotoPreview();
+    showToast("Foto dihapus", "info");
+  });
+}
+
+function renderPhotoPreview() {
+  const container = document.getElementById('photo-preview');
+  if (!container) return;
+  const fragment = document.createDocumentFragment();
+  state.formData.photos.forEach((photo, index) => {
+    const div = document.createElement('div');
+    div.className = 'relative aspect-square rounded-xl overflow-hidden border-2 border-slate-200 dark:border-slate-600 shadow-sm group';
+    div.innerHTML = `
+      <img src="${photo.base64}" alt="Upload ${index}" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <button data-remove-idx="${index}" type="button" class="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors" aria-label="Hapus foto">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1">
+        <div class="flex justify-between items-center">
+          <span>${formatBytes(photo.compressedSize)}</span>
+          ${photo.hasWatermark ? '<span class="watermark-badge"><i data-lucide="palette" class="w-3 h-3"></i> WM</span>' : ''}
+        </div>
+      </div>
+    `;
+    fragment.appendChild(div);
+  });
+  container.innerHTML = '';
+  container.appendChild(fragment);
+  if (window.lucide) lucide.createIcons({ nodes: [container] });
+  // ✅ Event delegation untuk tombol hapus
+  container.querySelectorAll('[data-remove-idx]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.removeIdx);
+      removePhoto(idx);
+    });
+  });
+}
+
+function resetForm() {
+  state.formData = {
+    namaDaerahIrigasi: 'Baru', namaPetugasPPA: '', namaSaluran: '', nomenKlatur: '',
+    jenisPintu: 'Type A', jenisPintuLainnya: '', koordinat: '',
+    h1: '', h: '', b: '', t: '',
+    kondisiDaunPintu: '', kondisiDratStang: '', kondisiRangka: '',
+    keterangan: '', photos: []
+  };
+  const form = document.getElementById('input-form');
+  if (form) form.reset();
+  renderPhotoPreview();
+  clearDraft();
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  const errors = validateForm();
+  if (errors.length > 0) { showToast(errors.join(', '), "error"); return; }
+  const totalPhotos = state.formData.photos.length;
+  const totalSize = formatBytes(state.formData.photos.reduce((acc, p) => acc + p.compressedSize, 0));
+  let finalJenisPintu = state.formData.jenisPintu;
+  if (finalJenisPintu === 'Lainnya') finalJenisPintu = state.formData.jenisPintuLainnya;
+  showSubmitModal(totalPhotos, totalSize, async () => {
+    const payload = { id: Date.now().toString(), apiKey: CONFIG.API_KEY, ...state.formData, jenisPintu: finalJenisPintu, timestamp: new Date().toISOString() };
+    delete payload.jenisPintuLainnya;
+    if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) {
+      state.isSyncing = true;
+      renderCurrentTab();
+      try {
+        await sendDataToSheet(payload);
+        showToast("Data berhasil dikirim!", "success", 5000);
+        resetForm();
+        setTimeout(() => fetchOnlineData(), 2000);
+      } catch (error) {
+        showToast(`Gagal mengirim: ${error.message}. Data disimpan ke antrean.`, "warning", 6000);
+        state.syncQueue.push(payload);
+        await saveQueueToStorage();
+        resetForm();
+      } finally { state.isSyncing = false; renderCurrentTab(); }
+    } else {
+      state.syncQueue.push(payload);
+      await saveQueueToStorage();
+      showToast("Mode Offline. Data disimpan ke antrean.", "info");
+      resetForm();
+      renderCurrentTab();
+    }
+  });
+}
+
+async function deleteOfflineData(id) {
+  showConfirm("Hapus Data Offline", "Data ini akan dihapus permanen. Lanjutkan?", async () => {
+    state.syncQueue = state.syncQueue.filter(item => item.id !== id);
+    await IDB.delete('syncQueue', id);
+    renderCurrentTab();
+    showToast("Data dihapus", "success");
+  });
+}
+
+let currentItemData = null;
+
+// ============================================
+// ✅ FIXED: openPhotoModal - XSS safe dengan data attributes
+// ============================================
+function openPhotoModal(item) {
+  currentItemData = item;
+  const modal = document.getElementById('photo-modal');
+  const content = document.getElementById('modal-content');
+  const allPhotos = (item["URL Foto"] || '').split(',').filter(p => p.trim());
+  const mapEmbedUrl = item["Koordinat"] && item["Koordinat"] !== '-' ? `https://maps.google.com/maps?q=${encodeURIComponent(item["Koordinat"])}&z=15&output=embed` : null;
+  
+  content.innerHTML = `
+    <div class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="modal-photos-grid">
+        ${allPhotos.length > 0 ? allPhotos.map((photo, idx) => `
+          <div class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-600 shadow-sm">
+            <img data-src="${escapeHtml(photo)}" alt="Foto ${idx + 1}"
+              class="lazy-image w-full h-64 object-cover cursor-zoom-in blur-placeholder photo-zoom-trigger"
+              data-photo-url="${escapeHtml(photo)}" />
+          </div>
+        `).join('') : `
+          <div class="md:col-span-2 h-64 bg-slate-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center text-slate-400">
+            <div class="text-center"><i data-lucide="camera" class="w-12 h-12 mx-auto mb-2"></i><p>Tidak ada foto</p></div>
+          </div>
+        `}
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Daerah Irigasi</p><p class="font-bold text-slate-800 dark:text-white">${escapeHtml(item["Nama Daerah Irigasi"] || '-')}</p></div>
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Nama Petugas/PPA</p><p class="font-bold text-slate-800 dark:text-white">${escapeHtml(item["Nama Petugas/PPA"] || '-')}</p></div>
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Nama Saluran</p><p class="font-bold text-slate-800 dark:text-white">${escapeHtml(item["Nama Saluran"] || '-')}</p></div>
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Jenis Pintu</p><p class="font-bold text-slate-800 dark:text-white">${escapeHtml(item["Jenis Pintu"] || '-')}</p></div>
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Tanggal Pencatatan</p><p class="font-bold text-slate-800 dark:text-white">${formatDateTime(item["Timestamp"])}</p></div>
+          <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Nomen Klatur</p><p class="font-bold text-slate-800 dark:text-white">${escapeHtml(item["Nomen Klatur"] || '-')}</p></div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-600">
+          <h4 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center text-sm">
+            <i data-lucide="ruler" class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400"></i>
+            Spesifikasi Teknis Pintu
+          </h4>
+          <div class="spec-display-card">
+            ${formatSpecRow('H<sub>r</sub> / H<sub>1</sub> : Tinggi Rangka', item["H1"], 'h1')}
+            ${formatSpecRow('H<sub>p</sub> / H : Tinggi Daun Pintu', item["H"], 'h')}
+            ${formatSpecRow('B : Lebar Daun Pintu', item["B"], 'b')}
+            ${formatSpecRow('t : Ketebalan Pelat', item["t"], 't')}
+          </div>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-600">
+          <h4 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center text-sm">
+            <i data-lucide="clipboard-check" class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400"></i>Kondisi Komponen
+          </h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-600 dark:text-slate-300">Daun Pintu</span><span class="font-semibold px-3 py-1 rounded-lg ${getStatusColor(item["Kondisi Daun Pintu"])}">${escapeHtml(item["Kondisi Daun Pintu"] || '-')}</span></div>
+            <div class="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-700"><span class="text-slate-600 dark:text-slate-300">Drat Stang</span><span class="font-semibold px-3 py-1 rounded-lg ${getStatusColor(item["Kondisi Drat Stang"])}">${escapeHtml(item["Kondisi Drat Stang"] || '-')}</span></div>
+            <div class="flex justify-between items-center py-2"><span class="text-slate-600 dark:text-slate-300">Rangka</span><span class="font-semibold px-3 py-1 rounded-lg ${getStatusColor(item["Kondisi Rangka"])}">${escapeHtml(item["Kondisi Rangka"] || '-')}</span></div>
+          </div>
+        </div>
+        <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Koordinat GPS</p><p class="font-semibold text-slate-800 dark:text-white">${escapeHtml(item["Koordinat"] || '-')}</p></div>
+        ${mapEmbedUrl ? `<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600"><iframe src="${mapEmbedUrl}" class="w-full h-64" style="border:0;" allowfullscreen="" loading="lazy"></iframe></div>` : ''}
+        <div><p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Keterangan Kondisi</p><p class="text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-600">${escapeHtml(item["Keterangan Kondisi"] || '-')}</p></div>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <button id="modal-btn-print" class="flex-1 flex items-center justify-center space-x-2 bg-slate-800 dark:bg-slate-700 text-white py-3 rounded-xl hover:bg-slate-900 transition-colors font-semibold"><i data-lucide="printer" class="w-5 h-5"></i><span>Print</span></button>
+        <button id="modal-btn-pdf" class="flex-1 flex items-center justify-center space-x-2 bg-rose-600 text-white py-3 rounded-xl hover:bg-rose-700 transition-colors font-semibold"><i data-lucide="file-text" class="w-5 h-5"></i><span>PDF</span></button>
+        ${item["Koordinat"] && item["Koordinat"] !== '-' ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(item["Koordinat"])}" target="_blank" rel="noopener noreferrer" class="flex-1 flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-colors font-semibold"><i data-lucide="map" class="w-5 h-5"></i><span>Peta</span></a>` : ''}
+        <button id="modal-btn-close" class="flex-1 flex items-center justify-center space-x-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl hover:bg-slate-300 transition-colors font-semibold"><i data-lucide="x" class="w-5 h-5"></i><span>Tutup</span></button>
+      </div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons({ nodes: [content] });
+  document.body.style.overflow = 'hidden';
+  LazyLoader.observeAll('.lazy-image');
+  
+  // ✅ Event delegation untuk zoom foto (XSS safe)
+  content.querySelectorAll('.photo-zoom-trigger').forEach(img => {
+    img.addEventListener('click', () => {
+      const url = img.getAttribute('data-photo-url');
+      if (url) openImageZoom(url);
+    });
+  });
+  
+  // ✅ Bind tombol modal via JS
+  const btnPrint = document.getElementById('modal-btn-print');
+  const btnPdf = document.getElementById('modal-btn-pdf');
+  const btnClose = document.getElementById('modal-btn-close');
+  if (btnPrint) btnPrint.addEventListener('click', printCurrentItem);
+  if (btnPdf) btnPdf.addEventListener('click', exportCurrentItemPDF);
+  if (btnClose) btnClose.addEventListener('click', closePhotoModal);
+}
+
+function closePhotoModal() { document.getElementById('photo-modal').classList.add('hidden'); document.body.style.overflow = ''; currentItemData = null; }
+
+// ============================================
+// ✅ FIXED: urlToBase64 untuk PDF export
+// ============================================
+async function urlToBase64(url) {
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) throw new Error('Gagal memuat gambar');
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (err) {
+    console.warn('Gagal konversi gambar ke base64:', url, err);
+    return null;
+  }
+}
+
+// ============================================
+// ✅ FIXED: exportCurrentItemPDF dengan konversi base64
+// ============================================
+async function exportCurrentItemPDF() {
+  if (!currentItemData) return;
+  if (!window.jspdf) { showToast('Library PDF belum dimuat.', 'warning'); return; }
+  showToast('Mempersiapkan PDF...', 'info');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  let yPos = 10;
+  const row = currentItemData;
+  doc.setFillColor(30, 64, 175);
+  doc.rect(0, 0, pageWidth, 30, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.text("LAPORAN INVENTARISASI PINTU AIR", pageWidth/2, 15, { align: 'center' });
+  doc.setFontSize(10);
+  doc.text("Kantor Benculuk - Dinas PUPR", pageWidth/2, 23, { align: 'center' });
+  yPos = 40;
+  doc.setTextColor(30, 64, 175);
+  doc.setFontSize(12);
+  doc.text("INFORMASI UMUM", 14, yPos); yPos += 8;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+  const info = [
+    `Daerah Irigasi: ${row["Nama Daerah Irigasi"] || '-'}`,
+    `Nama Petugas/PPA: ${row["Nama Petugas/PPA"] || '-'}`,
+    `Nama Saluran: ${row["Nama Saluran"] || '-'}`,
+    `Nomen Klatur: ${row["Nomen Klatur"] || '-'}`,
+    `Jenis Pintu: ${row["Jenis Pintu"] || '-'}`,
+    `Tanggal: ${formatDateTime(row["Timestamp"])}`,
+    `Koordinat: ${row["Koordinat"] || '-'}`
+  ];
+  info.forEach(line => { doc.text(line, 14, yPos); yPos += 5; });
+  yPos += 5;
+  doc.setFontSize(12);
+  doc.setTextColor(30, 64, 175);
+  doc.text("SPESIFIKASI TEKNIS PINTU", 14, yPos); yPos += 8;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(10);
+  const specH1 = formatSpecDisplay(row["H1"], 'h1');
+  const specH = formatSpecDisplay(row["H"], 'h');
+  const specB = formatSpecDisplay(row["B"], 'b');
+  const specT = formatSpecDisplay(row["t"], 't');
+  const specs = [
+    `Hr / H1 : Tinggi Rangka       = ${specH1.primary} ${specH1.conversion}`,
+    `Hp / H  : Tinggi Daun Pintu   = ${specH.primary} ${specH.conversion}`,
+    `B       : Lebar Daun Pintu    = ${specB.primary} ${specB.conversion}`,
+    `t       : Ketebalan Pelat     = ${specT.primary} ${specT.conversion}`
+  ];
+  specs.forEach(spec => { doc.text(spec, 14, yPos); yPos += 6; });
+  yPos += 5;
+  doc.setFontSize(12);
+  doc.setTextColor(30, 64, 175);
+  doc.text("KONDISI KOMPONEN", 14, yPos); yPos += 8;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+  const conditions = [
+    `Daun Pintu: ${row["Kondisi Daun Pintu"] || '-'}`,
+    `Drat Stang: ${row["Kondisi Drat Stang"] || '-'}`,
+    `Rangka: ${row["Kondisi Rangka"] || '-'}`
+  ];
+  conditions.forEach(cond => { doc.text(cond, 14, yPos); yPos += 5; });
+  yPos += 5;
+  doc.setFontSize(12);
+  doc.setTextColor(30, 64, 175);
+  doc.text("KETERANGAN", 14, yPos); yPos += 8;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(9);
+  const keterangan = row["Keterangan Kondisi"] || '-';
+  const splitKeterangan = doc.splitTextToSize(keterangan, pageWidth - 28);
+  doc.text(splitKeterangan, 14, yPos);
+  yPos += (splitKeterangan.length * 5) + 10;
+  const photoUrls = (row["URL Foto"] || '').split(',').filter(p => p.trim());
+  if (photoUrls.length > 0) {
+    if (yPos > pageHeight - 80) { doc.addPage(); yPos = 15; }
+    doc.setFontSize(12);
+    doc.setTextColor(30, 64, 175);
+    doc.text("FOTO DOKUMENTASI", 14, yPos); yPos += 8;
+    const photoWidth = 85; const photoHeight = 64; const margin = 14; const gap = 10;
+    for (let photoIndex = 0; photoIndex < photoUrls.length; photoIndex++) {
+      const photoUrl = photoUrls[photoIndex];
+      if (yPos + photoHeight > pageHeight - 20) { doc.addPage(); yPos = 15; }
+      const col = photoIndex % 2;
+      const xPos = margin + (col * (photoWidth + gap));
+      const yPosPhoto = yPos;
+      // ✅ Konversi URL ke base64 dulu
+      const base64 = await urlToBase64(photoUrl);
+      if (base64) {
+        try { doc.addImage(base64, 'JPEG', xPos, yPosPhoto, photoWidth, photoHeight); }
+        catch (e) { doc.setDrawColor(200); doc.rect(xPos, yPosPhoto, photoWidth, photoHeight); }
+      } else {
+        doc.setDrawColor(200);
+        doc.rect(xPos, yPosPhoto, photoWidth, photoHeight);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text('(gambar tidak dapat dimuat)', xPos + photoWidth/2, yPosPhoto + photoHeight/2, { align: 'center' });
+      }
+      doc.setFontSize(8); doc.setTextColor(100);
+      doc.text(`Foto ${photoIndex + 1}`, xPos + photoWidth/2, yPosPhoto + photoHeight + 4, { align: 'center' });
+      if (col === 1) yPos += photoHeight + 10;
+    }
+  }
+  doc.setFontSize(8); doc.setTextColor(150);
+  doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, pageWidth/2, pageHeight - 10, { align: 'center' });
+  const fileName = `Laporan_${row["Nama Daerah Irigasi"]}_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(fileName);
+  showToast(`PDF berhasil diunduh: ${fileName}`, "success");
+}
+
+// ============================================
+// ✅ FIXED: printCurrentItem dengan escape HTML
+// ============================================
+function printCurrentItem() {
+  if (!currentItemData) return;
+  const photoUrls = (currentItemData["URL Foto"] || '').split(',').filter(p => p.trim());
+  const mapEmbedUrl = currentItemData["Koordinat"] && currentItemData["Koordinat"] !== '-' ? `https://maps.google.com/maps?q=${encodeURIComponent(currentItemData["Koordinat"])}&z=15&output=embed` : null;
+  const specH1 = formatSpecDisplay(currentItemData["H1"], 'h1');
+  const specH = formatSpecDisplay(currentItemData["H"], 'h');
+  const specB = formatSpecDisplay(currentItemData["B"], 'b');
+  const specT = formatSpecDisplay(currentItemData["t"], 't');
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Laporan ${escapeHtml(currentItemData["Nama Daerah Irigasi"])}</title>
+<style>
+body { font-family: system-ui; padding: 20px; background: #f1f5f9; }
+.container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+.header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 30px; text-align: center; margin: -40px -40px 30px -40px; border-radius: 12px 12px 0 0; }
+h1 { font-size: 24px; margin: 0 0 5px 0; }
+h2 { font-size: 16px; margin: 0; opacity: 0.9; font-weight: 400; }
+.section { margin-bottom: 25px; }
+.section-title { font-size: 16px; font-weight: 700; color: #1e40af; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.info-box { background: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; }
+.label { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+.value { font-size: 14px; color: #1e293b; font-weight: 600; }
+.spec-table { width: 100%; border-collapse: collapse; }
+.spec-table td { padding: 8px 12px; border-bottom: 1px dashed #e2e8f0; font-size: 14px; }
+.spec-table td:first-child { font-weight: 500; color: #475569; width: 45%; }
+.spec-table td:last-child { font-weight: 700; font-family: 'Courier New', monospace; color: #1e293b; }
+.spec-conversion { color: #3b82f6; font-size: 12px; font-weight: 500; margin-left: 8px; }
+.photos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.photo-item img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; }
+@media print { body { background: white; padding: 0; } .container { box-shadow: none; } }
+</style></head><body>
+<div class="container">
+<div class="header">
+<h1>LAPORAN INVENTARISASI PINTU AIR</h1>
+<h2>Kantor Benculuk - Dinas PUPR</h2>
+</div>
+<div class="section">
+<div class="section-title">INFORMASI UMUM</div>
+<div class="info-box">
+<div class="grid-2">
+<div><div class="label">Daerah Irigasi</div><div class="value">${escapeHtml(currentItemData["Nama Daerah Irigasi"] || '-')}</div></div>
+<div><div class="label">Petugas/PPA</div><div class="value">${escapeHtml(currentItemData["Nama Petugas/PPA"] || '-')}</div></div>
+<div><div class="label">Nama Saluran</div><div class="value">${escapeHtml(currentItemData["Nama Saluran"] || '-')}</div></div>
+<div><div class="label">Nomen Klatur</div><div class="value">${escapeHtml(currentItemData["Nomen Klatur"] || '-')}</div></div>
+<div><div class="label">Jenis Pintu</div><div class="value">${escapeHtml(currentItemData["Jenis Pintu"] || '-')}</div></div>
+<div><div class="label">Tanggal</div><div class="value">${formatDateTime(currentItemData["Timestamp"])}</div></div>
+<div style="grid-column: 1/-1;"><div class="label">Koordinat GPS</div><div class="value">${escapeHtml(currentItemData["Koordinat"] || '-')}</div></div>
+</div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">SPESIFIKASI TEKNIS PINTU</div>
+<div class="info-box">
+<table class="spec-table">
+<tr><td>H<sub>r</sub> / H<sub>1</sub> : Tinggi Rangka</td><td>${specH1.primary} <span class="spec-conversion">${specH1.conversion}</span></td></tr>
+<tr><td>H<sub>p</sub> / H : Tinggi Daun Pintu</td><td>${specH.primary} <span class="spec-conversion">${specH.conversion}</span></td></tr>
+<tr><td>B : Lebar Daun Pintu</td><td>${specB.primary} <span class="spec-conversion">${specB.conversion}</span></td></tr>
+<tr><td>t : Ketebalan Pelat</td><td>${specT.primary} <span class="spec-conversion">${specT.conversion}</span></td></tr>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="section-title">KONDISI KOMPONEN</div>
+<div class="info-box">
+<p><strong>Daun Pintu:</strong> ${escapeHtml(currentItemData["Kondisi Daun Pintu"] || '-')}</p>
+<p><strong>Drat Stang:</strong> ${escapeHtml(currentItemData["Kondisi Drat Stang"] || '-')}</p>
+<p><strong>Rangka:</strong> ${escapeHtml(currentItemData["Kondisi Rangka"] || '-')}</p>
+</div>
+</div>
+<div class="section">
+<div class="section-title">KETERANGAN</div>
+<div class="info-box">${escapeHtml(currentItemData["Keterangan Kondisi"] || '-')}</div>
+</div>
+${photoUrls.length > 0 ? `
+<div class="section">
+<div class="section-title">FOTO DOKUMENTASI</div>
+<div class="photos-grid">
+${photoUrls.map((photo, idx) => `<div class="photo-item"><img src="${escapeHtml(photo)}" alt="Foto ${idx + 1}" /><p style="text-align: center; margin-top: 5px; font-size: 12px; color: #64748b;">Foto ${idx + 1}</p></div>`).join('')}
+</div>
+</div>
+` : ''}
+<div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e2e8f0; font-size: 11px; color: #64748b;">
+Dicetak: ${new Date().toLocaleString('id-ID')} | Kantor Benculuk - Dinas PUPR
+</div>
+</div>
+<script>window.onload = () => window.print();<\/script>
+</body></html>
+`);
+  printWindow.document.close();
+}
+
+function openImageZoom(src) { document.getElementById('zoomed-image').src = src; document.getElementById('image-zoom-modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+function closeImageZoom() { document.getElementById('image-zoom-modal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+function exportToExcel() {
+  if (!window.XLSX) { showToast('Library Excel belum dimuat.', 'warning'); return; }
+  if (state.savedData.length === 0) { showToast("Tidak ada data untuk diekspor", "error"); return; }
+  try {
+    const ws = XLSX.utils.json_to_sheet(state.savedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data Pintu");
+    const fileName = `Data_Pintu_Benculuk_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    showToast(`File Excel berhasil diunduh: ${fileName}`, "success");
+  } catch (error) { showToast("Gagal membuat file Excel", "error"); }
+}
+
+function exportToPDF() { showToast("Export PDF semua data belum didukung. Gunakan Export Excel.", "info"); }
+
+// ============================================
+// LEAFLET MAP - XSS safe dengan event delegation
+// ============================================
+let homeMapInstance = null;
+let markersLayer = null;
+let allMapMarkers = [];
+
+function getCoordinatesForMap() {
+  return state.savedData.filter(item => item["Koordinat"] && item["Koordinat"] !== '-' && item["Koordinat"].includes(',')).map(item => {
+    const parts = item["Koordinat"].split(',').map(c => parseFloat(c.trim()));
+    if (isNaN(parts[0]) || isNaN(parts[1])) return null;
+    return { lat: parts[0], lng: parts[1], data: item };
+  }).filter(c => c !== null);
+}
+
+function filterMapByCondition(condition) {
+  if (!homeMapInstance || !markersLayer) return;
+  if (state.activeMapFilter === condition) state.activeMapFilter = null;
+  else state.activeMapFilter = condition;
+  allMapMarkers.forEach(markerObj => {
+    const marker = markerObj.marker;
+    const markerCondition = markerObj.condition;
+    if (state.activeMapFilter === null) { if (!markersLayer.hasLayer(marker)) markersLayer.addLayer(marker); }
+    else if (markerCondition === state.activeMapFilter) { if (!markersLayer.hasLayer(marker)) markersLayer.addLayer(marker); }
+    else { if (markersLayer.hasLayer(marker)) markersLayer.removeLayer(marker); }
+  });
+  updateLegendUI();
+  showToast(`Filter peta: ${state.activeMapFilter ? getConditionLabel(state.activeMapFilter) : 'Semua'}`, 'info', 1500);
+}
+
+function updateLegendUI() {
+  const legendItems = document.querySelectorAll('.map-legend-item[data-condition]');
+  const resetBtn = document.getElementById('map-legend-reset');
+  legendItems.forEach(item => {
+    const condition = item.dataset.condition;
+    if (state.activeMapFilter === null) { item.classList.remove('active', 'dimmed'); }
+    else if (condition === state.activeMapFilter) { item.classList.add('active'); item.classList.remove('dimmed'); }
+    else { item.classList.add('dimmed'); item.classList.remove('active'); }
+  });
+  if (resetBtn) resetBtn.style.display = state.activeMapFilter ? 'block' : 'none';
+}
+
+function resetMapFilter() {
+  state.activeMapFilter = null;
+  allMapMarkers.forEach(markerObj => { if (!markersLayer.hasLayer(markerObj.marker)) markersLayer.addLayer(markerObj.marker); });
+  updateLegendUI();
+  showToast('Filter peta direset', 'info', 1500);
+}
+
+function initLeafletMap(containerId, coordinates) {
+  if (homeMapInstance) { try { homeMapInstance.remove(); } catch (e) {} homeMapInstance = null; markersLayer = null; allMapMarkers = []; }
+  state.activeMapFilter = null;
+  const container = document.getElementById(containerId);
+  if (!container || coordinates.length === 0) return;
+  container.style.height = '100%'; container.style.width = '100%';
+  const centerLat = coordinates.reduce((sum, c) => sum + c.lat, 0) / coordinates.length;
+  const centerLng = coordinates.reduce((sum, c) => sum + c.lng, 0) / coordinates.length;
+  homeMapInstance = L.map(containerId, { scrollWheelZoom: false, zoomControl: true, preferCanvas: coordinates.length > 100 }).setView([centerLat, centerLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19, minZoom: 2 }).addTo(homeMapInstance);
+  markersLayer = L.layerGroup().addTo(homeMapInstance);
+  const conditionCounts = { baik: 0, kerusakan: 0, rusak: 0, default: 0 };
+  
+  coordinates.forEach((coord, idx) => {
+    const data = coord.data || {};
+    const kondisiDaun = data["Kondisi Daun Pintu"] || '';
+    const conditionCategory = getConditionCategory(kondisiDaun);
+    conditionCounts[conditionCategory]++;
+    const markerIcon = L.divIcon({ className: '', html: `<div class="custom-marker-pin ${getMarkerColorClass(conditionCategory)}"><span>${idx + 1}</span></div>`, iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30] });
+    const marker = L.marker([coord.lat, coord.lng], { icon: markerIcon });
+    let statusColor = '#94a3b8'; let statusText = 'Belum dicek';
+    if (conditionCategory === 'baik') { statusColor = '#10b981'; statusText = 'Baik'; }
+    else if (conditionCategory === 'kerusakan') { statusColor = '#f59e0b'; statusText = 'Ada Kerusakan'; }
+    else if (conditionCategory === 'rusak') { statusColor = '#ef4444'; statusText = 'Rusak'; }
+    
+    // ✅ XSS safe: gunakan data attribute, bind click di popupopen
+    const popupHtml =
+      '<div class="popup-card">' +
+      '<div class="popup-header"><p class="popup-header-title"><i data-lucide="map-pin" style="width:16px;height:16px;"></i> ' + escapeHtml(data["Nama Daerah Irigasi"] || 'Daerah Irigasi') + '</p><p class="popup-header-sub">' + escapeHtml(data["Nama Saluran"] || 'Saluran') + '</p></div>' +
+      '<div class="popup-body">' +
+      '<div class="popup-row"><span class="popup-label"><i data-lucide="user" style="width:14px;height:14px;"></i> Petugas/PPA</span><span class="popup-value">' + escapeHtml(data["Nama Petugas/PPA"] || '-') + '</span></div>' +
+      '<div class="popup-row"><span class="popup-label"><i data-lucide="layers" style="width:14px;height:14px;"></i> Jenis Pintu</span><span class="popup-value">' + escapeHtml(data["Jenis Pintu"] || '-') + '</span></div>' +
+      '<div class="popup-row"><span class="popup-label"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i> Kondisi</span><span class="popup-value" style="color:' + statusColor + '">' + statusText + '</span></div>' +
+      '<div class="popup-row"><span class="popup-label"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Tanggal</span><span class="popup-value">' + formatDate(data["Timestamp"] || '') + '</span></div>' +
+      '</div>' +
+      '<div class="popup-footer">' +
+      '<button class="popup-btn popup-btn-primary" data-view-idx="' + idx + '"><i data-lucide="search" style="width:12px;height:12px;"></i> Detail</button>' +
+      '<a class="popup-btn popup-btn-secondary" href="https://www.google.com/maps?q=' + coord.lat + ',' + coord.lng + '" target="_blank" rel="noopener noreferrer"><i data-lucide="map" style="width:12px;height:12px;"></i> Maps</a>' +
+      '</div>' +
+      '</div>';
+    marker.bindPopup(popupHtml, { maxWidth: 300, minWidth: 260, closeButton: true, autoPan: true, autoPanPadding: [40, 40] });
+    // ✅ Bind click di popupopen (XSS safe)
+    marker.on('popupopen', () => {
+      const btn = marker.getPopup().getElement().querySelector('[data-view-idx]');
+      if (btn) btn.addEventListener('click', () => viewMapDetail(idx));
+      if (window.lucide) lucide.createIcons({ nodes: [marker.getPopup().getElement()] });
+    });
+    markersLayer.addLayer(marker);
+    allMapMarkers.push({ marker, condition: conditionCategory, idx });
+  });
+  
+  if (coordinates.length > 1) { const bounds = L.latLngBounds(coordinates.map(c => [c.lat, c.lng])); homeMapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 }); }
+  setTimeout(() => { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 100);
+  setTimeout(() => { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 300);
+  setTimeout(() => { if (homeMapInstance) homeMapInstance.invalidateSize(); }, 800);
+  
+  // ✅ Legenda interaktif
+  const legend = L.control({ position: 'bottomright' });
+  legend.onAdd = function() {
+    const div = L.DomUtil.create('div', 'map-legend');
+    div.innerHTML = `<div class="map-legend-title"><i data-lucide="filter" style="width:14px;height:14px;"></i> Filter Kondisi</div>
+      <div class="map-legend-item" data-condition="baik"><span class="map-legend-dot" style="background:#10b981;"></span><span style="color:#475569;">Kondisi Baik</span><span class="map-legend-count">${conditionCounts.baik}</span></div>
+      <div class="map-legend-item" data-condition="kerusakan"><span class="map-legend-dot" style="background:#f59e0b;"></span><span style="color:#475569;">Ada Kerusakan</span><span class="map-legend-count">${conditionCounts.kerusakan}</span></div>
+      <div class="map-legend-item" data-condition="rusak"><span class="map-legend-dot" style="background:#ef4444;"></span><span style="color:#475569;">Rusak</span><span class="map-legend-count">${conditionCounts.rusak}</span></div>
+      ${conditionCounts.default > 0 ? `<div class="map-legend-item" data-condition="default"><span class="map-legend-dot" style="background:#64748b;"></span><span style="color:#475569;">Belum Dicek</span><span class="map-legend-count">${conditionCounts.default}</span></div>` : ''}
+      <div class="map-legend-reset" id="map-legend-reset" style="display:none;"><i data-lucide="x-circle" style="width:10px;height:10px;display:inline;"></i> Reset Filter</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;">Total: ${coordinates.length} lokasi</div>`;
+    return div;
+  };
+  legend.addTo(homeMapInstance);
+  
+  // ✅ Event delegation untuk legenda
+  setTimeout(() => {
+    const legendEl = document.querySelector('.map-legend');
+    if (legendEl) {
+      legendEl.querySelectorAll('.map-legend-item[data-condition]').forEach(item => {
+        item.addEventListener('click', () => filterMapByCondition(item.dataset.condition));
+      });
+      const resetBtn = document.getElementById('map-legend-reset');
+      if (resetBtn) resetBtn.addEventListener('click', resetMapFilter);
+    }
+    if (window.lucide) lucide.createIcons();
+  }, 300);
+}
+
+function viewMapDetail(index) {
+  const coordinates = getCoordinatesForMap();
+  if (coordinates[index] && coordinates[index].data) {
+    if (homeMapInstance) homeMapInstance.closePopup();
+    openPhotoModal(coordinates[index].data);
+  }
+}
+
+function openFullMap() {
+  const coordinates = getCoordinatesForMap();
+  if (coordinates.length === 0) { showToast('Belum ada data koordinat', 'warning'); return; }
+  const points = coordinates.map(c => `${c.lat},${c.lng}`).join('/');
+  window.open(`https://www.google.com/maps/dir/${points}/data=!3m1!4b1`, '_blank');
+}
+
+function refreshMap() { if (homeMapInstance) setTimeout(() => homeMapInstance.invalidateSize(), 200); }
+window.addEventListener('resize', () => refreshMap());
+
+// ============================================
+// ✅ FIXED: searchLocations dengan data attributes
+// ============================================
+function searchLocations(query) {
+  const coordinates = getCoordinatesForMap();
+  const searchTerm = query.toLowerCase();
+  const listContainer = document.getElementById('location-list');
+  if (!listContainer) return;
+  const filtered = coordinates.filter(coord => {
+    const data = coord.data || {};
+    return (data["Nama Daerah Irigasi"] || '').toLowerCase().includes(searchTerm) ||
+           (data["Nama Saluran"] || '').toLowerCase().includes(searchTerm) ||
+           (data["Nomen Klatur"] || '').toLowerCase().includes(searchTerm) ||
+           (data["Nama Petugas/PPA"] || '').toLowerCase().includes(searchTerm);
+  });
+  if (filtered.length === 0) {
+    listContainer.innerHTML = `<div class="text-center py-8 text-slate-500 dark:text-slate-400"><i data-lucide="search-x" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Tidak ada lokasi ditemukan</p></div>`;
+    return;
+  }
+  listContainer.innerHTML = filtered.slice(0, 10).map((coord, idx) => {
+    const originalIdx = coordinates.indexOf(coord);
+    return `<div data-focus-lat="${coord.lat}" data-focus-lng="${coord.lng}" data-focus-idx="${originalIdx}"
+      class="location-item p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-slate-600 cursor-pointer transition-colors border border-slate-200 dark:border-slate-600">
+      <div class="flex items-start justify-between">
+        <div class="flex-1 min-w-0">
+          <h4 class="font-semibold text-sm text-slate-800 dark:text-white truncate">${escapeHtml(coord.data["Nama Daerah Irigasi"] || '-')}</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-300 truncate">${escapeHtml(coord.data["Nama Saluran"] || '-')}</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(coord.data["Nama Petugas/PPA"] || '-')}</p>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  if (window.lucide) lucide.createIcons({ nodes: [listContainer] });
+  // ✅ Event delegation
+  listContainer.querySelectorAll('.location-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const lat = parseFloat(item.dataset.focusLat);
+      const lng = parseFloat(item.dataset.focusLng);
+      const idx = parseInt(item.dataset.focusIdx);
+      focusLocation(lat, lng, idx);
+    });
+  });
+}
+
+function focusLocation(lat, lng, index) {
+  if (homeMapInstance) {
+    homeMapInstance.setView([lat, lng], 16);
+    const markers = markersLayer.getLayers();
+    if (markers[index]) markers[index].openPopup();
+    const listItems = document.querySelectorAll('#location-list > div.location-item');
+    listItems.forEach((item, idx) => {
+      if (idx === index) item.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30');
+      else item.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-100', 'dark:bg-blue-900/30');
+    });
+  }
+}
+
+// ============================================
+// RENDER FUNCTIONS
+// ============================================
+function renderNavigation() {
+  const tabs = [
+    { id: 'home', icon: 'home', label: 'Beranda' },
+    { id: 'detail', icon: 'image', label: 'Detail' },
+    { id: 'input', icon: 'plus-circle', label: 'Input' },
+    { id: 'data', icon: 'database', label: 'Data' },
+    { id: 'sync', icon: 'refresh-cw', label: 'Antrean', badge: state.syncQueue.length }
+  ];
+  const navHtml = tabs.map(tab => `
+    <button data-tab="${tab.id}" class="flex items-center justify-between p-3 rounded-xl transition-all ${state.activeTab === tab.id ? 'bg-white/20 text-white font-semibold' : 'text-blue-100 hover:bg-white/10'}">
+      <div class="flex items-center space-x-3"><i data-lucide="${tab.icon}" class="w-5 h-5"></i><span>${tab.label}</span></div>
+      ${tab.badge > 0 ? `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">${tab.badge}</span>` : ''}
+    </button>
+  `).join('');
+  document.getElementById('desktop-nav').innerHTML = navHtml;
+  document.getElementById('mobile-nav').innerHTML = navHtml;
+  const bottomNavHtml = tabs.map(tab => `
+    <button data-tab="${tab.id}" class="flex flex-col items-center justify-center p-2 flex-1 relative ${state.activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}">
+      <div class="relative">
+        <i data-lucide="${tab.icon}" class="w-6 h-6 mb-1"></i>
+        ${tab.badge > 0 ? `<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">${tab.badge}</span>` : ''}
+      </div>
+      <span class="text-[10px] font-medium">${tab.label}</span>
+    </button>
+  `).join('');
+  document.getElementById('bottom-nav').innerHTML = bottomNavHtml;
+  if (window.lucide) lucide.createIcons();
+  // ✅ Event delegation untuk nav
+  ['desktop-nav', 'mobile-nav', 'bottom-nav'].forEach(id => {
+    const nav = document.getElementById(id);
+    if (nav) {
+      nav.querySelectorAll('[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+    }
+  });
+}
+
+function renderOnlineStatus() {
+  const icon = document.getElementById('desktop-status-icon');
+  const text = document.getElementById('desktop-status-text');
+  if (state.isOnline) { icon.setAttribute('data-lucide', 'wifi'); icon.className = 'w-4 h-4 text-green-400'; text.textContent = 'Online'; document.getElementById('offline-banner').classList.remove('show'); }
+  else { icon.setAttribute('data-lucide', 'wifi-off'); icon.className = 'w-4 h-4 text-red-400'; text.textContent = 'Offline'; document.getElementById('offline-banner').classList.add('show'); }
+  if (window.lucide) lucide.createIcons({ nodes: [icon.parentElement] });
+}
+
+function switchTab(tabId) { state.activeTab = tabId; state.mobileMenuOpen = false; document.getElementById('mobile-menu').classList.add('hidden'); renderNavigation(); renderCurrentTab(); window.scrollTo(0, 0); }
+
+function renderCurrentTab() {
+  const content = document.getElementById('content-area');
+  if (homeMapInstance && state.activeTab !== 'home') { try { homeMapInstance.remove(); } catch (e) {} homeMapInstance = null; markersLayer = null; allMapMarkers = []; }
+  if (state.activeTab === 'home') { content.innerHTML = renderHomeTab(); setupHomeListeners(); }
+  else if (state.activeTab === 'detail') { content.innerHTML = renderDetailPintuTab(); setupDetailListeners(); }
+  else if (state.activeTab === 'input') { content.innerHTML = renderInputTab(); setupInputFormListeners(); renderPhotoPreview(); }
+  else if (state.activeTab === 'data') { content.innerHTML = renderDataTab(); setupDataListeners(); }
+  else if (state.activeTab === 'sync') { content.innerHTML = renderSyncTab(); setupSyncListeners(); }
+  if (window.lucide) lucide.createIcons({ nodes: [content] });
+  LazyLoader.observeAll('.lazy-image');
+  PerfMonitor.mark('render');
+  PerfMonitor.update();
+}
+
+// ============================================
+// HOME TAB
+// ============================================
+function renderHomeTab() {
+  const totalData = state.savedData.length;
+  const totalPhotos = state.savedData.reduce((acc, item) => acc + (item["URL Foto"] || '').split(',').filter(p => p.trim()).length, 0);
+  const queueCount = state.syncQueue.length;
+  const coordinates = getCoordinatesForMap();
+  const allPhotos = [];
+  state.savedData.forEach((item, idx) => {
+    (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx }));
+  });
+  const filteredPhotos = allPhotos.filter(photo => {
+    if (!state.homeSearchTerm) return true;
+    const term = state.homeSearchTerm.toLowerCase();
+    return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) || (photo.item["Nama Saluran"] || '').toLowerCase().includes(term) || (photo.item["Jenis Pintu"] || '').toLowerCase().includes(term);
+  });
+  
+  // ✅ Simpan item ke ItemStore untuk akses via ID
+  ItemStore.clear();
+  const photoItemIds = filteredPhotos.slice(0, 8).map(photo => ItemStore.set(photo.item));
+  
+  return `
+<div class="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 rounded-2xl p-6 md:p-8 text-white mb-6 shadow-2xl overflow-hidden animate-fade-up">
+  <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+  <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+  <div class="relative z-10">
+    <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur px-3 py-1.5 rounded-full mb-4 text-xs">
+      <i data-lucide="zap" class="w-3 h-3"></i>
+      <span class="font-semibold">Sistem Inventarisasi Digital v5.1 - PWA Edition</span>
+    </div>
+    <h1 class="text-2xl md:text-4xl font-bold mb-3 leading-tight">Kantor Benculuk<br/><span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Inventarisasi Pintu Air</span></h1>
+    <p class="text-blue-100 text-sm md:text-base mb-5 max-w-2xl">Platform digital untuk mendata dan memonitor kondisi pintu air irigasi dengan GPS, dokumentasi foto ber-watermark, peta sebaran interaktif, dan sinkronisasi.</p>
+    <div class="flex flex-wrap gap-2">
+      <button data-action="goto-input" class="bg-white text-blue-700 px-5 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg flex items-center space-x-2 text-sm"><i data-lucide="plus-circle" class="w-4 h-4"></i><span>Input Data Baru</span></button>
+      <button data-action="goto-data" class="bg-white/20 backdrop-blur text-white px-5 py-2.5 rounded-xl font-bold hover:bg-white/30 transition-all flex items-center space-x-2 border border-white/30 text-sm"><i data-lucide="database" class="w-4 h-4"></i><span>Database</span></button>
+    </div>
+  </div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 animate-fade-up">
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center justify-between mb-2"><div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg"><i data-lucide="database" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i></div><span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">TOTAL</span></div>
+    <p class="text-2xl font-bold text-slate-800 dark:text-white">${totalData}</p><p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Data Tercatat</p>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center justify-between mb-2"><div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg"><i data-lucide="camera" class="w-5 h-5 text-emerald-600 dark:text-emerald-400"></i></div><span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">TOTAL</span></div>
+    <p class="text-2xl font-bold text-slate-800 dark:text-white">${totalPhotos}</p><p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Foto Dokumentasi</p>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center justify-between mb-2"><div class="p-2 ${queueCount > 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-slate-100 dark:bg-slate-700'} rounded-lg"><i data-lucide="cloud-off" class="w-5 h-5 ${queueCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}"></i></div><span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">PENDING</span></div>
+    <p class="text-2xl font-bold text-slate-800 dark:text-white">${queueCount}</p><p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Menunggu Sinkron</p>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center justify-between mb-2"><div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg"><i data-lucide="map-pin" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i></div><span class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">LOKASI</span></div>
+    <p class="text-lg font-bold text-slate-800 dark:text-white">${coordinates.length}</p><p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Titik di Peta</p>
+  </div>
+</div>
+<div class="mb-6 animate-fade-up">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center"><i data-lucide="map-pin" class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"></i>Peta Sebaran Lokasi</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="lightbulb" class="w-3 h-3 inline mr-1"></i>Klik marker untuk detail • Klik legenda untuk filter kondisi</p>
+        </div>
+        ${coordinates.length > 0 ? `<button data-action="full-map" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-1"><i data-lucide="external-link" class="w-3 h-3"></i><span>Peta Penuh</span></button>` : ''}
+      </div>
+    </div>
+    <div class="map-wrapper">
+      ${coordinates.length > 0 ? `<div id="home-map" style="width: 100%; height: 100%;"></div>` : `<div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-slate-50 dark:bg-slate-700/50"><i data-lucide="map" class="w-16 h-16 mb-3 opacity-50"></i><p class="text-sm font-medium">Belum ada data koordinat</p></div>`}
+    </div>
+    ${coordinates.length > 0 ? `
+    <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+      <div class="relative mb-4">
+        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+        <input type="text" id="location-search" placeholder="Cari lokasi (nama saluran, nomen klatur, PPA)..." class="w-full pl-10 pr-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none dark:bg-slate-700 dark:text-white text-sm" />
+      </div>
+      <div id="location-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+    </div>
+    ` : ''}
+  </div>
+</div>
+<div class="animate-fade-up">
+  <div class="flex justify-between items-center mb-4">
+    <div><h2 class="text-lg md:text-xl font-bold text-slate-800 dark:text-white">Galeri Dokumentasi</h2><p class="text-slate-500 dark:text-slate-400 text-xs">Foto-foto hasil pencatatan lapangan</p></div>
+  </div>
+  <div class="relative mb-4">
+    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+    <input type="text" id="home-search-input" placeholder="Cari berdasarkan daerah irigasi, saluran, atau jenis pintu..." value="${escapeHtml(state.homeSearchTerm)}" class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-800 dark:text-white text-sm" />
+  </div>
+  <div id="home-gallery-grid">${renderHomeGalleryContent(filteredPhotos)}</div>
+</div>
+`;
+}
+
+// ✅ Helper: Render gallery content dengan data-item-id (XSS safe)
+function renderHomeGalleryContent(filteredPhotos) {
+  if (state.isLoadingData) return `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">${[1,2,3,4,5,6,7,8].map(() => `<div class="aspect-square bg-white dark:bg-slate-800 rounded-xl animate-skeleton border border-slate-200 dark:border-slate-700"></div>`).join('')}</div>`;
+  if (filteredPhotos.length === 0) return `<div class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 text-center text-slate-500"><i data-lucide="camera-off" class="w-10 h-10 mx-auto mb-3"></i><p class="font-semibold mb-1 text-sm">${state.homeSearchTerm ? 'Tidak ada hasil pencarian' : 'Belum ada foto'}</p></div>`;
+  
+  // ✅ Simpan item ke ItemStore, pakai ID di data attribute
+  const itemsWithIds = filteredPhotos.slice(0, 8).map(photo => {
+    const id = ItemStore.set(photo.item);
+    return { url: photo.url, item: photo.item, id };
+  });
+  
+  return `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    ${itemsWithIds.map((photo, idx) => `
+      <div data-item-id="${photo.id}" class="gallery-card home-gallery-item relative aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer bg-slate-100 dark:bg-slate-700">
+        <img data-src="${photo.url}" alt="Foto ${idx + 1}" class="lazy-image w-full h-full object-cover blur-placeholder" />
+        <div class="gallery-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-2">
+          <p class="text-white font-bold text-xs line-clamp-1">${escapeHtml(photo.item["Nama Daerah Irigasi"] || '-')}</p>
+          <p class="text-white/80 text-[10px] line-clamp-1">${escapeHtml(photo.item["Nama Saluran"] || '-')}</p>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+  ${filteredPhotos.length > 8 ? `<div class="mt-4 text-center"><button data-action="goto-data" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 font-semibold text-sm">Lihat semua ${filteredPhotos.length} foto <i data-lucide="arrow-right" class="w-3 h-3 inline"></i></button></div>` : `<div class="mt-4 text-center"><p class="text-xs text-slate-500 dark:text-slate-400">Menampilkan ${filteredPhotos.length} foto</p></div>`}`;
+}
+
+function setupHomeListeners() {
+  const searchInput = document.getElementById('home-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value, (value) => { state.homeSearchTerm = value; renderHomeGalleryOnly(); });
+    });
+  }
+  const locationSearch = document.getElementById('location-search');
+  if (locationSearch) {
+    locationSearch.addEventListener('input', (e) => searchLocations(e.target.value));
+  }
+  
+  // ✅ Event delegation untuk gallery & action buttons
+  const content = document.getElementById('content-area');
+  content.addEventListener('click', (e) => {
+    // Gallery card click
+    const card = e.target.closest('.home-gallery-item');
+    if (card && card.dataset.itemId) {
+      const item = ItemStore.get(card.dataset.itemId);
+      if (item) openPhotoModal(item);
+      return;
+    }
+    // Action buttons
+    const actionBtn = e.target.closest('[data-action]');
+    if (actionBtn) {
+      const action = actionBtn.dataset.action;
+      if (action === 'goto-input') switchTab('input');
+      else if (action === 'goto-data') switchTab('data');
+      else if (action === 'full-map') openFullMap();
+    }
+  });
+  
+  setTimeout(() => {
+    const coordinates = getCoordinatesForMap();
+    if (coordinates.length > 0 && document.getElementById('home-map')) initLeafletMap('home-map', coordinates);
+    // Initial location list
+    searchLocations('');
+  }, 300);
+}
+
+// ✅ FIXED: renderHomeGalleryOnly - tidak menghancurkan input search
+function renderHomeGalleryOnly() {
+  const galleryGrid = document.getElementById('home-gallery-grid');
+  if (!galleryGrid) return;
+  const allPhotos = [];
+  state.savedData.forEach((item, idx) => { (item["URL Foto"] || '').split(',').filter(p => p.trim()).forEach(photo => allPhotos.push({ url: photo, item: item, index: idx })); });
+  const filteredPhotos = allPhotos.filter(photo => {
+    if (!state.homeSearchTerm) return true;
+    const term = state.homeSearchTerm.toLowerCase();
+    return (photo.item["Nama Daerah Irigasi"] || '').toLowerCase().includes(term) || (photo.item["Nama Saluran"] || '').toLowerCase().includes(term) || (photo.item["Jenis Pintu"] || '').toLowerCase().includes(term);
+  });
+  galleryGrid.innerHTML = renderHomeGalleryContent(filteredPhotos);
+  if (window.lucide) lucide.createIcons({ nodes: [galleryGrid] });
+  LazyLoader.observeAll('.lazy-image');
+}
+
+// ============================================
+// DETAIL TAB
+// ============================================
+function renderDetailPintuTab() {
+  return `
+<div class="max-w-7xl mx-auto">
+  <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-5 text-white mb-6 shadow-lg animate-fade-up">
+    <h2 class="text-xl md:text-2xl font-bold mb-1">Detail Teknis Pintu Air Irigasi</h2>
+    <p class="text-blue-100 text-sm">Referensi gambar teknis dan spesifikasi pintu air untuk Kantor Benculuk</p>
+  </div>
+  <div class="space-y-6">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden animate-fade-up">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 text-white">
+        <div class="flex items-center space-x-3"><i data-lucide="layers" class="w-5 h-5"></i><h3 class="text-lg font-bold">PINTU PLAT (Plate Gate)</h3></div>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+          <div class="space-y-3">
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600">
+              <img data-src="https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w1000" alt="Tampak Depan Pintu Plat" data-photo-url="https://drive.google.com/thumbnail?id=1nXQ6j_KnKyBvTjUFGuc9MZKmGpCNNGAv&sz=w2000" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder detail-zoom-trigger" />
+            </div>
+            <h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Tampak Depan Pintu Plat</h4>
+          </div>
+          <div class="space-y-3">
+            <div class="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 border-2 border-slate-200 dark:border-slate-600">
+              <img data-src="https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w1000" alt="Detail Mekanisme" data-photo-url="https://drive.google.com/thumbnail?id=1NvDeWBvAYLTx5Yp03ra9MN2V5pefrw3P&sz=w2000" class="lazy-image w-full rounded-lg border border-slate-300 dark:border-slate-600 image-zoom blur-placeholder detail-zoom-trigger" />
+            </div>
+            <h4 class="font-bold text-slate-800 dark:text-white text-center text-sm">Ringkasan Teknis & Sosialisasi</h4>
+          </div>
+        </div>
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-200 dark:border-blue-800">
+          <h4 class="font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center text-sm"><i data-lucide="ruler" class="w-4 h-4 mr-2"></i>Spesifikasi Teknis Pintu</h4>
+          <div class="spec-display-card">
+            <div class="spec-row"><span class="spec-label">H<sub>r</sub> / H<sub>1</sub> : Tinggi Rangka</span><span><span class="spec-value">150 cm</span><span class="spec-conversion-inline">(1,50 m)</span></span></div>
+            <div class="spec-row"><span class="spec-label">H<sub>p</sub> / H : Tinggi Daun Pintu</span><span><span class="spec-value">130 cm</span><span class="spec-conversion-inline">(1,30 m)</span></span></div>
+            <div class="spec-row"><span class="spec-label">B : Lebar Daun Pintu</span><span><span class="spec-value">100 cm</span><span class="spec-conversion-inline">(1,00 m)</span></span></div>
+            <div class="spec-row"><span class="spec-label">t : Ketebalan Pelat</span><span><span class="spec-value">5 mm</span><span class="spec-conversion-inline">(0,5 cm)</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+}
+
+function setupDetailListeners() {
+  setTimeout(() => {
+    document.querySelectorAll('.detail-zoom-trigger').forEach(img => {
+      img.addEventListener('click', () => {
+        const url = img.getAttribute('data-photo-url');
+        if (url) openImageZoom(url);
+      });
+    });
+  }, 100);
+}
+
+// ============================================
+// INPUT TAB
+// ============================================
+function renderInputTab() {
+  const daerahOptions = CONFIG.DAERAH_IRIGASI_OPTIONS.map(opt => `<option value="${opt}" ${state.formData.namaDaerahIrigasi === opt ? 'selected' : ''}>${opt}</option>`).join('');
+  const jenisPintuOptions = CONFIG.JENIS_PINTU_OPTIONS.map(opt => `<option value="${opt}" ${state.formData.jenisPintu === opt ? 'selected' : ''}>${opt}</option>`).join('');
+  const convH1 = formatSpecDisplay(state.formData.h1, 'h1');
+  const convH = formatSpecDisplay(state.formData.h, 'h');
+  const convB = formatSpecDisplay(state.formData.b, 'b');
+  const convT = formatSpecDisplay(state.formData.t, 't');
+  return `
+<div class="max-w-3xl mx-auto">
+  <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-5 text-white mb-5 shadow-lg">
+    <h2 class="text-xl font-bold mb-1">Input Data Baru</h2>
+    <p class="text-blue-100 text-sm">Catat kondisi pintu irigasi dengan foto ber-watermark otomatis.</p>
+  </div>
+  <form id="input-form" class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="md:col-span-2"><h3 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center text-sm"><i data-lucide="map" class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400"></i>Informasi Lokasi</h3></div>
+      <div class="space-y-1">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nama Daerah Irigasi *</label>
+        <select name="namaDaerahIrigasi" required class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm">${daerahOptions}</select>
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nama Petugas / PPA *</label>
+        <input type="text" name="namaPetugasPPA" value="${escapeHtml(state.formData.namaPetugasPPA)}" required class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm uppercase tracking-wide" placeholder="Nama petugas (otomatis huruf besar)" style="text-transform: uppercase;" />
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nama Saluran *</label>
+        <input type="text" name="namaSaluran" value="${escapeHtml(state.formData.namaSaluran)}" required class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Contoh: Saluran Primer A" />
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nomen Klatur</label>
+        <input type="text" name="nomenKlatur" value="${escapeHtml(state.formData.nomenKlatur)}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Kode nomen klatur" />
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Jenis Pintu</label>
+        <select name="jenisPintu" id="select-jenis-pintu" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm">${jenisPintuOptions}</select>
+        <input type="text" name="jenisPintuLainnya" id="input-jenis-lainnya" class="w-full mt-2 p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm ${state.formData.jenisPintu === 'Lainnya' ? '' : 'hidden'}" placeholder="Ketik jenis pintu (cth: Pintu Angkat, Pintu Plat, Ulir Tunggal...)" value="${escapeHtml(state.formData.jenisPintuLainnya || '')}" />
+        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="info" class="w-3 h-3 inline"></i> Pilih "Lainnya" untuk isi manual</p>
+      </div>
+      <div class="space-y-1 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Koordinat (GPS)</label>
+        <div class="flex space-x-2">
+          <input type="text" name="koordinat" value="${escapeHtml(state.formData.koordinat)}" class="flex-1 p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none dark:text-white text-sm" placeholder="Latitude, Longitude (Otomatis / Ketik Manual)" />
+          <button type="button" id="btn-get-location" class="bg-slate-800 dark:bg-slate-700 text-white p-2.5 rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center" aria-label="Ambil lokasi GPS"><i data-lucide="map-pin" class="w-4 h-4"></i></button>
+        </div>
+        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1"><i data-lucide="lightbulb" class="w-3 h-3 inline"></i> Otomatis diambil saat menggunakan kamera atau bisa diketik manual</p>
+      </div>
+      <div class="md:col-span-2 mt-4">
+        <h3 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center text-sm"><i data-lucide="ruler" class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400"></i>Spesifikasi Teknis Pintu</h3>
+        <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-3 text-xs text-blue-800 dark:text-blue-300">
+          <div class="flex items-start space-x-2">
+            <i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0"></i>
+            <div>
+              <p class="font-semibold mb-1">Format Penulisan Spesifikasi:</p>
+              <p>• H<sub>r</sub>/H<sub>1</sub>, H<sub>p</sub>/H, B dalam satuan <strong>cm</strong> (otomatis dikonversi ke m)</p>
+              <p>• t dalam satuan <strong>mm</strong> (otomatis dikonversi ke cm)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-1 spec-input-wrapper">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">H<sub>r</sub> / H<sub>1</sub> - Tinggi Rangka <span class="text-xs font-normal text-slate-500">(cm)</span></label>
+        <input type="number" name="h1" value="${state.formData.h1 || ''}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Contoh: 150" step="0.1" />
+        <span id="conversion-h1" class="spec-conversion ${state.formData.h1 ? '' : 'empty'}">${state.formData.h1 ? `= ${convH1.primary} ${convH1.conversion}` : 'Contoh: 150 cm = 1,50 m'}</span>
+      </div>
+      <div class="space-y-1 spec-input-wrapper">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">H<sub>p</sub> / H - Tinggi Daun Pintu <span class="text-xs font-normal text-slate-500">(cm)</span></label>
+        <input type="number" name="h" value="${state.formData.h || ''}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Contoh: 130" step="0.1" />
+        <span id="conversion-h" class="spec-conversion ${state.formData.h ? '' : 'empty'}">${state.formData.h ? `= ${convH.primary} ${convH.conversion}` : 'Contoh: 130 cm = 1,30 m'}</span>
+      </div>
+      <div class="space-y-1 spec-input-wrapper">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">B - Lebar Daun Pintu <span class="text-xs font-normal text-slate-500">(cm)</span></label>
+        <input type="number" name="b" value="${state.formData.b || ''}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Contoh: 100" step="0.1" />
+        <span id="conversion-b" class="spec-conversion ${state.formData.b ? '' : 'empty'}">${state.formData.b ? `= ${convB.primary} ${convB.conversion}` : 'Contoh: 100 cm = 1,00 m'}</span>
+      </div>
+      <div class="space-y-1 spec-input-wrapper">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">t - Ketebalan Pelat <span class="text-xs font-normal text-slate-500">(mm)</span></label>
+        <input type="number" name="t" value="${state.formData.t || ''}" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Contoh: 5" step="0.1" />
+        <span id="conversion-t" class="spec-conversion ${state.formData.t ? '' : 'empty'}">${state.formData.t ? `= ${convT.primary} ${convT.conversion}` : 'Contoh: 5 mm = 0,5 cm'}</span>
+      </div>
+      <div class="md:col-span-2 mt-4"><h3 class="font-bold text-slate-800 dark:text-white mb-3 flex items-center text-sm"><i data-lucide="clipboard-check" class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400"></i>Kondisi Komponen</h3></div>
+      <div class="space-y-1 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Daun Pintu</label>
+        <select name="kondisiDaunPintu" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm">
+          <option value="">Pilih Kondisi</option>
+          <option value="Beroperasi dengan baik" ${state.formData.kondisiDaunPintu === 'Beroperasi dengan baik' ? 'selected' : ''}>Beroperasi dengan baik</option>
+          <option value="Beroperasi terdapat kerusakan" ${state.formData.kondisiDaunPintu === 'Beroperasi terdapat kerusakan' ? 'selected' : ''}>Beroperasi terdapat kerusakan</option>
+          <option value="Rusak tidak dapat dioperasikan" ${state.formData.kondisiDaunPintu === 'Rusak tidak dapat dioperasikan' ? 'selected' : ''}>Rusak tidak dapat dioperasikan</option>
+        </select>
+      </div>
+      <div class="space-y-1 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Drat Stang</label>
+        <select name="kondisiDratStang" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm">
+          <option value="">Pilih Kondisi</option>
+          <option value="Beroperasi dengan baik" ${state.formData.kondisiDratStang === 'Beroperasi dengan baik' ? 'selected' : ''}>Beroperasi dengan baik</option>
+          <option value="Beroperasi terdapat kerusakan" ${state.formData.kondisiDratStang === 'Beroperasi terdapat kerusakan' ? 'selected' : ''}>Beroperasi terdapat kerusakan</option>
+          <option value="Rusak tidak dapat dioperasikan" ${state.formData.kondisiDratStang === 'Rusak tidak dapat dioperasikan' ? 'selected' : ''}>Rusak tidak dapat dioperasikan</option>
+        </select>
+      </div>
+      <div class="space-y-1 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Rangka</label>
+        <select name="kondisiRangka" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm">
+          <option value="">Pilih Kondisi</option>
+          <option value="Beroperasi dengan baik" ${state.formData.kondisiRangka === 'Beroperasi dengan baik' ? 'selected' : ''}>Beroperasi dengan baik</option>
+          <option value="Beroperasi terdapat kerusakan" ${state.formData.kondisiRangka === 'Beroperasi terdapat kerusakan' ? 'selected' : ''}>Beroperasi terdapat kerusakan</option>
+          <option value="Rusak tidak dapat dioperasikan" ${state.formData.kondisiRangka === 'Rusak tidak dapat dioperasikan' ? 'selected' : ''}>Rusak tidak dapat dioperasikan</option>
+        </select>
+      </div>
+      <div class="space-y-1 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300">Keterangan Umum</label>
+        <textarea name="keterangan" rows="3" class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm" placeholder="Jelaskan kondisi secara detail...">${escapeHtml(state.formData.keterangan)}</textarea>
+      </div>
+      <div class="space-y-3 md:col-span-2">
+        <label class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-between">
+          <span>Foto Dokumentasi (Max 10 foto)</span>
+          <span class="text-xs font-normal text-slate-500">${state.formData.photos.length}/10</span>
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="button" id="btn-trigger-camera" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 transition-all text-blue-700 dark:text-blue-300">
+            <i data-lucide="camera" class="w-8 h-8 mb-2"></i>
+            <span class="font-bold text-sm">Kamera</span>
+            <span class="text-[10px] text-blue-600 dark:text-blue-400 mt-1 text-center">+ Watermark otomatis</span>
+          </button>
+          <button type="button" id="btn-trigger-file" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 transition-all text-slate-700 dark:text-slate-300">
+            <i data-lucide="upload" class="w-8 h-8 mb-2"></i>
+            <span class="font-bold text-sm">Pilih File</span>
+            <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 text-center">Dari galeri/file</span>
+          </button>
+        </div>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" />
+        <input type="file" id="file-input" multiple accept="image/*" class="hidden" />
+        <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3"></div>
+      </div>
+    </div>
+    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-700">
+      <button type="submit" ${state.isSyncing ? 'disabled' : ''} class="w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all flex items-center justify-center space-x-2 ${state.isSyncing ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl'}">
+        ${state.isSyncing ? '<div class="loading-spinner mr-2"></div><span>Mengirim data...</span>' : '<i data-lucide="upload" class="w-4 h-4"></i><span>Simpan Data (Ctrl+S)</span>'}
+      </button>
+    </div>
+  </form>
+</div>
+`;
+}
+
+function setupInputFormListeners() {
+  const form = document.getElementById('input-form');
+  if (!form) return;
+  form.addEventListener('submit', handleSubmit);
+  form.querySelectorAll('input, textarea, select').forEach(input => {
+    input.addEventListener('input', handleInputChange);
+    input.addEventListener('change', handleInputChange);
+  });
+  const jenisSelect = document.getElementById('select-jenis-pintu');
+  const jenisLainnyaInput = document.getElementById('input-jenis-lainnya');
+  if (jenisSelect && jenisLainnyaInput) {
+    jenisSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'Lainnya') { jenisLainnyaInput.classList.remove('hidden'); jenisLainnyaInput.focus(); }
+      else { jenisLainnyaInput.classList.add('hidden'); state.formData.jenisPintuLainnya = ''; jenisLainnyaInput.value = ''; }
+    });
+  }
+  // ✅ Bind tombol via JS (bukan inline onclick)
+  const btnGetLoc = document.getElementById('btn-get-location');
+  const btnCamera = document.getElementById('btn-trigger-camera');
+  const btnFile = document.getElementById('btn-trigger-file');
+  const cameraInput = document.getElementById('camera-input');
+  const fileInput = document.getElementById('file-input');
+  if (btnGetLoc) btnGetLoc.addEventListener('click', getLocation);
+  if (btnCamera) btnCamera.addEventListener('click', triggerCamera);
+  if (btnFile) btnFile.addEventListener('click', triggerFile);
+  if (cameraInput) cameraInput.addEventListener('change', (e) => handlePhotoUpload(e, true));
+  if (fileInput) fileInput.addEventListener('change', (e) => handlePhotoUpload(e, false));
+  ['h1', 'h', 'b', 't'].forEach(field => updateSpecConversion(field, state.formData[field]));
+}
+
+// ============================================
+// DATA TAB - ✅ FIXED: Partial update, tidak kehilangan fokus
+// ============================================
+function renderDataTab() {
+  const filteredData = getFilteredData();
+  const paginatedData = getPaginatedData(filteredData);
+  const totalPages = Math.ceil(filteredData.length / CONFIG.ITEMS_PER_PAGE);
+  return `
+<div class="max-w-6xl mx-auto">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 space-y-3 md:space-y-0">
+    <div><h2 class="text-xl font-bold text-slate-800 dark:text-white">Database Pintu Irigasi</h2><p class="text-slate-500 dark:text-slate-400 text-sm">${filteredData.length} dari ${state.savedData.length} data</p></div>
+    <div class="flex space-x-2 w-full md:w-auto">
+      <button data-action="export-excel" class="flex-1 md:flex-none flex items-center justify-center space-x-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 font-semibold text-sm"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i><span>Excel</span></button>
+      <button data-action="refresh-data" class="flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 p-2 rounded-xl border border-blue-200 dark:border-blue-800" aria-label="Refresh data"><i data-lucide="refresh-cw" class="w-4 h-4 ${state.isLoadingData ? 'animate-spin-custom' : ''}"></i></button>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-4 mb-5 border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Cari</label>
+        <input type="text" id="search-input" placeholder="Daerah irigasi/saluran/petugas..." value="${escapeHtml(state.searchTerm)}" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm" />
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Jenis Pintu</label>
+        <select id="filter-jenis" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm">
+          <option value="">Semua</option>
+          ${CONFIG.JENIS_PINTU_OPTIONS.map(opt => `<option value="${opt}" ${state.filters.jenis === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Kondisi</label>
+        <select id="filter-kondisi" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm">
+          <option value="">Semua</option>
+          <option value="baik" ${state.filters.kondisi === 'baik' ? 'selected' : ''}>Baik</option>
+          <option value="kerusakan" ${state.filters.kondisi === 'kerusakan' ? 'selected' : ''}>Ada Kerusakan</option>
+          <option value="rusak" ${state.filters.kondisi === 'rusak' ? 'selected' : ''}>Rusak</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Tanggal</label>
+        <input type="date" id="filter-tanggal" value="${state.filters.tanggal}" class="w-full mt-1 p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white text-sm" />
+      </div>
+    </div>
+    <div class="flex justify-end space-x-2 mt-3">
+      <button data-action="reset-filters" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-semibold text-sm">Reset</button>
+      <button data-action="apply-filters" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-semibold text-sm">Terapkan Filter</button>
+    </div>
+  </div>
+  <div id="data-grid-container">${renderDataGridContent(filteredData, paginatedData, totalPages)}</div>
+</div>
+`;
+}
+
+// ✅ Helper: Render data grid dengan data-item-id (XSS safe)
+function renderDataGridContent(filteredData, paginatedData, totalPages) {
+  if (state.isLoadingData) return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${[1,2,3,4,5,6].map(() => `<div class="bg-white dark:bg-slate-800 rounded-2xl h-72 animate-skeleton border border-slate-200 dark:border-slate-700"></div>`).join('')}</div>`;
+  if (paginatedData.length === 0) return `<div class="bg-white dark:bg-slate-800 p-8 rounded-2xl border border-slate-200 dark:border-slate-700 text-center text-slate-500"><i data-lucide="database" class="w-10 h-10 mx-auto mb-3"></i><p class="text-sm">Tidak ada data yang cocok.</p></div>`;
+  
+  // ✅ Simpan item ke ItemStore
+  const itemsWithIds = paginatedData.map(item => ({ item, id: ItemStore.set(item) }));
+  
+  return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    ${itemsWithIds.map((entry, idx) => {
+      const item = entry.item;
+      const firstPhoto = (item["URL Foto"] || '').split(',')[0];
+      return `<div data-item-id="${entry.id}" class="data-card bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md cursor-pointer">
+        <div class="h-40 bg-slate-100 dark:bg-slate-700 relative">
+          ${firstPhoto ? `<img data-src="${firstPhoto}" alt="Pintu" class="lazy-image w-full h-full object-cover blur-placeholder" />` : `<div class="flex items-center justify-center h-full text-slate-400"><i data-lucide="camera" class="w-7 h-7"></i></div>`}
+          <div class="absolute bottom-2 right-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur text-[10px] px-2 py-1 rounded-md font-semibold">${escapeHtml(item["Jenis Pintu"] || '-')}</div>
+        </div>
+        <div class="p-4">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-sm text-slate-800 dark:text-white leading-tight">${escapeHtml(item["Nama Daerah Irigasi"] || '-')}</h3>
+            <span class="text-[9px] text-slate-400 bg-slate-50 dark:bg-slate-700 px-1.5 py-0.5 rounded whitespace-nowrap ml-2">${formatDate(item["Timestamp"])}</span>
+          </div>
+          <p class="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2">${escapeHtml(item["Nama Saluran"] || '-')}</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2"><i data-lucide="user" class="w-3 h-3 inline"></i> ${escapeHtml(item["Nama Petugas/PPA"] || '-')}</p>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>
+  ${totalPages > 1 ? `<div class="flex justify-center items-center space-x-1.5 mt-6">
+    <button data-action="prev-page" ${state.currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white text-sm ${state.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">Prev</button>
+    <div class="flex space-x-0.5">
+      ${Array.from({length: Math.min(totalPages, 5)}, (_, i) => {
+        let pageNum = totalPages <= 5 ? i + 1 : state.currentPage <= 3 ? i + 1 : state.currentPage >= totalPages - 2 ? totalPages - 4 + i : state.currentPage - 2 + i;
+        return `<button data-action="goto-page" data-page="${pageNum}" class="w-8 h-8 rounded-lg border ${state.currentPage === pageNum ? 'bg-blue-600 text-white border-blue-600' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white'} text-sm">${pageNum}</button>`;
+      }).join('')}
+    </div>
+    <button data-action="next-page" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white text-sm ${state.currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">Next</button>
+  </div>` : ''}`;
+}
+
+function setupDataListeners() {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value, (value) => {
+        state.searchTerm = value;
+        state.currentPage = 1;
+        MemoCache.clear();
+        // ✅ PARTIAL UPDATE - tidak menghancurkan input search!
+        renderDataGridOnly();
+      });
+    });
+  }
+  
+  const gridContainer = document.getElementById('data-grid-container');
+  if (gridContainer) {
+    // ✅ Event delegation untuk data cards & pagination
+    gridContainer.addEventListener('click', (e) => {
+      // Card click
+      const card = e.target.closest('.data-card');
+      if (card && card.dataset.itemId) {
+        const item = ItemStore.get(card.dataset.itemId);
+        if (item) openPhotoModal(item);
+        return;
+      }
+      // Pagination
+      const actionBtn = e.target.closest('[data-action]');
+      if (actionBtn) {
+        const action = actionBtn.dataset.action;
+        if (action === 'prev-page' && state.currentPage > 1) changePage(state.currentPage - 1);
+        else if (action === 'next-page') changePage(state.currentPage + 1);
+        else if (action === 'goto-page') changePage(parseInt(actionBtn.dataset.page));
+      }
+    });
+  }
+  
+  const jenisFilter = document.getElementById('filter-jenis');
+  const kondisiFilter = document.getElementById('filter-kondisi');
+  const tanggalFilter = document.getElementById('filter-tanggal');
+  if (jenisFilter) jenisFilter.addEventListener('change', (e) => { state.filters.jenis = e.target.value; });
+  if (kondisiFilter) kondisiFilter.addEventListener('change', (e) => { state.filters.kondisi = e.target.value; });
+  if (tanggalFilter) tanggalFilter.addEventListener('change', (e) => { state.filters.tanggal = e.target.value; });
+  
+  // ✅ Event delegation untuk action buttons di luar grid
+  const content = document.getElementById('content-area');
+  content.addEventListener('click', (e) => {
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+    const action = actionBtn.dataset.action;
+    if (action === 'export-excel') exportToExcel();
+    else if (action === 'refresh-data') fetchOnlineData();
+    else if (action === 'reset-filters') resetFilters();
+    else if (action === 'apply-filters') applyFilters();
+  });
+}
+
+// ✅ FIXED: Partial update - tidak menghancurkan input search
+function renderDataGridOnly() {
+  const gridContainer = document.getElementById('data-grid-container');
+  if (!gridContainer) return;
+  const filteredData = getFilteredData();
+  const paginatedData = getPaginatedData(filteredData);
+  const totalPages = Math.ceil(filteredData.length / CONFIG.ITEMS_PER_PAGE);
+  gridContainer.innerHTML = renderDataGridContent(filteredData, paginatedData, totalPages);
+  if (window.lucide) lucide.createIcons({ nodes: [gridContainer] });
+  LazyLoader.observeAll('.lazy-image');
+}
+
+// ============================================
+// SYNC TAB
+// ============================================
+function renderSyncTab() {
+  let queueHtml = '';
+  if (state.syncQueue.length === 0) {
+    queueHtml = `<div class="flex flex-col items-center justify-center py-8 text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl"><i data-lucide="check-circle-2" class="w-10 h-10 text-emerald-400 mb-3"></i><p class="text-sm">Semua data sudah tersinkronisasi.</p></div>`;
+  } else {
+    queueHtml = `<div class="space-y-3">
+      ${state.syncQueue.map(item => `
+        <div class="flex items-center justify-between p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-700/50">
+          <div class="flex items-center space-x-3 overflow-hidden flex-1">
+            <div class="truncate flex-1">
+              <h4 class="font-bold text-slate-700 dark:text-white truncate text-sm">${escapeHtml(item.namaDaerahIrigasi)}</h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400">${escapeHtml(item.jenisPintu)} • ${formatTime(item.timestamp)}</p>
+            </div>
+          </div>
+          <button data-delete-id="${item.id}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg" aria-label="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      `).join('')}
+      <button data-action="auto-sync" ${!state.isOnline || state.isSyncing ? 'disabled' : ''} class="w-full mt-5 py-3 rounded-xl font-bold text-white shadow-md flex items-center justify-center space-x-2 ${!state.isOnline ? 'bg-slate-400 cursor-not-allowed' : state.isSyncing ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}">
+        <i data-lucide="refresh-cw" class="w-4 h-4 ${state.isSyncing ? 'animate-spin-custom' : ''}"></i>
+        <span class="text-sm">${state.isSyncing ? 'Menyinkronkan Data...' : `Sinkronisasi Sekarang (${state.syncQueue.length})`}</span>
+      </button>
+    </div>`;
+  }
+  return `<div class="max-w-3xl mx-auto"><div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-lg font-bold text-slate-800 dark:text-white">Antrean Offline</h2><p class="text-slate-500 dark:text-slate-400 text-sm">Data menunggu dikirim ke server.</p></div>
+      <div class="p-2.5 rounded-full ${state.isOnline ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600'}"><i data-lucide="${state.isOnline ? 'wifi' : 'wifi-off'}" class="w-5 h-5"></i></div>
+    </div>${queueHtml}</div></div>`;
+}
+
+function setupSyncListeners() {
+  const content = document.getElementById('content-area');
+  content.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('[data-delete-id]');
+    if (deleteBtn) {
+      deleteOfflineData(deleteBtn.dataset.deleteId);
+      return;
+    }
+    const actionBtn = e.target.closest('[data-action]');
+    if (actionBtn && actionBtn.dataset.action === 'auto-sync') {
+      autoSync();
+    }
+  });
+}
+
+// ============================================
+// GLOBAL EVENT LISTENERS
+// ============================================
+function setupGlobalListeners() {
+  window.addEventListener('online', () => { state.isOnline = true; renderOnlineStatus(); showToast("Koneksi tersambung!", "success"); autoSync(); });
+  window.addEventListener('offline', () => { state.isOnline = false; renderOnlineStatus(); showToast("Mode offline aktif.", "warning"); });
+  
+  document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+    state.mobileMenuOpen = !state.mobileMenuOpen;
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('mobile-menu-btn');
+    if (state.mobileMenuOpen) { menu.classList.remove('hidden'); btn.innerHTML = '<i data-lucide="x" class="w-6 h-6"></i>'; }
+    else { menu.classList.add('hidden'); btn.innerHTML = '<i data-lucide="menu" class="w-6 h-6"></i>'; }
+    if (window.lucide) lucide.createIcons({ nodes: [btn] });
+  });
+  
+  // ✅ Bind modal buttons via JS (XSS safe)
+  const btnToggleDark = document.getElementById('btn-toggle-dark');
+  const btnToggleDarkMobile = document.getElementById('btn-toggle-dark-mobile');
+  const btnPrint = document.getElementById('btn-print');
+  const btnPdf = document.getElementById('btn-pdf');
+  const btnCloseModal = document.getElementById('btn-close-modal');
+  const btnCloseZoom = document.getElementById('btn-close-zoom');
+  const btnCloseShortcuts = document.getElementById('btn-close-shortcuts');
+  
+  if (btnToggleDark) btnToggleDark.addEventListener('click', toggleDarkMode);
+  if (btnToggleDarkMobile) btnToggleDarkMobile.addEventListener('click', toggleDarkMode);
+  if (btnPrint) btnPrint.addEventListener('click', printCurrentItem);
+  if (btnPdf) btnPdf.addEventListener('click', exportCurrentItemPDF);
+  if (btnCloseModal) btnCloseModal.addEventListener('click', closePhotoModal);
+  if (btnCloseZoom) btnCloseZoom.addEventListener('click', closeImageZoom);
+  if (btnCloseShortcuts) btnCloseShortcuts.addEventListener('click', closeShortcutsModal);
+}
+
+// ============================================
+// INIT
+// ============================================
+async function init() {
+  try {
+    PerfMonitor.mark('init-start');
+    await IDB.init();
+    LazyLoader.init();
+    initDarkMode();
+    await loadQueueFromStorage();
+    await loadDraft();
+    renderNavigation();
+    renderOnlineStatus();
+    renderCurrentTab();
+    setupGlobalListeners();
+    setupBeforeUnload();
+    setupKeyboardShortcuts();
+    startAutoSave();
+    if (state.isOnline && !CONFIG.APPS_SCRIPT_URL.includes("YOUR_SCRIPT_ID_HERE")) fetchOnlineData();
+    document.getElementById('app-loading').classList.add('hidden');
+    PerfMonitor.mark('init-complete');
+    PerfMonitor.update();
+    console.log("✅ Sistem Inventarisasi Pintu Air - Kantor Benculuk v5.1");
+    console.log("🔒 XSS Protection: Event delegation + data attributes");
+    console.log("🔍 Search Focus: Partial update, input tidak kehilangan fokus");
+    console.log("📱 PWA: Installable, offline-capable");
+    console.log("📐 Spesifikasi: Hᵣ/H₁, Hₚ/H, B, t dengan konversi otomatis");
+  } catch (error) {
+    console.error("Init error:", error);
+    document.getElementById('app-loading').innerHTML = `<div class="text-center p-8"><h2 class="text-xl font-bold text-slate-800 mb-2">Gagal Memuat Aplikasi</h2><p class="text-slate-600 mb-4">${error.message}</p><button onclick="location.reload()" class="px-6 py-2 bg-blue-600 text-white rounded-lg">Coba Lagi</button></div>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
